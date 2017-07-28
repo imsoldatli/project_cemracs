@@ -9,6 +9,7 @@ Created on Mon Jul 24 09:24:22 2017
 import numpy as np
 import math
 import copy
+import matplotlib.pyplot as plt
 
 def b(i,j,X,Y,Z,X_initial_probs):
     num_initial=len(X[0])
@@ -22,15 +23,29 @@ def b(i,j,X,Y,Z,X_initial_probs):
 def b_example_72(i,j,X,Y,Z,X_initial_probs):
     return rho*math.cos(Y[i][j])
     
-
+def b_example_73(i,j,X,Y,Z,X_initial_probs):
+    return -rho*Y[i][j]
+    
 def f(i,j,X,Y,Z):
     return a*Y[i][j]
+
+def f_example_73(i,j,X,Y,Z,X_initial_probs):
+    num_initial=len(X[0])
+    X_mean=0
+    for k in range(len(X[i])):
+        num_per_initial=len(X[i])/num_initial
+        index=int(math.floor(k/num_per_initial))
+        X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
+    return -math.atan(X_mean)
 
 def g(x):
     return x
     
 def g_example_72(x):
     return math.sin(x)
+    
+def g_example_73(x):
+    return math.atan(x)
 
 def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
     num_initial=len(X[0])
@@ -50,26 +65,33 @@ def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
             Y_old=Y
         
         if use_example_72:
-            #evaluate at T
-#            for j in range(num_initial*2**(num_t_fine-1)):
-#                Y[num_t_fine-1][j]=math.sin(X[num_t_fine-1][j])
             for n in range(num_t_fine-1):
                 i=num_t_fine-2-n
                 for j in range(num_initial*2**i):   
                     Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0
+        elif use_example_73:
+            for n in range(num_t_fine-1):
+                i=num_t_fine-2-n
+                for j in range(num_initial*2**i):
+                    #Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f_example_73(i+1,2*j,X,Y,Z)+delta_t_fine*f_example_73(i+1,2*j+1,X,Y,Z))/2.0
+                    Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f_example_73(i,j,X,Y_old,Z,X_initial_probs)
+                    Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
         else:
             for n in range(num_t_fine-1):
                 i=num_t_fine-2-n
                 for j in range(num_initial*2**i):
                     #Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z)+delta_t_fine*f(i+1,2*j+1,X,Y,Z))/2.0
                     Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y_old,Z)
-                    Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
+                    Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0          
     
         for i in range(num_t_fine-1):
             for j in range(num_initial*2**i):
                 if use_example_72:
                     X[i+1][2*j]=X[i][j]+delta_t_fine*b_example_72(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
                     X[i+1][2*j+1]=X[i][j]+delta_t_fine*b_example_72(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
+                elif use_example_73:
+                    X[i+1][2*j]=X[i][j]+delta_t_fine*b_example_73(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
+                    X[i+1][2*j+1]=X[i][j]+delta_t_fine*b_example_73(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W                    
                 else:
                     X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
                     X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
@@ -84,6 +106,8 @@ def solver(level,xi_vals,xi_probs):
         for i in range(num_initial):
             if use_example_72:
                 Y_terminal[i]=g_example_72(xi_vals[i])
+            elif use_example_73:
+                Y_terminal[i]=g_example_73(xi_vals[i])
             else:
                 Y_terminal[i]=g(xi_vals[i])
         return Y_terminal
@@ -107,6 +131,10 @@ def solver(level,xi_vals,xi_probs):
         row2=np.zeros((num_initial*2**i))
         Y.append(row2)
     X=(solver_bar(X,Y_terminal,xi_probs,Y))[0]
+
+    if level==0:
+        Y_0_values=np.zeros((num_keep))
+        index=0
     
     for j in range(J):
         X_terminal=X[num_t_fine-1]
@@ -116,42 +144,62 @@ def solver(level,xi_vals,xi_probs):
         else:
             Y_terminal=solver(level+1,X_terminal,X_terminal_probs)
         [X,Y,Z]=solver_bar(X,Y_terminal,xi_probs,Y)
-        #printing Y[0] for each iteration to observe bifurcation
-        if level==0:
-            print('Iteration ',j)
-            print(Y[0])
+        if level==0 and j>J-num_keep-1:
+            Y_0_values[index]=Y[0]
+            index+=1
+            
     Y_initial=Y[0]
     if level==0:
-        return [Y_initial,X,Y,Z]
+        return [Y_initial,X,Y,Z,Y_0_values]
     return Y_initial
 
 if __name__ == '__main__':
+    global use_example_72
+    use_example_72=True
+    global use_example_73
+    use_example_73=False
     global J
-    J=5
+    J=10
+    global num_keep
+    num_keep=5
+    global num_intervals_total
+    num_intervals_total=10
+    global T
     T=1.0
-    global num_t_coarse
-    num_t_coarse=2
-    global delta_t_coarse
-    delta_t_coarse=T/(num_t_coarse-1)
-    global num_t_fine
-    num_t_fine=3
-    global delta_t_fine
-    delta_t_fine=delta_t_coarse/(num_t_fine-1)
-    
     global sigma
     sigma=1
-    global delta_W
-    delta_W=math.sqrt(delta_t_fine)
-    global rho
-    rho=0.1
     global a
-    a=0.25
-    global use_example_72
-    use_example_72=False
-    
+    a=0.25 
     x_0=[2.0]
     x_0_probs=[1.0]
-    [Y_initial,X,Y,Z]=solver(0,x_0,x_0_probs)
+
+    num_rho=20
+    rho_values=np.linspace(1,6,num_rho)
+    for index in range(num_rho):
+
+        global num_intervals_coarse
+        num_intervals_coarse=1
+        global rho
+        rho=rho_values[index]
+        
+        global num_t_coarse
+        num_t_coarse=num_intervals_coarse+1
+        global delta_t_coarse
+        delta_t_coarse=T/(num_t_coarse-1)
+        global num_t_fine
+        num_t_fine=num_intervals_total/num_intervals_coarse+1
+        global delta_t_fine
+        delta_t_fine=delta_t_coarse/(num_t_fine-1)
+        
+        global delta_W
+        delta_W=math.sqrt(delta_t_fine) 
+    
+        [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
+        print(Y_0_values)
+        for index2 in range(num_keep):
+            plt.scatter(rho,Y_0_values[index2])
+    plt.savefig('one_level_example_73.eps')
+        
     
     Y_0=0
     m_0=0
@@ -166,6 +214,6 @@ if __name__ == '__main__':
     print(Y_0)
     
     print('Log Num Time Steps')
-    print(math.log(num_t_fine-1))
+    print(math.log(num_intervals_total))
     print('Log Difference')
     print(math.log(abs(true_Y_0-Y_0)))
