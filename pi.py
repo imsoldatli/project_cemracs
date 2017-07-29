@@ -7,7 +7,7 @@ def pi(x,x_min,x_max,delta_x):
 
     low=(x-x_min)//delta_x
 
-    if low>num_t-1:
+    if low>=num_x-1:
 
         x_index=num_x-1
 
