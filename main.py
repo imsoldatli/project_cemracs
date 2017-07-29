@@ -155,9 +155,9 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     global use_example_72
-    use_example_72=True
+    use_example_72=False
     global use_example_73
-    use_example_73=False
+    use_example_73=True
     global J
     J=10
     global num_keep
@@ -166,21 +166,26 @@ if __name__ == '__main__':
     num_intervals_total=10
     global T
     T=1.0
-    global sigma
-    sigma=1
     global a
     a=0.25 
     x_0=[2.0]
     x_0_probs=[1.0]
 
-    num_rho=20
+    num_rho=1
     rho_values=np.linspace(1,6,num_rho)
-    for index in range(num_rho):
+    num_sigma=15
+    sigma_values=np.linspace(0.5,10,num_sigma)
+    #for index in range(num_rho):
+    for index in range(num_sigma):
 
         global num_intervals_coarse
         num_intervals_coarse=1
         global rho
-        rho=rho_values[index]
+        #rho=rho_values[index]
+        rho=2
+        global sigma
+        sigma=sigma_values[index]
+        
         
         global num_t_coarse
         num_t_coarse=num_intervals_coarse+1
@@ -197,8 +202,10 @@ if __name__ == '__main__':
         [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
         print(Y_0_values)
         for index2 in range(num_keep):
-            plt.scatter(rho,Y_0_values[index2])
-    plt.savefig('one_level_example_73.eps')
+            #plt.scatter(rho,Y_0_values[index2])
+            plt.scatter(sigma,Y_0_values[index2])
+    #plt.savefig('one_level_example_73.eps')
+    plt.savefig('one_level_example_73_change_sigma.eps')
         
     
     Y_0=0
