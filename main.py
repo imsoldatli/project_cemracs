@@ -8,10 +8,9 @@ Created on Mon Jul 24 09:24:22 2017
 
 import numpy as np
 import math
-import copy
 import matplotlib.pyplot as plt
 
-def b(i,j,X,Y,Z,X_initial_probs):
+def b_example_1(i,j,X,Y,Z,X_initial_probs):
     num_initial=len(X[0])
     Y_mean=0
     for k in range(len(Y[i])):
@@ -26,8 +25,11 @@ def b_example_72(i,j,X,Y,Z,X_initial_probs):
 def b_example_73(i,j,X,Y,Z,X_initial_probs):
     return -rho*Y[i][j]
     
-def f(i,j,X,Y,Z):
+def f_example_1(i,j,X,Y,Z,X_initial_probs):
     return a*Y[i][j]
+
+def f_example_72(i,j,X,Y,Z,X_initial_probs):
+    return 0
 
 def f_example_73(i,j,X,Y,Z,X_initial_probs):
     num_initial=len(X[0])
@@ -38,7 +40,7 @@ def f_example_73(i,j,X,Y,Z,X_initial_probs):
         X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
     return -math.atan(X_mean)
 
-def g(x):
+def g_example_1(x):
     return x
     
 def g_example_72(x):
@@ -64,37 +66,17 @@ def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
         if k>0:
             Y_old=Y
         
-        if use_example_72:
-            for n in range(num_t_fine-1):
-                i=num_t_fine-2-n
-                for j in range(num_initial*2**i):   
-                    Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0
-        elif use_example_73:
-            for n in range(num_t_fine-1):
-                i=num_t_fine-2-n
-                for j in range(num_initial*2**i):
-                    #Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f_example_73(i+1,2*j,X,Y,Z)+delta_t_fine*f_example_73(i+1,2*j+1,X,Y,Z))/2.0
-                    Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f_example_73(i,j,X,Y_old,Z,X_initial_probs)
-                    Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
-        else:
-            for n in range(num_t_fine-1):
-                i=num_t_fine-2-n
-                for j in range(num_initial*2**i):
-                    #Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z)+delta_t_fine*f(i+1,2*j+1,X,Y,Z))/2.0
-                    Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y_old,Z)
-                    Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0          
+        for n in range(num_t_fine-1):
+            i=num_t_fine-2-n
+            for j in range(num_initial*2**i):
+                #Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z,X_initial_probs)+delta_t_fine*f(i+1,2*j+1,X,Y,Z,X_initial_probs))/2.0
+                Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y_old,Z,X_initial_probs)
+                Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0          
     
         for i in range(num_t_fine-1):
             for j in range(num_initial*2**i):
-                if use_example_72:
-                    X[i+1][2*j]=X[i][j]+delta_t_fine*b_example_72(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
-                    X[i+1][2*j+1]=X[i][j]+delta_t_fine*b_example_72(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
-                elif use_example_73:
-                    X[i+1][2*j]=X[i][j]+delta_t_fine*b_example_73(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
-                    X[i+1][2*j+1]=X[i][j]+delta_t_fine*b_example_73(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W                    
-                else:
-                    X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
-                    X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
+                X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
+                X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
     return [X,Y,Z]
 
 def solver(level,xi_vals,xi_probs):
@@ -104,12 +86,7 @@ def solver(level,xi_vals,xi_probs):
         #print('break condition')
         Y_terminal=np.zeros((num_initial))
         for i in range(num_initial):
-            if use_example_72:
-                Y_terminal[i]=g_example_72(xi_vals[i])
-            elif use_example_73:
-                Y_terminal[i]=g_example_73(xi_vals[i])
-            else:
-                Y_terminal[i]=g(xi_vals[i])
+            Y_terminal[i]=g(xi_vals[i])
         return Y_terminal
     X=[]
     for i in range(num_t_fine):
@@ -138,11 +115,7 @@ def solver(level,xi_vals,xi_probs):
     
     for j in range(J):
         X_terminal=X[num_t_fine-1]
-        #figure out how to break from loop
-        if j==1 and level==num_t_coarse-2:
-            Y_terminal=solver(level+1,X_terminal,X_terminal_probs)
-        else:
-            Y_terminal=solver(level+1,X_terminal,X_terminal_probs)
+        Y_terminal=solver(level+1,X_terminal,X_terminal_probs)
         [X,Y,Z]=solver_bar(X,Y_terminal,xi_probs,Y)
         if level==0 and j>J-num_keep-1:
             Y_0_values[index]=Y[0]
@@ -154,10 +127,12 @@ def solver(level,xi_vals,xi_probs):
     return Y_initial
 
 if __name__ == '__main__':
-    global use_example_72
-    use_example_72=False
-    global use_example_73
-    use_example_73=True
+    global b
+    b=b_example_1
+    global f
+    f=f_example_1
+    global g
+    g=g_example_1
     global J
     J=10
     global num_keep
@@ -173,19 +148,18 @@ if __name__ == '__main__':
 
     num_rho=1
     rho_values=np.linspace(1,6,num_rho)
-    num_sigma=15
+    num_sigma=1
     sigma_values=np.linspace(0.5,10,num_sigma)
     #for index in range(num_rho):
     for index in range(num_sigma):
-
         global num_intervals_coarse
         num_intervals_coarse=1
         global rho
         #rho=rho_values[index]
-        rho=2
+        rho=0.1
         global sigma
-        sigma=sigma_values[index]
-        
+        #sigma=sigma_values[index]
+        sigma=1
         
         global num_t_coarse
         num_t_coarse=num_intervals_coarse+1
@@ -203,9 +177,9 @@ if __name__ == '__main__':
         print(Y_0_values)
         for index2 in range(num_keep):
             #plt.scatter(rho,Y_0_values[index2])
-            plt.scatter(sigma,Y_0_values[index2])
+            #plt.scatter(sigma,Y_0_values[index2])
     #plt.savefig('one_level_example_73.eps')
-    plt.savefig('one_level_example_73_change_sigma.eps')
+    #plt.savefig('one_level_example_73_change_sigma.eps')
         
     
     Y_0=0
@@ -215,7 +189,7 @@ if __name__ == '__main__':
         m_0+=x_0[k]*x_0_probs[k]
 
     true_Y_0=m_0*math.exp(a*T)/(1+rho/a*(math.exp(a*T)-1.0))
-    print('True Answer: Y_0=')
+    print('True Answer For Example 1: Y_0=')
     print(true_Y_0)
     print('Our Answer: Y_0=')
     print(Y_0)
