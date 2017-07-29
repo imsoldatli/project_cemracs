@@ -23,7 +23,7 @@ if __name__ == '__main__':
     global delta_t
     delta_t=T/(num_t-1)
     global t_grid
-    t_grid=linspace(0,T,num_t)
+    t_grid=np.linspace(0,T,num_t)
     global x_min
     x_min=-5
     global x_max
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     global delta_x
     delta_x=(x_max-x_min)/(num_x-1)
     global x_grid
-    x_grid=linspace(x_min,x_max,num_x)
+    x_grid=np.linspace(x_min,x_max,num_x)
     global sigma
     sigma=1
 
