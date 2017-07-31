@@ -120,27 +120,31 @@ if __name__ == '__main__':
     global g
     g=g_example_1
     global J
-    J=10
+    J=25
     global num_keep
     num_keep=5
     global T
     T=1.0
+    global sigma
+    sigma=1
     global num_t
-    num_t=10
+    num_t=1000
     global delta_t
     delta_t=T/(num_t-1)
     global t_grid
     t_grid=np.linspace(0,T,num_t)
-    global x_min
-    x_min=-5
-    global x_max
-    x_max=5
-    global num_x
-    num_x=10
     global delta_x
-    delta_x=float(x_max-x_min)/(num_x-1)
+    delta_x=sigma*math.sqrt(delta_t)
+    x_min_goal=0.0
+    x_max_goal=4.0
+    global num_x
+    num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
+    global x_min
+    x_min=x_min_goal
     global x_grid
-    x_grid=np.linspace(x_min,x_max,num_x)
+    x_grid = x_min+delta_x*np.arange(num_x)
+    global x_max
+    x_max=x_grid[num_x-1]
     
     global y_min
     y_min=-5
@@ -152,9 +156,6 @@ if __name__ == '__main__':
     delta_y=float(y_max-y_min)/(num_y-1)
     global y_grid
     y_grid=np.linspace(y_min,y_max,num_y)
-
-    global sigma
-    sigma=1
     
     global a
     a=0.25
@@ -171,5 +172,5 @@ if __name__ == '__main__':
     v=np.zeros((num_t,num_x))
     
     for j in range(J):
-     #   [u,v]=backward(mu,u,v)
+        [u,v]=backward(mu,u,v)
         mu=forward(u,v,mu_0)
