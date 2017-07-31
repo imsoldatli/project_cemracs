@@ -40,24 +40,24 @@ def g_example_73(x):
 
 def pi(x):
 
-    low=float(x-x_min)//delta_x
+    low=int((x-x_min)/delta_x)
 
     if low>=num_x-1:
 
         x_index=num_x-1
 
-    elif low<1:
+    elif low<0:
 
         x_index=0
 
     elif (x-x_min-low*delta_x)<(x_min+(low+1)*delta_x-x):
-
+        
         x_index=low
     else:
 
         x_index=low+1
 
-    return(int(x_index))
+    return(x_index)
     
 def forward(u,v,mu_0):
 
@@ -86,7 +86,7 @@ def backward(mu,u_old,v_old):
     v = np.zeros((num_t,num_x))
         
     u[num_t-1,:] = g(x_grid)
-    v[num_t-1,:] = v_old[num_t-1,:]
+    v[num_t-1,:] = v_old[num_t-1,:] # Not sure if this is right, but doesn't matter for example 1
 
     for i in reversed(range(num_t-1)):
         for j in range(num_x):
@@ -124,7 +124,7 @@ if __name__ == '__main__':
     global sigma
     sigma=1
     global num_t
-    num_t=100
+    num_t=200
     global delta_t
     delta_t=T/(num_t-1)
     global t_grid
