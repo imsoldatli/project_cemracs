@@ -13,8 +13,8 @@ import matplotlib.pyplot as plt
 def b_example_1(i,j,X,Y,Z,X_initial_probs):
     num_initial=len(X[0])
     Y_mean=0
+    num_per_initial=len(Y[i])/num_initial
     for k in range(len(Y[i])):
-        num_per_initial=len(Y[i])/num_initial
         index=int(math.floor(k/num_per_initial))
         Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
     return -rho*Y_mean
@@ -34,8 +34,8 @@ def f_example_72(i,j,X,Y,Z,X_initial_probs):
 def f_example_73(i,j,X,Y,Z,X_initial_probs):
     num_initial=len(X[0])
     X_mean=0
+    num_per_initial=len(X[i])/num_initial
     for k in range(len(X[i])):
-        num_per_initial=len(X[i])/num_initial
         index=int(math.floor(k/num_per_initial))
         X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
     return -math.atan(X_mean)
@@ -84,9 +84,7 @@ def solver(level,xi_vals,xi_probs):
     num_initial=len(xi_vals)
     if level==num_t_coarse-1:
         #print('break condition')
-        Y_terminal=np.zeros((num_initial))
-        for i in range(num_initial):
-            Y_terminal[i]=g(xi_vals[i])
+        Y_terminal=g(xi_vals)
         return Y_terminal
     X=[]
     for i in range(num_t_fine):

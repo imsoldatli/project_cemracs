@@ -10,9 +10,7 @@ import math
 import matplotlib.pyplot as plt
 
 def b_example_1(i,j,mu,u,v):
-    Y_mean=0
-    for k in range(num_x):
-        Y_mean+=u[i][k]*mu[i][k]
+    Y_mean=np.dot(u[i],mu[i])
     return -rho*Y_mean
     
 def b_example_72(i,j,mu,u,v):
@@ -28,9 +26,7 @@ def f_example_72(i,j,mu,u,v):
     return 0
 
 def f_example_73(i,j,mu,u,v):
-    X_mean=0
-    for k in range(num_x):
-        X_mean+=x_grid[k]*mu[i][j]
+    X_mean=np.dot(x_grid,mu[i])
     return -math.atan(X_mean)
 
 def g_example_1(x):
@@ -128,7 +124,7 @@ if __name__ == '__main__':
     global sigma
     sigma=1
     global num_t
-    num_t=1000
+    num_t=100
     global delta_t
     delta_t=T/(num_t-1)
     global t_grid
@@ -166,8 +162,7 @@ if __name__ == '__main__':
     mu_0[int(num_x/2)]=1.0
     mu=np.zeros((num_t,num_x))
     for k in range(num_t):
-        for j in range(num_x):
-            mu[k][j]=mu_0[j]
+        mu[k]=mu_0
     u=np.zeros((num_t,num_x))
     v=np.zeros((num_t,num_x))
     
