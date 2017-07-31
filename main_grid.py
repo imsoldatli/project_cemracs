@@ -14,7 +14,7 @@ def b_example_1(i,j,mu,u,v):
     return -rho*Y_mean
     
 def b_example_72(i,j,mu,u,v):
-    return rho*math.cos(u[i][j])
+    return rho*np.cos(u[i][j])
     
 def b_example_73(i,j,mu,u,v):
     return -rho*u[i][j]
@@ -27,16 +27,16 @@ def f_example_72(i,j,mu,u,v):
 
 def f_example_73(i,j,mu,u,v):
     X_mean=np.dot(x_grid,mu[i])
-    return -math.atan(X_mean)
+    return -np.arctan(X_mean)
 
 def g_example_1(x):
     return x
     
 def g_example_72(x):
-    return math.sin(x)
+    return np.sin(x)
     
 def g_example_73(x):
-    return math.atan(x)
+    return np.arctan(x)
 
 def pi(x):
 
@@ -90,20 +90,24 @@ def backward(mu,u_old,v_old):
 
     for i in reversed(range(num_t-1)):
         for j in range(num_x):
+            if i==num_t-2:
+                j_down = (x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t))
             
-            j_down = pi(x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t))
+                j_up = (x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t))
+            
+                u[i][j] = (g(j_down) + g(j_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+                v[i][j] = 1.0/np.sqrt(delta_t) * (g(j_up) - g(j_down))
+            else:
+                j_down = pi(x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t))
 
-#            j_down = pi((x_grid[j] + b(i+1,j,mu,u,v)*delta_t - sigma*np.sqrt(delta_t)), x_min,x_max,delta_x)
+                #j_down = pi((x_grid[j] + b(i+1,j,mu,u,v)*delta_t - sigma*np.sqrt(delta_t)))
             
-            j_up = pi(x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t))
+                j_up = pi(x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t))
 
-#            j_up = pi((x_grid[j] + b(i+1,j,mu,u,v)*delta_t + sigma*np.sqrt(delta_t)), x_min,x_max,delta_x)
+                #j_up = pi((x_grid[j] + b(i+1,j,mu,u,v)*delta_t + sigma*np.sqrt(delta_t)))
             
-            u[i][j] = (u[i+1][j_down] + u[i+1][j_up])/2.0 + delta_t*f(i,j,mu,u_old,v_old)
-           
-#            u[i][j] = y_grid[pi(((u[i+1][j_down] + delta_t*f(i+1,j_down,mu,u,v) + u[i+1][j_up] + delta_t*f(i+1,j_up,mu,u,v))/2.0), y_min, y_max, delta_y)]
-            
-            v[i][j] = 1.0/np.sqrt(delta_t) * (u[i+1][j_up] - u[i+1][j_down])
+                u[i][j] = (u[i+1][j_down] + u[i+1][j_up])/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+                v[i][j] = 1.0/np.sqrt(delta_t) * (u[i+1][j_up] - u[i+1][j_down])
 
     return [u,v]
 
@@ -124,34 +128,26 @@ if __name__ == '__main__':
     global sigma
     sigma=1
     global num_t
-    num_t=200
+    num_t=300
     global delta_t
     delta_t=T/(num_t-1)
     global t_grid
     t_grid=np.linspace(0,T,num_t)
     global delta_x
     delta_x=sigma*math.sqrt(delta_t)
-    x_min_goal=0.0
-    x_max_goal=4.0
+    x_min_goal=-1.0
+    x_max_goal=5.0
+    x_center=(x_min_goal+x_max_goal)/2.0
     global num_x
     num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
-    global x_min
-    x_min=x_min_goal
+    if num_x%2==0:
+        num_x+=1
     global x_grid
-    x_grid = x_min+delta_x*np.arange(num_x)
+    x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
+    global x_min
+    x_min=x_grid[0]
     global x_max
     x_max=x_grid[num_x-1]
-    
-    global y_min
-    y_min=-5
-    global y_max
-    y_max=5
-    global num_y
-    num_y=10
-    global delta_y
-    delta_y=float(y_max-y_min)/(num_y-1)
-    global y_grid
-    y_grid=np.linspace(y_min,y_max,num_y)
     
     global a
     a=0.25

@@ -20,7 +20,7 @@ def b_example_1(i,j,X,Y,Z,X_initial_probs):
     return -rho*Y_mean
     
 def b_example_72(i,j,X,Y,Z,X_initial_probs):
-    return rho*math.cos(Y[i][j])
+    return rho*np.cos(Y[i][j])
     
 def b_example_73(i,j,X,Y,Z,X_initial_probs):
     return -rho*Y[i][j]
@@ -44,10 +44,10 @@ def g_example_1(x):
     return x
     
 def g_example_72(x):
-    return math.sin(x)
+    return np.sin(x)
     
 def g_example_73(x):
-    return math.atan(x)
+    return np.arctan(x)
 
 def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
     num_initial=len(X[0])
@@ -126,11 +126,11 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     global b
-    b=b_example_1
+    b=b_example_73
     global f
-    f=f_example_1
+    f=f_example_73
     global g
-    g=g_example_1
+    g=g_example_73
     global J
     J=8
     global num_keep
@@ -141,7 +141,7 @@ if __name__ == '__main__':
     T=1.0
     global a
     a=0.25 
-    x_0=[2.0100756305184242]
+    x_0=[2.0]
     x_0_probs=[1.0]
 
     num_rho=1
@@ -154,7 +154,7 @@ if __name__ == '__main__':
         num_intervals_coarse=1
         global rho
         rho=rho_values[index]
-        rho=0.1
+        rho=1.0
         global sigma
         #sigma=sigma_values[index]
         sigma=1
