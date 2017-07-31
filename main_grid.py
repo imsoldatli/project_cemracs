@@ -9,34 +9,28 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
-def b_example_1(i,j,mu_0,u,v):
-    num_initial=len(X[0])
+def b_example_1(i,j,mu,u,v):
     Y_mean=0
-    for k in range(len(Y[i])):
-        num_per_initial=len(Y[i])/num_initial
-        index=int(math.floor(k/num_per_initial))
-        Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
+    for k in range(num_x):
+        Y_mean+=u[i][k]*mu[i][k]
     return -rho*Y_mean
     
-def b_example_72(i,j,mu_0,u,v):
-    return rho*math.cos(Y[i][j])
+def b_example_72(i,j,mu,u,v):
+    return rho*math.cos(u[i][j])
     
-def b_example_73(i,j,mu_0,u,v):
-    return -rho*Y[i][j]
+def b_example_73(i,j,mu,u,v):
+    return -rho*u[i][j]
     
-def f_example_1(i,j,X,Y,Z,X_initial_probs):
-    return a*Y[i][j]
+def f_example_1(i,j,mu,u,v):
+    return a*u[i][j]
 
-def f_example_72(i,j,X,Y,Z,X_initial_probs):
+def f_example_72(i,j,mu,u,v):
     return 0
 
-def f_example_73(i,j,X,Y,Z,X_initial_probs):
-    num_initial=len(X[0])
+def f_example_73(i,j,mu,u,v):
     X_mean=0
-    for k in range(len(X[i])):
-        num_per_initial=len(X[i])/num_initial
-        index=int(math.floor(k/num_per_initial))
-        X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
+    for k in range(num_x):
+        X_mean+=x_grid[k]*mu[i][j]
     return -math.atan(X_mean)
 
 def g_example_1(x):
@@ -48,7 +42,7 @@ def g_example_72(x):
 def g_example_73(x):
     return math.atan(x)
 
-def pi(x,x_min,x_max,delta_x):
+def pi(x):
 
     low=float(x-x_min)//delta_x
 
@@ -77,17 +71,17 @@ def forward(u,v,mu_0):
     for i in range(num_t-1): #t_i
        for j in range(num_x): #x_j
 
-           low=x_grid[j]+b(i,j,mu_0,u,v)*delta_t-sigma*sqrt(delta_t)
-           low_index=pi(low,x_min,x_max,delta_x)
+           low=x_grid[j]+b(i,j,mu,u,v)*delta_t-sigma*math.sqrt(delta_t)
+           low_index=pi(low)
            mu[i+1,low_index]+=mu[i,j]*0.5
 
-           up=x_grid[j]+b(i,j,mu_0,u,v)*delta_t+sigma*sqrt(delta_t)
-           up_index=pi(up,x_min,x_max,delta_x)
+           up=x_grid[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
+           up_index=pi(up)
            mu[i+1,up_index]+=mu[i,j]*0.5
 
 
-    print(mu)
-    print('the sum on each row is', mu.sum(axis=1))
+    #print(mu)
+    #print('the sum on each row is', mu.sum(axis=1))
     return mu
 
 if __name__ == '__main__':
@@ -121,6 +115,11 @@ if __name__ == '__main__':
     x_grid=np.linspace(x_min,x_max,num_x)
     global sigma
     sigma=1
+    
+    global a
+    a=0.25
+    global rho
+    rho=0.1
 
     mu_0=np.zeros((num_x))
     mu_0[int(num_x/2)]=1.0
@@ -133,4 +132,4 @@ if __name__ == '__main__':
     
     for j in range(J):
      #   [u,v]=backward(mu,u,v)
-        [mu]=forward(u,v,mu_0)
+        mu=forward(u,v,mu_0)
