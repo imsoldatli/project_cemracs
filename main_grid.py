@@ -3,8 +3,9 @@
 """
 Created on Fri Jul 28 17:37:27 2017
 
-@author: christy
+@author: Andrea Angiuli, Christy Graves, Houzhi Li
 """
+
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -126,13 +127,11 @@ if __name__ == '__main__':
     global g
     g=g_example_73
     global J
-    J=30
+    J=10
     global num_keep
     num_keep=5
     global T
     T=1.0
-    global sigma
-    sigma=10
     global num_t
     num_t=20
     global delta_t
@@ -140,7 +139,7 @@ if __name__ == '__main__':
     global t_grid
     t_grid=np.linspace(0,T,num_t)
     global delta_x
-    delta_x=sigma*(delta_t)**2
+    delta_x=delta_t**2
     x_min_goal=-1.0
     x_max_goal=5.0
     x_center=(x_min_goal+x_max_goal)/2.0
@@ -157,18 +156,44 @@ if __name__ == '__main__':
     
     global a
     a=0.25
-    global rho
-    rho=25.0
-
-    mu_0=np.zeros((num_x))
-    mu_0[int(num_x/2)]=1.0
-    mu=np.zeros((num_t,num_x))
-    for k in range(num_t):
-        mu[k]=mu_0
-    u=np.zeros((num_t,num_x))
-    v=np.zeros((num_t,num_x))
     
-    for j in range(J):
-        [u,v]=backward(mu,u,v)
-        mu=forward(u,v,mu_0)
-        print(u[0][int(num_x/2)])
+    
+    
+    num_rho=20
+    rho_values=np.linspace(1,6,num_rho)
+    num_sigma=1
+    sigma_values=np.linspace(0.5,10,num_sigma)
+    all_Y_0_values=np.zeros((num_rho,num_keep))
+    #all_Y_0_values=np.zeros((num_sigma,num_keep))
+    for index in range(num_rho):
+    #for index in range(num_sigma):
+        index2=0
+        global rho
+        rho=rho_values[index]
+        #rho=2.0
+        global sigma
+        #sigma=sigma_values[index]
+        sigma=1
+    
+        mu_0=np.zeros((num_x))
+        mu_0[int(num_x/2)]=1.0
+        mu=np.zeros((num_t,num_x))
+        for k in range(num_t):
+            mu[k]=mu_0
+        u=np.zeros((num_t,num_x))
+        v=np.zeros((num_t,num_x))
+    
+        for j in range(J):
+            [u,v]=backward(mu,u,v)
+            mu=forward(u,v,mu_0)
+            if j>J-num_keep-1:
+                all_Y_0_values[index][index2]=u[0][int(num_x/2)]
+                index2+=1
+        print all_Y_0_values[index]
+        #for index2 in range(num_keep):
+            #plt.scatter(rho,Y_0_values[index2])
+            #plt.scatter(sigma,Y_0_values[index2])
+    #plt.savefig('two_level_changing_rho_example_72.eps')
+    #plt.savefig('one_level_example_73_change_sigma.eps')
+    np.save('grid_example_73_rho_values',rho_values)
+    np.save('grid_example_73_changing_rho',all_Y_0_values)

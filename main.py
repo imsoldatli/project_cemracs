@@ -3,7 +3,7 @@
 """
 Created on Mon Jul 24 09:24:22 2017
 
-@author: christy
+@author: Andrea Angiuli, Christy Graves, Houzhi Li
 """
 
 import numpy as np
@@ -139,6 +139,19 @@ if __name__ == '__main__':
     num_intervals_total=6
     global T
     T=1.0
+    global num_intervals_coarse
+    num_intervals_coarse=3
+    global num_t_coarse
+    num_t_coarse=num_intervals_coarse+1
+    global delta_t_coarse
+    delta_t_coarse=T/(num_t_coarse-1)
+    global num_t_fine
+    num_t_fine=num_intervals_total/num_intervals_coarse+1
+    global delta_t_fine
+    delta_t_fine=delta_t_coarse/(num_t_fine-1)
+    global delta_W
+    delta_W=math.sqrt(delta_t_fine) 
+    
     global a
     a=0.25 
     x_0=[2.0]
@@ -148,37 +161,27 @@ if __name__ == '__main__':
     rho_values=np.linspace(1,6,num_rho)
     num_sigma=1
     sigma_values=np.linspace(0.5,10,num_sigma)
+    all_Y_0_values=np.zeros((num_rho,num_keep))
+    #all_Y_0_values=np.zeros((num_sigma,num_keep))
     for index in range(num_rho):
     #for index in range(num_sigma):
-        global num_intervals_coarse
-        num_intervals_coarse=1
         global rho
         rho=rho_values[index]
         #rho=2.0
         global sigma
         #sigma=sigma_values[index]
         sigma=1
-        
-        global num_t_coarse
-        num_t_coarse=num_intervals_coarse+1
-        global delta_t_coarse
-        delta_t_coarse=T/(num_t_coarse-1)
-        global num_t_fine
-        num_t_fine=num_intervals_total/num_intervals_coarse+1
-        global delta_t_fine
-        delta_t_fine=delta_t_coarse/(num_t_fine-1)
-        
-        global delta_W
-        delta_W=math.sqrt(delta_t_fine) 
     
         [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
+        all_Y_0_values[index]=Y_0_values
         print(Y_0_values)
-        for index2 in range(num_keep):
-            plt.scatter(rho,Y_0_values[index2])
+        #for index2 in range(num_keep):
+            #plt.scatter(rho,Y_0_values[index2])
             #plt.scatter(sigma,Y_0_values[index2])
-    plt.savefig('two_level_changing_rho_example_72.eps')
+    #plt.savefig('two_level_changing_rho_example_72.eps')
     #plt.savefig('one_level_example_73_change_sigma.eps')
-        
+    np.save('tree_example_73_rho_values',rho_values)
+    np.save('tree_example_73_three_level_changing_rho',all_Y_0_values)
     
     Y_0=0
     m_0=0
