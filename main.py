@@ -126,11 +126,11 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     global b
-    b=b_example_73
+    b=b_example_72
     global f
-    f=f_example_73
+    f=f_example_72
     global g
-    g=g_example_73
+    g=g_example_72
     global J
     J=10
     global num_keep
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     global T
     T=1.0
     global num_intervals_coarse
-    num_intervals_coarse=3
+    num_intervals_coarse=1
     global num_t_coarse
     num_t_coarse=num_intervals_coarse+1
     global delta_t_coarse
@@ -154,20 +154,20 @@ if __name__ == '__main__':
     
     global a
     a=0.25 
-    x_0=[2.0]
+    x_0=[0.0]
     x_0_probs=[1.0]
 
-    num_rho=20
-    rho_values=np.linspace(1,6,num_rho)
-    num_sigma=1
+    num_rho=1
+    rho_values=np.linspace(2,9,num_rho)
+    num_sigma=20
     sigma_values=np.linspace(0.5,10,num_sigma)
-    all_Y_0_values=np.zeros((num_rho,num_keep))
-    #all_Y_0_values=np.zeros((num_sigma,num_keep))
-    for index in range(num_rho):
-    #for index in range(num_sigma):
+    #all_Y_0_values=np.zeros((num_rho,num_keep))
+    all_Y_0_values=np.zeros((num_sigma,num_keep))
+    #for index in range(num_rho):
+    for index in range(num_sigma):
         global rho
-        rho=rho_values[index]
-        #rho=2.0
+        #rho=rho_values[index]
+        rho=5.0
         global sigma
         #sigma=sigma_values[index]
         sigma=1
@@ -180,8 +180,8 @@ if __name__ == '__main__':
             #plt.scatter(sigma,Y_0_values[index2])
     #plt.savefig('two_level_changing_rho_example_72.eps')
     #plt.savefig('one_level_example_73_change_sigma.eps')
-    np.save('tree_example_73_rho_values',rho_values)
-    np.save('tree_example_73_three_level_changing_rho',all_Y_0_values)
+    np.save('tree_example_72_sigma_values',sigma_values)
+    np.save('tree_example_72_one_level_changing_sigma',all_Y_0_values)
     
     Y_0=0
     m_0=0

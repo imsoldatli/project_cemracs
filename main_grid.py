@@ -121,11 +121,11 @@ def backward(mu,u_old,v_old):
 
 if __name__ == '__main__':
     global b
-    b=b_example_73
+    b=b_example_72
     global f
-    f=f_example_73
+    f=f_example_72
     global g
-    g=g_example_73
+    g=g_example_72
     global J
     J=10
     global num_keep
@@ -140,8 +140,8 @@ if __name__ == '__main__':
     t_grid=np.linspace(0,T,num_t)
     global delta_x
     delta_x=delta_t**2
-    x_min_goal=-1.0
-    x_max_goal=5.0
+    x_min_goal=-3.0
+    x_max_goal=3.0
     x_center=(x_min_goal+x_max_goal)/2.0
     global num_x
     num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
@@ -160,7 +160,7 @@ if __name__ == '__main__':
     
     
     num_rho=20
-    rho_values=np.linspace(1,6,num_rho)
+    rho_values=np.linspace(2,9,num_rho)
     num_sigma=1
     sigma_values=np.linspace(0.5,10,num_sigma)
     all_Y_0_values=np.zeros((num_rho,num_keep))
@@ -195,5 +195,5 @@ if __name__ == '__main__':
             #plt.scatter(sigma,Y_0_values[index2])
     #plt.savefig('two_level_changing_rho_example_72.eps')
     #plt.savefig('one_level_example_73_change_sigma.eps')
-    np.save('grid_example_73_rho_values',rho_values)
-    np.save('grid_example_73_changing_rho',all_Y_0_values)
+    np.save('grid_example_72_rho_values',rho_values)
+    np.save('grid_example_72_changing_rho',all_Y_0_values)
