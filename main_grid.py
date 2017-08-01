@@ -195,5 +195,5 @@ if __name__ == '__main__':
             #plt.scatter(sigma,Y_0_values[index2])
     #plt.savefig('two_level_changing_rho_example_72.eps')
     #plt.savefig('one_level_example_73_change_sigma.eps')
-    np.save('grid_example_72_rho_values',rho_values)
-    np.save('grid_example_72_changing_rho',all_Y_0_values)
+    #np.save('grid_example_72_rho_values',rho_values)
+    #np.save('grid_example_72_changing_rho',all_Y_0_values)

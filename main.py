@@ -24,6 +24,15 @@ def b_example_72(i,j,X,Y,Z,X_initial_probs):
     
 def b_example_73(i,j,X,Y,Z,X_initial_probs):
     return -rho*Y[i][j]
+
+def b_example_73_E(i,j,X,Y,Z,X_initial_probs):
+    num_initial=len(X[0])
+    Y_mean=0
+    num_per_initial=len(Y[i])/num_initial
+    for k in range(len(Y[i])):
+        index=int(math.floor(k/num_per_initial))
+        Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
+    return -rho*Y_mean
     
 def f_example_1(i,j,X,Y,Z,X_initial_probs):
     return a*Y[i][j]
@@ -40,14 +49,21 @@ def f_example_73(i,j,X,Y,Z,X_initial_probs):
         X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
     return -math.atan(X_mean)
 
-def g_example_1(x):
+def g_example_1(index,xi_vals,xi_probs):
+    x=xi_vals[index]
     return x
     
-def g_example_72(x):
+def g_example_72(index,xi_vals,xi_probs):
+    x=xi_vals[index]
     return np.sin(x)
     
-def g_example_73(x):
+def g_example_73(index,xi_vals,xi_probs):
+    x=xi_vals[index]
     return np.arctan(x)
+
+def g_example_73_E(index,xi_vals,xi_probs):
+    X_mean=np.dot(xi_vals,xi_probs)
+    return np.arctan(X_mean)
 
 def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
     num_initial=len(X[0])
@@ -84,7 +100,9 @@ def solver(level,xi_vals,xi_probs):
     num_initial=len(xi_vals)
     if level==num_t_coarse-1:
         #print('break condition')
-        Y_terminal=g(xi_vals)
+        Y_terminal=np.zeros((num_initial))
+        for index in range(num_initial):
+            Y_terminal[index]=g(index,xi_vals,xi_probs)
         return Y_terminal
     X=[]
     for i in range(num_t_fine):
@@ -126,11 +144,11 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     global b
-    b=b_example_72
+    b=b_example_73_E
     global f
-    f=f_example_72
+    f=f_example_73
     global g
-    g=g_example_72
+    g=g_example_73_E
     global J
     J=10
     global num_keep
@@ -154,11 +172,11 @@ if __name__ == '__main__':
     
     global a
     a=0.25 
-    x_0=[0.0]
+    x_0=[2.0]
     x_0_probs=[1.0]
 
     num_rho=1
-    rho_values=np.linspace(2,9,num_rho)
+    rho_values=np.linspace(1,6,num_rho)
     num_sigma=20
     sigma_values=np.linspace(0.5,10,num_sigma)
     #all_Y_0_values=np.zeros((num_rho,num_keep))
@@ -167,10 +185,10 @@ if __name__ == '__main__':
     for index in range(num_sigma):
         global rho
         #rho=rho_values[index]
-        rho=5.0
+        rho=3.0
         global sigma
-        #sigma=sigma_values[index]
-        sigma=1
+        sigma=sigma_values[index]
+        #sigma=1
     
         [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
         all_Y_0_values[index]=Y_0_values
@@ -180,8 +198,8 @@ if __name__ == '__main__':
             #plt.scatter(sigma,Y_0_values[index2])
     #plt.savefig('two_level_changing_rho_example_72.eps')
     #plt.savefig('one_level_example_73_change_sigma.eps')
-    np.save('tree_example_72_sigma_values',sigma_values)
-    np.save('tree_example_72_one_level_changing_sigma',all_Y_0_values)
+    np.save('tree_example_73_E_sigma_values',sigma_values)
+    np.save('tree_example_73_E_one_level_changing_sigma',all_Y_0_values)
     
     Y_0=0
     m_0=0
