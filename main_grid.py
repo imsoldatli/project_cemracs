@@ -9,6 +9,9 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
+def b_dummy(i,j,mu,u,v):
+    return 0
+
 def b_example_1(i,j,mu,u,v):
     Y_mean=np.dot(u[i],mu[i])
     return -rho*Y_mean
@@ -107,6 +110,9 @@ def backward(mu,u_old,v_old):
                 #j_up = pi((x_grid[j] + b(i+1,j,mu,u,v)*delta_t + sigma*np.sqrt(delta_t)))
             
                 u[i][j] = (u[i+1][j_down] + u[i+1][j_up])/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+                
+                #u[i][j] = (u[i+1][j_down] + u[i+1][j_up])/2.0 + delta_t*f(i+1,j,mu,u,v)
+                
                 v[i][j] = 1.0/np.sqrt(delta_t) * (u[i+1][j_up] - u[i+1][j_down])
 
     return [u,v]
@@ -120,7 +126,7 @@ if __name__ == '__main__':
     global g
     g=g_example_1
     global J
-    J=25
+    J=30
     global num_keep
     num_keep=5
     global T
@@ -128,13 +134,14 @@ if __name__ == '__main__':
     global sigma
     sigma=1
     global num_t
-    num_t=300
+    num_t=500
     global delta_t
     delta_t=T/(num_t-1)
     global t_grid
     t_grid=np.linspace(0,T,num_t)
     global delta_x
     delta_x=sigma*math.sqrt(delta_t)
+    #delta_x=math.sqrt(2*delta_t)/sigma
     x_min_goal=-1.0
     x_max_goal=5.0
     x_center=(x_min_goal+x_max_goal)/2.0
@@ -165,3 +172,4 @@ if __name__ == '__main__':
     for j in range(J):
         [u,v]=backward(mu,u,v)
         mu=forward(u,v,mu_0)
+        print(u[0][int(num_x/2)])

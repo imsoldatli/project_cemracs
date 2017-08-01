@@ -126,13 +126,13 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     global b
-    b=b_example_73
+    b=b_example_72
     global f
-    f=f_example_73
+    f=f_example_72
     global g
-    g=g_example_73
+    g=g_example_72
     global J
-    J=8
+    J=10
     global num_keep
     num_keep=5
     global num_intervals_total
@@ -141,20 +141,20 @@ if __name__ == '__main__':
     T=1.0
     global a
     a=0.25 
-    x_0=[2.0]
+    x_0=[0.0]
     x_0_probs=[1.0]
 
-    num_rho=1
-    rho_values=np.linspace(1,6,num_rho)
+    num_rho=20
+    rho_values=np.linspace(2,9,num_rho)
     num_sigma=1
     sigma_values=np.linspace(0.5,10,num_sigma)
     for index in range(num_rho):
     #for index in range(num_sigma):
         global num_intervals_coarse
-        num_intervals_coarse=1
+        num_intervals_coarse=2
         global rho
         rho=rho_values[index]
-        rho=1.0
+        #rho=0.1
         global sigma
         #sigma=sigma_values[index]
         sigma=1
@@ -176,7 +176,7 @@ if __name__ == '__main__':
         for index2 in range(num_keep):
             plt.scatter(rho,Y_0_values[index2])
             #plt.scatter(sigma,Y_0_values[index2])
-    plt.savefig('one_level_changing_rho_example_73.eps')
+    plt.savefig('two_level_changing_rho_example_72.eps')
     #plt.savefig('one_level_example_73_change_sigma.eps')
         
     
