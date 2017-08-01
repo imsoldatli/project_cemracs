@@ -120,11 +120,11 @@ def backward(mu,u_old,v_old):
 
 if __name__ == '__main__':
     global b
-    b=b_example_1
+    b=b_example_73
     global f
-    f=f_example_1
+    f=f_example_73
     global g
-    g=g_example_1
+    g=g_example_73
     global J
     J=30
     global num_keep
@@ -132,16 +132,15 @@ if __name__ == '__main__':
     global T
     T=1.0
     global sigma
-    sigma=1
+    sigma=10
     global num_t
-    num_t=500
+    num_t=20
     global delta_t
     delta_t=T/(num_t-1)
     global t_grid
     t_grid=np.linspace(0,T,num_t)
     global delta_x
-    delta_x=sigma*math.sqrt(delta_t)
-    #delta_x=math.sqrt(2*delta_t)/sigma
+    delta_x=sigma*(delta_t)**2
     x_min_goal=-1.0
     x_max_goal=5.0
     x_center=(x_min_goal+x_max_goal)/2.0
@@ -159,7 +158,7 @@ if __name__ == '__main__':
     global a
     a=0.25
     global rho
-    rho=0.1
+    rho=25.0
 
     mu_0=np.zeros((num_x))
     mu_0[int(num_x/2)]=1.0
