@@ -34,6 +34,12 @@ def b_example_73_E(i,j,X,Y,Z,X_initial_probs):
         Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
     return -rho*Y_mean
     
+def b_jet_lag_weak(i,j,X,Y,Z,X_initial_probs):
+    return omega_0-omega_S-1.0/(R*sigma)*Z[i][j]
+
+def b_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+    return omega_0-omega_S-1.0/R*Y[i][j]
+    
 def f_example_1(i,j,X,Y,Z,X_initial_probs):
     return a*Y[i][j]
 
@@ -48,6 +54,33 @@ def f_example_73(i,j,X,Y,Z,X_initial_probs):
         index=int(math.floor(k/num_per_initial))
         X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
     return -math.atan(X_mean)
+    
+def f_jet_lag_weak(i,j,X,Y,Z,X_initial_probs):
+    value1=1.0/sigma*(omega_0-omega_S)*Z[i][j]-1.0/(2*R*sigma**2)*(Z[i][j])**2
+    num_initial=len(X[0])
+    num_per_initial=len(X[i])/num_initial
+    X_probs=np.zeros((len(X[i])))
+    for k in range(len(X[i])):
+        index=int(math.floor(k/num_per_initial))
+        X_probs[k]=X_initial_probs[index]/num_per_initial
+    c_bar=np.dot(0.5*(np.sin((X[i][j]-X[i])/2.0))**2,X_probs)
+    value2=K*c_bar
+    c_sun=0.5*(np.sin((X[i][j]-p)/2.0))**2
+    value3=F*c_sun
+    return value1+value2+value3
+    
+def f_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+    num_initial=len(X[0])
+    num_per_initial=len(X[i])/num_initial
+    X_probs=np.zeros((len(X[i])))
+    for k in range(len(X[i])):
+        index=int(math.floor(k/num_per_initial))
+        X_probs[k]=X_initial_probs[index]/num_per_initial
+    partial_c_bar=np.dot(0.5*np.sin((X[i][j]-X[i])/2.0)*np.cos((X[i][j]-X[i])/2.0),X_probs)
+    value1=-K*partial_c_bar
+    partial_c_sun=0.5*np.sin((X[i][j]-p)/2.0)*np.cos((X[i][j]-p)/2.0)
+    value2=-F*partial_c_sun
+    return value1+value2
 
 def g_example_1(index,xi_vals,xi_probs):
     x=xi_vals[index]
@@ -64,6 +97,9 @@ def g_example_73(index,xi_vals,xi_probs):
 def g_example_73_E(index,xi_vals,xi_probs):
     X_mean=np.dot(xi_vals,xi_probs)
     return np.arctan(X_mean)
+    
+def g_jet_lag(index,xi_vals,xi_probs):
+    return 0
 
 def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
     num_initial=len(X[0])
@@ -93,6 +129,9 @@ def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
             for j in range(num_initial*2**i):
                 X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
                 X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
+                if periodic_2_pi:
+                    X[i+1][2*j]=X[i+1][2*j]%(2*np.pi)
+                    X[i+1][2*j+1]=X[i+1][2*j+1]%(2*np.pi)
     return [X,Y,Z]
 
 def solver(level,xi_vals,xi_probs):
@@ -144,11 +183,13 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     global b
-    b=b_example_73_E
+    b=b_jet_lag_Pontryagin
     global f
-    f=f_example_73
+    f=f_jet_lag_Pontryagin
     global g
-    g=g_example_73_E
+    g=g_jet_lag
+    global periodic_2_pi
+    periodic_2_pi=True
     global J
     J=10
     global num_keep
@@ -156,7 +197,7 @@ if __name__ == '__main__':
     global num_intervals_total
     num_intervals_total=6
     global T
-    T=1.0
+    T=24.0
     global num_intervals_coarse
     num_intervals_coarse=1
     global num_t_coarse
@@ -171,13 +212,26 @@ if __name__ == '__main__':
     delta_W=math.sqrt(delta_t_fine) 
     
     global a
-    a=0.25 
-    x_0=[2.0]
+    a=0.25
+    global R
+    R=1
+    global K
+    K=1
+    global F
+    F=1
+    global omega_0
+    omega_0=2*np.pi/24.5
+    global omega_S
+    omega_S=2*np.pi/24
+    global p
+    p=0
+    
+    x_0=[0.0]
     x_0_probs=[1.0]
 
     num_rho=1
     rho_values=np.linspace(1,6,num_rho)
-    num_sigma=20
+    num_sigma=1
     sigma_values=np.linspace(0.5,10,num_sigma)
     #all_Y_0_values=np.zeros((num_rho,num_keep))
     all_Y_0_values=np.zeros((num_sigma,num_keep))
@@ -198,8 +252,8 @@ if __name__ == '__main__':
             #plt.scatter(sigma,Y_0_values[index2])
     #plt.savefig('two_level_changing_rho_example_72.eps')
     #plt.savefig('one_level_example_73_change_sigma.eps')
-    np.save('tree_example_73_E_sigma_values',sigma_values)
-    np.save('tree_example_73_E_one_level_changing_sigma',all_Y_0_values)
+    #np.save('tree_example_73_E_sigma_values',sigma_values)
+    #np.save('tree_example_73_E_one_level_changing_sigma',all_Y_0_values)
     
     Y_0=0
     m_0=0

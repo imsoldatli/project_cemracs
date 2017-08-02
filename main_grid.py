@@ -22,6 +22,12 @@ def b_example_72(i,j,mu,u,v):
     
 def b_example_73(i,j,mu,u,v):
     return -rho*u[i][j]
+
+def b_jet_lag_weak(i,j,mu,u,v):
+    return omega_0-omega_S-1.0/(R*sigma)*v[i][j]
+
+def b_jet_lag_Pontryagin(i,j,mu,u,v):
+    return omega_0-omega_S-1.0/R*u[i][j]
     
 def f_example_1(i,j,mu,u,v):
     return a*u[i][j]
@@ -32,6 +38,21 @@ def f_example_72(i,j,mu,u,v):
 def f_example_73(i,j,mu,u,v):
     X_mean=np.dot(x_grid,mu[i])
     return -np.arctan(X_mean)
+    
+def f_jet_lag_weak(i,j,mu,u,v):
+    value1=1.0/sigma*(omega_0-omega_S)*v[i][j]-1.0/(2*R*sigma**2)*(v[i][j])**2
+    c_bar=np.dot(0.5*(np.sin((x_grid[j]-x_grid)/2.0))**2,mu[i])
+    value2=K*c_bar
+    c_sun=0.5*(np.sin((x_grid[j]-p)/2.0))**2
+    value3=F*c_sun
+    return value1+value2+value3
+    
+def f_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+    partial_c_bar=np.dot(0.5*np.sin((x_grid[j]-x_grid)/2.0)*np.cos((x_grid[j]-x_grid)/2.0),mu[i])
+    value1=-K*partial_c_bar
+    partial_c_sun=0.5*np.sin((x_grid[j]-p)/2.0)*np.cos((x_grid[j]-p)/2.0)
+    value2=-F*partial_c_sun
+    return value1+value2
 
 def g_example_1(x):
     return x
@@ -41,17 +62,27 @@ def g_example_72(x):
     
 def g_example_73(x):
     return np.arctan(x)
+    
+def g_jet_lag(x):
+    return 0
 
 def pi(x):
+    
+    if periodic_2_pi:
+        x=x%(2*np.pi)
 
     low=int((x-x_min)/delta_x)
 
     if low>=num_x-1:
-
-        x_index=num_x-1
+        if periodic_2_pi:
+            if (x-x_grid[num_x-1])<(2*np.pi-x):
+                x_index=num_x-1
+            else:
+                x_index=0
+        else:
+            x_index=num_x-1
 
     elif low<0:
-
         x_index=0
 
     elif (x-x_min-low*delta_x)<(x_min+(low+1)*delta_x-x):
@@ -90,7 +121,7 @@ def backward(mu,u_old,v_old):
     v = np.zeros((num_t,num_x))
         
     u[num_t-1,:] = g(x_grid)
-    v[num_t-1,:] = v_old[num_t-1,:] # Not sure if this is right, but doesn't matter for example 1
+    v[num_t-1,:] = v_old[num_t-1,:]
 
     for i in reversed(range(num_t-1)):
         for j in range(num_x):
@@ -121,11 +152,13 @@ def backward(mu,u_old,v_old):
 
 if __name__ == '__main__':
     global b
-    b=b_example_72
+    b=b_jet_lag_weak
     global f
-    f=f_example_72
+    f=f_jet_lag_weak
     global g
-    g=g_example_72
+    g=g_jet_lag
+    global periodic_2_pi
+    periodic_2_pi=True
     global J
     J=10
     global num_keep
@@ -140,26 +173,42 @@ if __name__ == '__main__':
     t_grid=np.linspace(0,T,num_t)
     global delta_x
     delta_x=delta_t**2
-    x_min_goal=-3.0
-    x_max_goal=3.0
-    x_center=(x_min_goal+x_max_goal)/2.0
     global num_x
-    num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
-    if num_x%2==0:
-        num_x+=1
     global x_grid
-    x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
     global x_min
-    x_min=x_grid[0]
     global x_max
+    if periodic_2_pi:
+        num_x=int((2*np.pi)/(delta_x))+1
+        delta_x=2*np.pi/num_x
+        x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
+    else:
+        x_min_goal=-1
+        x_max_goal=5
+        x_center=(x_min_goal+x_max_goal)/2.0
+        num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
+        if num_x%2==0:
+            num_x+=1
+        x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
+        
+    x_min=x_grid[0]
     x_max=x_grid[num_x-1]
     
     global a
     a=0.25
+    global R
+    R=1
+    global K
+    K=1
+    global F
+    F=1
+    global omega_0
+    omega_0=2*np.pi/24.5
+    global omega_S
+    omega_S=2*np.pi/24
+    global p
+    p=0    
     
-    
-    
-    num_rho=20
+    num_rho=1
     rho_values=np.linspace(2,9,num_rho)
     num_sigma=1
     sigma_values=np.linspace(0.5,10,num_sigma)
@@ -176,7 +225,10 @@ if __name__ == '__main__':
         sigma=1
     
         mu_0=np.zeros((num_x))
-        mu_0[int(num_x/2)]=1.0
+        if periodic_2_pi:
+            mu_0[0]=1
+        else:
+            mu_0[int(num_x/2)]=1.0
         mu=np.zeros((num_t,num_x))
         for k in range(num_t):
             mu[k]=mu_0
