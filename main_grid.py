@@ -79,7 +79,7 @@ def forward(u,v,mu_0):
            up_index=pi(up)
            mu[i+1,up_index]+=mu[i,j]*0.5
 
-
+#findsigma
     #print(mu)
     #print('the sum on each row is', mu.sum(axis=1))
     return mu
