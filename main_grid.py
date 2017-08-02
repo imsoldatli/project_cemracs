@@ -47,7 +47,7 @@ def f_jet_lag_weak(i,j,mu,u,v):
     value3=F*c_sun
     return value1+value2+value3
     
-def f_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+def f_jet_lag_Pontryagin(i,j,mu,u,v):
     partial_c_bar=np.dot(0.5*np.sin((x_grid[j]-x_grid)/2.0)*np.cos((x_grid[j]-x_grid)/2.0),mu[i])
     value1=-K*partial_c_bar
     partial_c_sun=0.5*np.sin((x_grid[j]-p)/2.0)*np.cos((x_grid[j]-p)/2.0)
@@ -110,7 +110,6 @@ def forward(u,v,mu_0):
            up_index=pi(up)
            mu[i+1,up_index]+=mu[i,j]*0.5
 
-#findsigma
     #print(mu)
     #print('the sum on each row is', mu.sum(axis=1))
     return mu
@@ -152,9 +151,9 @@ def backward(mu,u_old,v_old):
 
 if __name__ == '__main__':
     global b
-    b=b_jet_lag_weak
+    b=b_jet_lag_Pontryagin
     global f
-    f=f_jet_lag_weak
+    f=f_jet_lag_Pontryagin
     global g
     g=g_jet_lag
     global periodic_2_pi
@@ -164,9 +163,9 @@ if __name__ == '__main__':
     global num_keep
     num_keep=5
     global T
-    T=1.0
+    T=24.0*20
     global num_t
-    num_t=20
+    num_t=int(T)*5+1
     global delta_t
     delta_t=T/(num_t-1)
     global t_grid
@@ -198,15 +197,15 @@ if __name__ == '__main__':
     global R
     R=1
     global K
-    K=1
+    K=0.01
     global F
-    F=1
+    F=0.01
     global omega_0
     omega_0=2*np.pi/24.5
     global omega_S
     omega_S=2*np.pi/24
     global p
-    p=0    
+    p=(9/12)*np.pi
     
     num_rho=1
     rho_values=np.linspace(2,9,num_rho)
@@ -218,11 +217,11 @@ if __name__ == '__main__':
     #for index in range(num_sigma):
         index2=0
         global rho
-        rho=rho_values[index]
-        #rho=2.0
+        #rho=rho_values[index]
+        rho=2.0
         global sigma
         #sigma=sigma_values[index]
-        sigma=1
+        sigma=0.1
     
         mu_0=np.zeros((num_x))
         if periodic_2_pi:

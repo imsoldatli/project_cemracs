@@ -124,7 +124,7 @@ def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
             for j in range(num_initial*2**i):
                 #Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z,X_initial_probs)+delta_t_fine*f(i+1,2*j+1,X,Y,Z,X_initial_probs))/2.0
                 Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y_old,Z,X_initial_probs)
-                Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0          
+                Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0      
     
         for i in range(num_t_fine-1):
             for j in range(num_initial*2**i):
@@ -184,9 +184,9 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     global b
-    b=b_jet_lag_Pontryagin
+    b=b_jet_lag_weak
     global f
-    f=f_jet_lag_Pontryagin
+    f=f_jet_lag_weak
     global g
     g=g_jet_lag
     global periodic_2_pi
@@ -217,9 +217,9 @@ if __name__ == '__main__':
     global R
     R=1
     global K
-    K=1
+    K=0.01
     global F
-    F=1
+    F=0.01
     global omega_0
     omega_0=2*np.pi/24.5
     global omega_S
@@ -242,8 +242,8 @@ if __name__ == '__main__':
         #rho=rho_values[index]
         rho=3.0
         global sigma
-        sigma=sigma_values[index]
-        #sigma=1
+        #sigma=sigma_values[index]
+        sigma=0.1
     
         [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
         all_Y_0_values[index]=Y_0_values
