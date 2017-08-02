@@ -113,6 +113,7 @@ def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
         
     for j in range(len(Y[num_t_fine-1])):
         Y[num_t_fine-1][j]=Y_terminal[j]
+    #Y[num_t_fine-1,:]=Y_terminal
         
     for k in range(J):
         if k>0:
