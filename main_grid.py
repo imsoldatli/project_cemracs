@@ -9,6 +9,7 @@ Created on Fri Jul 28 17:37:27 2017
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import scipy
 
 def b_dummy(i,j,mu,u,v):
     return 0
@@ -151,9 +152,9 @@ def backward(mu,u_old,v_old):
 
 if __name__ == '__main__':
     global b
-    b=b_jet_lag_Pontryagin
+    b=b_jet_lag_weak
     global f
-    f=f_jet_lag_Pontryagin
+    f=f_jet_lag_weak
     global g
     g=g_jet_lag
     global periodic_2_pi
@@ -225,7 +226,8 @@ if __name__ == '__main__':
     
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
-            mu_0[0]=1
+            mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
+            #mu_0[0]=1
         else:
             mu_0[int(num_x/2)]=1.0
         mu=np.zeros((num_t,num_x))
