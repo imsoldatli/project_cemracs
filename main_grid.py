@@ -205,7 +205,7 @@ if __name__ == '__main__':
     global omega_S
     omega_S=2*np.pi/24
     global p
-    p=(9/12)*np.pi
+    p=(9.0/12.0)*np.pi
     
     num_rho=1
     rho_values=np.linspace(2,9,num_rho)
