@@ -64,106 +64,109 @@ def g_example_73(index,xi_vals,xi_probs):
 def g_example_73_E(index,xi_vals,xi_probs):
     X_mean=np.dot(xi_vals,xi_probs)
     return np.arctan(X_mean)
+#
+#def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
+#    num_initial=len(X[0])
+#    Y=[]
+#    Z=[]
+#    for i in range(num_t_fine):
+#        row2=np.zeros((num_initial*2**i))
+#        row3=np.zeros((num_initial*2**i))
+#        Y.append(row2)
+#        Z.append(row3)
+#        
+#    for j in range(len(Y[num_t_fine-1])):
+#        Y[num_t_fine-1][j]=Y_terminal[j]
+#
+#
+#    for k in range(J):
+#        if k>0:
+#            Y_old=Y
+#        
+#        for n in range(num_t_fine-1):
+#            i=num_t_fine-2-n
+#            for j in range(num_initial*2**i):
+#                #Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z,X_initial_probs)+delta_t_fine*f(i+1,2*j+1,X,Y,Z,X_initial_probs))/2.0
+#                Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y_old,Z,X_initial_probs)
+#                Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
+#    
+#        for i in range(num_t_fine-1):
+#            for j in range(num_initial*2**i):
+#                X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
+#                X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
+#        
+#    return [X,Y,Z]
+#
+#
+#def solver(level,xi_vals,xi_probs):
+#    #print('Executing solver[level] for level=',level)
+#    num_initial=len(xi_vals)
+#    if level==num_t_coarse-1:
+#        #print('break condition')
+#        Y_terminal=np.zeros((num_initial))
+#        for index in range(num_initial):
+#            Y_terminal[index]=g(index,xi_vals,xi_probs)
+#        return Y_terminal
+#    X=[]
+#    for i in range(num_t_fine):
+#        X.append([])
+#        for k in range(num_initial):
+#            row1=xi_vals[k]*np.ones((2**i))
+#            X[i]=np.concatenate((X[i],row1))
+#
+#    X_terminal_probs=[]
+#    for k in range(num_initial):
+#        row4=xi_probs[k]*(0.5)**(num_t_fine-1)*np.ones((2**(num_t_fine-1)))
+#        X_terminal_probs=np.concatenate((X_terminal_probs,row4))
+#    
+#    Y_terminal=np.zeros(num_initial*(2**(num_t_fine-1)))
+#    
+#    num_initial=len(X[0])
+#    Y=[]
+#    for i in range(num_t_fine):
+#        row2=np.zeros((num_initial*2**i))
+#        Y.append(row2)
+#    X=(solver_bar(X,Y_terminal,xi_probs,Y))[0]
+#
+#    if level==0:
+#        Y_0_values=np.zeros((num_keep))
+#        index=0
+#        
+#    
+#    for j in range(J):
+#        X_terminal=X[num_t_fine-1]
+#        Y_terminal=solver(level+1,X_terminal,X_terminal_probs)
+#        [X,Y,Z]=solver_bar(X,Y_terminal,xi_probs,Y)
+#        if level==0 and j>J-num_keep-1:
+#            Y_0_values[index]=Y[0]
+#            index+=1
+#            
+#    Y_initial=Y[0]
+#    if level==0:
+#        return [Y_initial,X,Y,Z,Y_0_values]
+#    return Y_initial
 
-def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
-    num_initial=len(X[0])
-    Y=[]
-    Z=[]
-    for i in range(num_t_fine):
-        row2=np.zeros((num_initial*2**i))
-        row3=np.zeros((num_initial*2**i))
-        Y.append(row2)
-        Z.append(row3)
-        
-    for j in range(len(Y[num_t_fine-1])):
-        Y[num_t_fine-1][j]=Y_terminal[j]
-
-
-    for k in range(J):
-        if k>0:
-            Y_old=Y
-        
-        for n in range(num_t_fine-1):
-            i=num_t_fine-2-n
-            for j in range(num_initial*2**i):
-                #Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z,X_initial_probs)+delta_t_fine*f(i+1,2*j+1,X,Y,Z,X_initial_probs))/2.0
-                Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y_old,Z,X_initial_probs)
-                Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
+def sigma_continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
     
-        for i in range(num_t_fine-1):
-            for j in range(num_initial*2**i):
-                X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
-                X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
-        
-    return [X,Y,Z]
-
-
-def solver(level,xi_vals,xi_probs):
-    #print('Executing solver[level] for level=',level)
-    num_initial=len(xi_vals)
-    if level==num_t_coarse-1:
-        #print('break condition')
-        Y_terminal=np.zeros((num_initial))
-        for index in range(num_initial):
-            Y_terminal[index]=g(index,xi_vals,xi_probs)
-        return Y_terminal
-    X=[]
-    for i in range(num_t_fine):
-        X.append([])
-        for k in range(num_initial):
-            row1=xi_vals[k]*np.ones((2**i))
-            X[i]=np.concatenate((X[i],row1))
-
-    X_terminal_probs=[]
-    for k in range(num_initial):
-        row4=xi_probs[k]*(0.5)**(num_t_fine-1)*np.ones((2**(num_t_fine-1)))
-        X_terminal_probs=np.concatenate((X_terminal_probs,row4))
-    
-    Y_terminal=np.zeros(num_initial*(2**(num_t_fine-1)))
-    
-    num_initial=len(X[0])
-    Y=[]
-    for i in range(num_t_fine):
-        row2=np.zeros((num_initial*2**i))
-        Y.append(row2)
-    X=(solver_bar(X,Y_terminal,xi_probs,Y))[0]
-
-    if level==0:
-        Y_0_values=np.zeros((num_keep))
-        index=0
-        
-    
-    for j in range(J):
-        X_terminal=X[num_t_fine-1]
-        Y_terminal=solver(level+1,X_terminal,X_terminal_probs)
-        [X,Y,Z]=solver_bar(X,Y_terminal,xi_probs,Y)
-        if level==0 and j>J-num_keep-1:
-            Y_0_values[index]=Y[0]
-            index+=1
-            
-    Y_initial=Y[0]
-    if level==0:
-        return [Y_initial,X,Y,Z,Y_0_values]
-    return Y_initial
-
-def sigma_continuation_solver_bar(X,X_initial_probs,Y,Z):
-    num_initial=len(X[0]) 
+    num_initial=len(X_ini[0]) 
     Y_0_values=np.zeros((num_keep))
     index=0
-    
+    X=X_ini
+    Y=Y_ini
+    Z=Z_ini
     for k in range(J):
-        for n in range(num_t_total-1):
-            i=num_t_total-2-n
-            for j in range(num_initial*2**i):
-                #Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z,X_initial_probs)+delta_t_fine*f(i+1,2*j+1,X,Y,Z,X_initial_probs))/2.0
-                Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y,Z,X_initial_probs)
-                Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
-    
         for i in range(num_t_total-1):
             for j in range(num_initial*2**i):
                 X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
                 X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
         
+        for i in reversed(range(num_t_total-2)):
+            for j in range(num_initial*2**i):
+#                Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z,X_initial_probs)+delta_t_fine*f(i+1,2*j+1,X,Y,Z,X_initial_probs))/2.0
+                temp_Y=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y,Z,X_initial_probs)
+                Y[i][j]=temp_Y
+                Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
+    
         if k>J-num_keep-1:
             Y_0_values[index]=Y[0][0]
             index+=1
@@ -217,9 +220,9 @@ if __name__ == '__main__':
     global g
     g=g_example_73
     global J
-    J=6
+    J=1
     global num_keep
-    num_keep=5
+    num_keep=1
     global num_intervals_total
     num_intervals_total=6
     global num_t_total
@@ -246,7 +249,7 @@ if __name__ == '__main__':
 
     num_rho=1
     rho_values=np.linspace(1,6,num_rho)
-    num_sigma=13
+    num_sigma=2
     sigma_values=np.linspace(0.5,6.5,num_sigma)
     #all_Y_0_values=np.zeros((num_rho,num_keep))
     all_Y_0_values=np.zeros((num_sigma,num_keep))
@@ -299,7 +302,7 @@ if __name__ == '__main__':
     for index in reversed(range(num_sigma)):
         global rho
         #rho=rho_values[index]
-        rho=3.0
+        rho=5.0
         global sigma
         sigma=sigma_values[index]
         #sigma=1
