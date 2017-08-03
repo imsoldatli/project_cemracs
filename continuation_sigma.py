@@ -160,12 +160,14 @@ def sigma_continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
                 X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
                 X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
         
-        for i in reversed(range(num_t_total-2)):
+        for i in reversed(range(num_t_total-1)):
             for j in range(num_initial*2**i):
 #                Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z,X_initial_probs)+delta_t_fine*f(i+1,2*j+1,X,Y,Z,X_initial_probs))/2.0
                 temp_Y=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y,Z,X_initial_probs)
+#                temp_=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0
                 Y[i][j]=temp_Y
                 Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
+#                print(k,i,j,temp_)
     
         if k>J-num_keep-1:
             Y_0_values[index]=Y[0][0]
@@ -220,9 +222,9 @@ if __name__ == '__main__':
     global g
     g=g_example_73
     global J
-    J=1
+    J=10
     global num_keep
-    num_keep=1
+    num_keep=5
     global num_intervals_total
     num_intervals_total=6
     global num_t_total
@@ -230,7 +232,7 @@ if __name__ == '__main__':
     global T
     T=1.0
     global num_intervals_coarse
-    num_intervals_coarse=2
+    num_intervals_coarse=1
     global num_t_coarse
     num_t_coarse=num_intervals_coarse+1
     global delta_t_coarse
@@ -249,7 +251,7 @@ if __name__ == '__main__':
 
     num_rho=1
     rho_values=np.linspace(1,6,num_rho)
-    num_sigma=2
+    num_sigma=13
     sigma_values=np.linspace(0.5,6.5,num_sigma)
     #all_Y_0_values=np.zeros((num_rho,num_keep))
     all_Y_0_values=np.zeros((num_sigma,num_keep))
@@ -293,6 +295,8 @@ if __name__ == '__main__':
             for k in range(num_initial):
                 row2=g(k,x_0,x_0_probs)*np.ones((2**i))
                 Y[i]=np.concatenate((Y[i],row2))
+    Y__=Y
+    print(Y__)
     
     Z=[]
     for i in range(num_t_total):
