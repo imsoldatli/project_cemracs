@@ -44,12 +44,12 @@ def f_jet_lag_weak(i,j,mu,u,v):
     value1=1.0/sigma*(omega_0-omega_S)*v[i][j]-1.0/(2*R*sigma**2)*(v[i][j])**2
     c_bar=np.dot(0.5*(np.sin((x_grid[j]-x_grid)/2.0))**2,mu[i])
     value2=K*c_bar
-    c_sun=0.5*(np.sin((x_grid[j]-p)/2.0))**2
+    c_sun=0.5*(np.sin((p-x_grid[j])/2.0))**2
     value3=F*c_sun
     return value1+value2+value3
     
 def f_jet_lag_Pontryagin(i,j,mu,u,v):
-    partial_c_bar=np.dot(0.5*np.sin((x_grid[j]-x_grid)/2.0)*np.cos((x_grid[j]-x_grid)/2.0),mu[i])
+    partial_c_bar=np.dot(0.5*np.sin((x_grid-x_grid[j])/2.0)*np.cos((x_grid-x_grid[j])/2.0),mu[i])
     value1=-K*partial_c_bar
     partial_c_sun=0.5*np.sin((x_grid[j]-p)/2.0)*np.cos((x_grid[j]-p)/2.0)
     value2=-F*partial_c_sun
@@ -152,19 +152,19 @@ def backward(mu,u_old,v_old):
 
 if __name__ == '__main__':
     global b
-    b=b_jet_lag_weak
+    b=b_jet_lag_Pontryagin
     global f
-    f=f_jet_lag_weak
+    f=f_jet_lag_Pontryagin
     global g
     g=g_jet_lag
     global periodic_2_pi
     periodic_2_pi=True
     global J
-    J=10
+    J=25
     global num_keep
     num_keep=5
     global T
-    T=24.0*20
+    T=24.0*10
     global num_t
     num_t=int(T)*5+1
     global delta_t
@@ -206,7 +206,7 @@ if __name__ == '__main__':
     global omega_S
     omega_S=2*np.pi/24
     global p
-    p=(9.0/12.0)*np.pi
+    p=(3.0/12.0)*np.pi
     
     num_rho=1
     rho_values=np.linspace(2,9,num_rho)
@@ -240,7 +240,7 @@ if __name__ == '__main__':
             [u,v]=backward(mu,u,v)
             mu=forward(u,v,mu_0)
             if j>J-num_keep-1:
-                all_Y_0_values[index][index2]=u[0][int(num_x/2)]
+                all_Y_0_values[index][index2]=u[0][0]
                 index2+=1
         print all_Y_0_values[index]
         #for index2 in range(num_keep):
@@ -250,3 +250,4 @@ if __name__ == '__main__':
     #plt.savefig('one_level_example_73_change_sigma.eps')
     #np.save('grid_example_72_rho_values',rho_values)
     #np.save('grid_example_72_changing_rho',all_Y_0_values)
+    np.save('mu_jet_lag',mu)
