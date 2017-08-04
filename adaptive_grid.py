@@ -121,11 +121,11 @@ def backward(mu,u_old,v_old):
 
 if __name__ == '__main__':
     global b
-    b=b_example_72
+    b=b_example_73
     global f
-    f=f_example_72
+    f=f_example_73
     global g
-    g=g_example_72
+    g=g_example_73
     global J
     J=10
     global num_keep
@@ -135,8 +135,8 @@ if __name__ == '__main__':
     global a
     a=0.25
     
-    x_min_goal=-3.0
-    x_max_goal=3.0
+    x_min_goal=0
+    x_max_goal=4.0
     x_center=(x_min_goal+x_max_goal)/2.0
     
     num_rho=20
@@ -152,16 +152,22 @@ if __name__ == '__main__':
         rho=rho_values[index]
         #rho=2.0
         
+        global sigma 
+        #sigma=sigma_values[index]
+        sigma=1
+        
         global num_t
 #        num_t=int(20*rho/rho_values[0])
-        num_t=int(20*math.sqrt(rho/rho_values[0]))
+#        num_t=int(20/math.sqrt(rho/rho_values[0]))
+        num_t=30
         global delta_t
         delta_t=T/(num_t-1)
         global t_grid
         t_grid=np.linspace(0,T,num_t)
         global delta_x
 #        delta_x=delta_t**2
-        delta_x=delta_t
+        delta_x=(rho+sigma)*delta_t**2
+#        delta_x=delta_t
         global num_x
         num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
         if num_x%2==0:
@@ -174,9 +180,7 @@ if __name__ == '__main__':
         x_max=x_grid[num_x-1]
     
         
-        global sigma 
-        #sigma=sigma_values[index]
-        sigma=1
+
     
         mu_0=np.zeros((num_x))
         mu_0[int(num_x/2)]=1.0
