@@ -115,7 +115,7 @@ def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
         Y[num_t_fine-1][j]=Y_terminal[j]
     #Y[num_t_fine-1,:]=Y_terminal
         
-    for k in range(J):
+    for k in range(J_solver_bar):
         if k>0:
             Y_old=Y
         
@@ -184,21 +184,23 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     global b
-    b=b_jet_lag_weak
+    b=b_example_73
     global f
-    f=f_jet_lag_weak
+    f=f_example_73
     global g
-    g=g_jet_lag
+    g=g_example_73
     global periodic_2_pi
-    periodic_2_pi=True
+    periodic_2_pi=False
     global J
     J=10
+    global J_solver_bar
+    J_solver_bar=10
     global num_keep
     num_keep=5
     global num_intervals_total
     num_intervals_total=6
     global T
-    T=24.0
+    T=1.0
     global num_intervals_coarse
     num_intervals_coarse=1
     global num_t_coarse
@@ -227,12 +229,14 @@ if __name__ == '__main__':
     global p
     p=0
     
-    x_0=[0.0]
+    x_0=[2.0]
     x_0_probs=[1.0]
 
+
+    
+
     num_rho=1
-    rho_values=np.linspace(1,6,num_rho)
-    num_sigma=1
+    num_sigma=20
     sigma_values=np.linspace(0.5,10,num_sigma)
     #all_Y_0_values=np.zeros((num_rho,num_keep))
     all_Y_0_values=np.zeros((num_sigma,num_keep))
@@ -240,10 +244,10 @@ if __name__ == '__main__':
     for index in range(num_sigma):
         global rho
         #rho=rho_values[index]
-        rho=3.0
+        rho=4.0
         global sigma
-        #sigma=sigma_values[index]
-        sigma=0.1
+        sigma=sigma_values[index]
+        #sigma=1.0
     
         [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
         all_Y_0_values[index]=Y_0_values
