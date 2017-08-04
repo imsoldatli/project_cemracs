@@ -5,7 +5,7 @@ Created on Mon Jul 24 09:24:22 2017
 
 @author: Andrea Angiuli, Christy Graves, Houzhi Li
 """
-
+#boring comment
 import numpy as np
 import math
 import matplotlib.pyplot as plt
