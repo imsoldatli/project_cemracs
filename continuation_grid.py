@@ -153,21 +153,24 @@ def backward(mu,u_old,v_old):
 
 if __name__ == '__main__':
     global b
-    b=b_jet_lag_Pontryagin
+    b=b_example_72
     global f
-    f=f_jet_lag_Pontryagin
+    f=f_example_72
     global g
-    g=g_jet_lag
+    g=g_example_72
     global periodic_2_pi
-    periodic_2_pi=True
+#    periodic_2_pi=True
+    periodic_2_pi=False
     global J
-    J=25
+    J=10
     global num_keep
     num_keep=5
     global T
-    T=24.0*10
+#    T=24.0*10
+    T=1.0
     global num_t
-    num_t=int(T)*5+1
+#    num_t=int(T)*5+1
+    num_t=21
     global delta_t
     delta_t=T/(num_t-1)
     global t_grid
@@ -183,8 +186,8 @@ if __name__ == '__main__':
         delta_x=2*np.pi/num_x
         x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
     else:
-        x_min_goal=-1
-        x_max_goal=5
+        x_min_goal=-3
+        x_max_goal=3
         x_center=(x_min_goal+x_max_goal)/2.0
         num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
         if num_x%2==0:
@@ -209,21 +212,34 @@ if __name__ == '__main__':
     global p
     p=(3.0/12.0)*np.pi
     
-    num_rho=1
-    rho_values=np.linspace(2,9,num_rho)
-    num_sigma=1
+    num_rho=20
+    rho_values=np.linspace(0.5,10,num_rho)
+    num_sigma=20
     sigma_values=np.linspace(0.5,10,num_sigma)
     all_Y_0_values=np.zeros((num_rho,num_keep))
     #all_Y_0_values=np.zeros((num_sigma,num_keep))
+    
+#    mu_0=np.zeros((num_x))
+#    if periodic_2_pi:
+#        mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
+#        #mu_0[0]=1
+#    else:
+#        mu_0[int(num_x/2)]=1.0
+#    mu=np.zeros((num_t,num_x))
+#    for k in range(num_t):
+#        mu[k]=mu_0
+#    u=np.zeros((num_t,num_x))
+#    v=np.zeros((num_t,num_x))
+    
     for index in range(num_rho):
     #for index in range(num_sigma):
         index2=0
         global rho
-        #rho=rho_values[index]
-        rho=2.0
+        rho=rho_values[index]
+#        rho=2.0
         global sigma
         #sigma=sigma_values[index]
-        sigma=0.1
+        sigma=1.0
     
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
@@ -231,6 +247,7 @@ if __name__ == '__main__':
             #mu_0[0]=1
         else:
             mu_0[int(num_x/2)]=1.0
+        print(x_grid[int(num_x/2)])
         mu=np.zeros((num_t,num_x))
         for k in range(num_t):
             mu[k]=mu_0
@@ -243,6 +260,7 @@ if __name__ == '__main__':
             if j>J-num_keep-1:
                 all_Y_0_values[index][index2]=u[0][0]
                 index2+=1
+        print ('rho=',rho)
         print all_Y_0_values[index]
         #for index2 in range(num_keep):
             #plt.scatter(rho,Y_0_values[index2])
@@ -251,5 +269,5 @@ if __name__ == '__main__':
     #plt.savefig('one_level_example_73_change_sigma.eps')
     #np.save('grid_example_72_rho_values',rho_values)
     #np.save('grid_example_72_changing_rho',all_Y_0_values)
-    np.save('mu_jet_lag',mu)
+#    np.save('mu_jet_lag',mu)
 
