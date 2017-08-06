@@ -100,6 +100,38 @@ def f_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs):
     value2=-F*partial_c_sun
     return value1+value2
     
+def b_trader_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+    return -rho*Y[i][j] #rho=1/c_alpha
+
+def f_trader_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+    num_initial=len(X[0])
+    Y_mean=0
+    num_per_initial=len(Y[i])/num_initial
+    for k in range(len(Y[i])):
+        index=int(math.floor(k/num_per_initial))
+        Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
+    return -c_x*x_grid[j]-h_bar*rho*Y_mean
+
+def g_trader_Pontryagin(index,xi_vals,xi_probs):
+    x=xi_vals[index]
+    return c_g *x
+
+def b_trader_weak(i,j,X,Y,Z,X_initial_probs):
+    return -rho*Z[i][j]/sigma #rho=1/c_alpha
+
+def f_trader_weak(i,j,X,Y,Z,X_initial_probs):
+    num_initial=len(X[0])
+    Z_mean=0
+    num_per_initial=len(Z[i])/num_initial
+    for k in range(len(Z[i])):
+        index=int(math.floor(k/num_per_initial))
+        Z_mean+=Z[i][k]*X_initial_probs[index]/num_per_initial
+    return -0.5*c_x*x_grid[j]**2-x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
+
+def g_trader_weak(index,xi_vals,xi_probs):
+    x=xi_vals[index]
+    return c_g*0.5*x**2
+    
 def continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
     
     num_initial=len(X_ini[0]) 
@@ -187,7 +219,6 @@ def solver(level,xi_vals,xi_probs):
         for k in range(num_initial):
             row1=xi_vals[k]*np.ones((2**i))
             X[i]=np.concatenate((X[i],row1))
-    print(X[num_t_fine-1])
 
     X_terminal_probs=[]
     for k in range(num_initial):
@@ -221,14 +252,13 @@ def solver(level,xi_vals,xi_probs):
     return Y_initial
 
 if __name__ == '__main__':
-    problem ='ex_73' #possible values in order of appearance: jetlag, trader, ex_1, ex_72, ex_73
+    problem ='trader_weak' #possible values in order of appearance: jetlag, trader, ex_1, ex_72, ex_73
     global b
     global f
     global g
     global periodic_2_pi
     global J
     global J_solver_bar
-    J_solver_bar=10 # ToDo
     global num_keep
     global T
     global num_t
@@ -252,6 +282,7 @@ if __name__ == '__main__':
         g=g_jet_lag
         periodic_2_pi=True
         J=25
+        J_solver_bar=10
         num_keep=5
         T=24.0*10
         num_intervals_total=6
@@ -273,6 +304,7 @@ if __name__ == '__main__':
         g=g_jet_lag
         periodic_2_pi=True
         J=25
+        J_solver_bar=10
         num_keep=5
         T=24.0*10
         num_intervals_total=6
@@ -294,6 +326,7 @@ if __name__ == '__main__':
         g=g_example_1
         periodic_2_pi=False
         J=25
+        J_solver_bar=10
         num_keep=5
         T=1.0
         num_intervals_total=6
@@ -309,20 +342,22 @@ if __name__ == '__main__':
         g=g_example_72
         periodic_2_pi=False
         J=10
+        J_solver_bar=10
         num_keep=5
         T=1.0
         num_intervals_total=6
         num_intervals_coarse=1
         x_0=[0.0]
         x_0_probs=[1.0]
-        sigma=1
-        rho=2
+        sigma=1.0
+        rho=2.0
     elif problem=='ex_73':
         b=b_example_73
         f=f_example_73
         g=g_example_73
         periodic_2_pi=False
         J=25
+        J_solver_bar=10
         num_keep=5
         T=1.0
         num_intervals_total=6
@@ -347,6 +382,7 @@ if __name__ == '__main__':
         g=g_trader_Pontryagin
         periodic_2_pi=False
         J=25
+        J_solver_bar=10
         num_keep=5
         T=1.0
         num_intervals_total=6
@@ -364,6 +400,7 @@ if __name__ == '__main__':
         g=g_trader_weak
         periodic_2_pi=False
         J=25
+        J_solver_bar=10
         num_keep=5
         T=1.0
         num_intervals_total=6
@@ -382,14 +419,16 @@ if __name__ == '__main__':
     global delta_W
     delta_W=math.sqrt(delta_t_fine)
 
-    execution='continuation rho'
+    execution='ordinary'
     # possible values in order of appearance:
     # ordinary, changing sigma, changing rho, continuation sigma
     if execution=='ordinary':
         [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
-        all_Y_0_values[index]=Y_0_values
         print(Y_0_values)
         if problem=='ex_1':
+            m_0=0
+            for k in range(len(x_0)):
+                m_0+=x_0[k]*x_0_probs[k]
             true_Y_0=m_0*math.exp(a*T)/(1+rho/a*(math.exp(a*T)-1.0))
             print('True Answer For Example 1: Y_0=')
             print(true_Y_0)

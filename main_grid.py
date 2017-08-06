@@ -88,9 +88,7 @@ def f_trader_weak(i,j,mu,u,v):
 def g_trader_weak(x):
     return c_g*0.5*x**2
 
-def pi(x):
-    print(x)
-    
+def pi(x):    
     if periodic_2_pi:
         x=x%(2*np.pi)
 
@@ -369,9 +367,9 @@ if __name__ == '__main__':
         # convergence for rho=0.1
     elif problem=='trader_weak':
         sigma=0.7
-        rho=0.03
+        rho=0.02
         c_x=1
-        h_bar=10
+        h_bar=2
         c_g=0.3
         b=b_trader_weak
         f=f_trader_weak
@@ -418,8 +416,8 @@ if __name__ == '__main__':
                 all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
                 index2+=1
         print all_Y_0_values[0]
-        print(mu[num_t-1])
-        np.save('mu_weak',mu)
+#        print(mu[num_t-1])
+#        np.save('mu_weak',mu)
 
         ############## evaluating mu_u, mu_v
 
