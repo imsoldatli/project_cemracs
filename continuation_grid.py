@@ -258,7 +258,7 @@ if __name__ == '__main__':
             [u,v]=backward(mu,u,v)
             mu=forward(u,v,mu_0)
             if j>J-num_keep-1:
-                all_Y_0_values[index][index2]=u[0][0]
+                all_Y_0_values[index][index2]=u[0][int(num_x/2)]
                 index2+=1
         print ('rho=',rho)
         print all_Y_0_values[index]
