@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+0#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
 Created on Mon Jul 24 09:24:22 2017
@@ -236,7 +236,7 @@ if __name__ == '__main__':
     
 
     num_rho=1
-    num_sigma=20
+    num_sigma=1
     sigma_values=np.linspace(0.5,10,num_sigma)
     #all_Y_0_values=np.zeros((num_rho,num_keep))
     all_Y_0_values=np.zeros((num_sigma,num_keep))
@@ -244,10 +244,10 @@ if __name__ == '__main__':
     for index in range(num_sigma):
         global rho
         #rho=rho_values[index]
-        rho=4.0
+        rho=2.0
         global sigma
-        sigma=sigma_values[index]
-        #sigma=1.0
+        #sigma=sigma_values[index]
+        sigma=1.0
     
         [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
         all_Y_0_values[index]=Y_0_values

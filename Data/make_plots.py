@@ -11,6 +11,7 @@ import math
 import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
+    thing=np.load('grid_example_73_changing_rho.npy')
 #    rho_values_1=np.load('tree_example_73_rho_values_1.npy')
 #    rho_values_01=np.load('tree_example_73_rho_values_01.npy')
 #    rho_values_001=np.load('tree_example_73_rho_values_001.npy')

@@ -152,21 +152,21 @@ def backward(mu,u_old,v_old):
 
 if __name__ == '__main__':
     global b
-    b=b_jet_lag_Pontryagin
+    b=b_example_73
     global f
-    f=f_jet_lag_Pontryagin
+    f=f_example_73
     global g
-    g=g_jet_lag
+    g=g_example_73
     global periodic_2_pi
-    periodic_2_pi=True
+    periodic_2_pi=False
     global J
-    J=25
+    J=10
     global num_keep
     num_keep=5
     global T
-    T=24.0*10
+    T=1.0
     global num_t
-    num_t=int(T)*5+1
+    num_t=20
     global delta_t
     delta_t=T/(num_t-1)
     global t_grid
@@ -219,10 +219,10 @@ if __name__ == '__main__':
         index2=0
         global rho
         #rho=rho_values[index]
-        rho=2.0
+        rho=1.0
         global sigma
         #sigma=sigma_values[index]
-        sigma=0.1
+        sigma=1.0
     
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
@@ -240,7 +240,10 @@ if __name__ == '__main__':
             [u,v]=backward(mu,u,v)
             mu=forward(u,v,mu_0)
             if j>J-num_keep-1:
-                all_Y_0_values[index][index2]=u[0][0]
+                if periodic_2_pi:
+                    all_Y_0_values[index][index2]=u[0][0]
+                else:
+                    all_Y_0_values[index][index2]=u[0][int(num_x/2)]
                 index2+=1
         print all_Y_0_values[index]
         #for index2 in range(num_keep):
@@ -250,4 +253,4 @@ if __name__ == '__main__':
     #plt.savefig('one_level_example_73_change_sigma.eps')
     #np.save('grid_example_72_rho_values',rho_values)
     #np.save('grid_example_72_changing_rho',all_Y_0_values)
-    np.save('mu_jet_lag',mu)
+    #np.save('mu_jet_lag',mu)
