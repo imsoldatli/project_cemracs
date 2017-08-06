@@ -174,7 +174,7 @@ def backward(mu,u_old,v_old):
 
 if __name__ == '__main__':
 
-    problem ='ex_72' #possible values in order of appearance: jetlag, trader, ex_1, ex_72, ex_73
+    problem ='trader_weak' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
     global b
     global f
     global g
@@ -355,7 +355,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=12
+        num_t=20
         delta_t=(T-0.06)/(num_t-1)
         t_grid=np.linspace(0.06,T,num_t)
         delta_x=delta_t**(2)
@@ -378,7 +378,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=12
+        num_t=20
         delta_t=(T-0.06)/(num_t-1)
         t_grid=np.linspace(0.06,T,num_t)
         delta_x=delta_t**(2)
@@ -419,6 +419,8 @@ if __name__ == '__main__':
                 all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
                 index2+=1
         print all_Y_0_values[0]
+        print(mu[num_t-1])
+        np.save('mu_weak',mu)
 
         ############## evaluating mu_u, mu_v
 
@@ -496,6 +498,49 @@ if __name__ == '__main__':
                     index2+=1
 
             print all_Y_0_values[index]
+    elif execution=='adaptive':
+        num_rho=20
+        rho_values=np.linspace(2,9,num_rho)
+
+        all_Y_0_values=np.zeros((num_rho,num_keep))
+    #all_Y_0_values=np.zeros((num_sigma,num_keep))
+        for index in range(num_rho):
+    #for index in range(num_sigma):
+            index2=0
+            rho=rho_values[index]
+
+#           num_t=int(20*rho/rho_values[0])
+#           num_t=int(20/math.sqrt(rho/rho_values[0]))
+            num_t=30
+            delta_t=T/(num_t-1)
+            t_grid=np.linspace(0,T,num_t)
+
+#        delta_x=delta_t**2
+            delta_x=(rho+sigma)*delta_t**2
+#        delta_x=delta_t
+            num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
+            if num_x%2==0:
+                num_x+=1
+            x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
+            x_min=x_grid[0]
+            x_max=x_grid[num_x-1]
+#            print(num_t,delta_x,rho,num_x,x_min)
+
+            mu_0=np.zeros((num_x))
+            mu_0[int(num_x/2)]=1.0
+            mu=np.zeros((num_t,num_x))
+            for k in range(num_t):
+                mu[k]=mu_0
+            u=np.zeros((num_t,num_x))
+            v=np.zeros((num_t,num_x))
+
+            for j in range(J):
+                [u,v]=backward(mu,u,v)
+                mu=forward(u,v,mu_0)
+                if j>J-num_keep-1:
+                    all_Y_0_values[index][index2]=np.dot(u[0],mu[0])
+                    index2+=1
+
         #for index2 in range(num_keep):
             #plt.scatter(rho,Y_0_values[index2])
             #plt.scatter(sigma,Y_0_values[index2])
