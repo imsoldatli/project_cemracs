@@ -138,9 +138,6 @@ def forward(u,v,mu_0):
            up=x_grid[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
            up_index=pi(up)
            mu[i+1,up_index]+=mu[i,j]*0.5
-
-    #print(mu)
-    #print('the sum on each row is', mu.sum(axis=1))
     return mu
 
 def backward(mu,u_old,v_old):
@@ -202,7 +199,7 @@ def backward(mu,u_old,v_old):
 
 
 if __name__ == '__main__':
-    problem ='trader_weak' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
+    problem ='ex_73' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
     global b
     global f
     global g
@@ -390,7 +387,7 @@ if __name__ == '__main__':
 
         # convergence for rho=0.1
 
-    execution='ordinary'
+    execution='adaptive'
     # possible values in order of appearance:
     # ordinary, changing sigma, changing rho
     if execution=='ordinary':
@@ -416,8 +413,6 @@ if __name__ == '__main__':
                 all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
                 index2+=1
         print all_Y_0_values[0]
-#        print(mu[num_t-1])
-#        np.save('mu_weak',mu)
 
         ############## evaluating mu_u, mu_v
 
@@ -495,6 +490,9 @@ if __name__ == '__main__':
                     index2+=1
             print all_Y_0_values[index]
     elif execution=='adaptive':
+        x_min_goal=x_min
+        x_max_goal=x_max
+        x_center=(x_min_goal+x_max_goal)/2.0
         num_rho=20
         rho_values=np.linspace(2,9,num_rho)
 
@@ -520,7 +518,6 @@ if __name__ == '__main__':
             x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
             x_min=x_grid[0]
             x_max=x_grid[num_x-1]
-#            print(num_t,delta_x,rho,num_x,x_min)
 
             mu_0=np.zeros((num_x))
             mu_0[int(num_x/2)]=1.0
