@@ -183,6 +183,7 @@ if __name__ == '__main__':
     global num_keep
     global T
     global num_t
+
     global delta_t
     global t_grid
     global delta_x
@@ -394,6 +395,9 @@ if __name__ == '__main__':
     # ordinary, changing sigma, changing rho
     if execution=='ordinary':
 
+
+
+    
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
                 mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
@@ -499,3 +503,5 @@ if __name__ == '__main__':
     #plt.savefig('one_level_example_73_change_sigma.eps')
     #np.save('grid_example_72_rho_values',rho_values)
     #np.save('grid_example_72_changing_rho',all_Y_0_values)
+
+    #np.save('mu_jet_lag',mu)

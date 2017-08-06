@@ -164,8 +164,13 @@ if __name__ == '__main__':
         global t_grid
         t_grid=np.linspace(0,T,num_t)
         global delta_x
+<<<<<<< HEAD
         delta_x=delta_t**2
 #        delta_x=delta_t**2*(rho_values[0]/rho+sigma)
+=======
+#        delta_x=delta_t**2
+        delta_x=(rho+sigma)*delta_t**2
+>>>>>>> 5e82e47e17b99c6aa719871d62aa8fa7cd9f5273
 #        delta_x=delta_t
         global num_x
         num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
