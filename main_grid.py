@@ -122,7 +122,7 @@ def lin_int(x_min,x_max,y_min,y_max,x_get):
     elif x_get<=x_min:
         return y_min
     else:
-        return x_min+(y_max-y_min)/(x_max-x_min)*(x_get-x_min)
+        return y_min+(y_max-y_min)/(x_max-x_min)*(x_get-x_min)
 
 def forward(u,v,mu_0):
 

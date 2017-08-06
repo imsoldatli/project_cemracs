@@ -102,7 +102,7 @@ def lin_int(x_min,x_max,y_min,y_max,x_get):
     elif x_get<=x_min:
         return y_min
     else:
-        return x_min+(y_max-y_min)/(x_max-x_min)*(x_get-x_min)
+        return y_min+(y_max-y_min)/(x_max-x_min)*(x_get-x_min)
     
 def forward(u,v,mu_0):
 
@@ -183,31 +183,31 @@ def backward(mu,u_old,v_old):
                 v[i][j] = 1.0/np.sqrt(delta_t) * (g(x_grid[j_up]) - g(x_grid[j_down]))
 
             else:
-#
-#                if x_down>x_grid[j_down]:
-#                    if j_down<num_x-1:
-#                        u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
-#                    else:
-#                        u_down=u[i+1][j_down]
-#                else:
-#                    if j_down>0:
-#                        u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
-#                    else:
-#                        u_down=u[i+1][j_down]
-#                        
-#                if x_up>x_grid[j_up]:
-#                    if j_up<num_x-1:
-#                        u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
-#                    else:
-#                        u_up=u[i+1][j_up]
-#                else:
-#                    if j_up>0:
-#                        u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
-#                    else:
-#                        u_up=u[i+1][j_up]
 
-                u_up = u[i+1][j_up]
-                u_down = u[i+1][j_down]
+                if x_down>x_grid[j_down]:
+                    if j_down<num_x-1:
+                        u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
+                    else:
+                        u_down=u[i+1][j_down]
+                else:
+                    if j_down>0:
+                        u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
+                    else:
+                        u_down=u[i+1][j_down]
+                        
+                if x_up>x_grid[j_up]:
+                    if j_up<num_x-1:
+                        u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
+                    else:
+                        u_up=u[i+1][j_up]
+                else:
+                    if j_up>0:
+                        u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+                    else:
+                        u_up=u[i+1][j_up]
+
+#                u_up = u[i+1][j_up]
+#                u_down = u[i+1][j_down]
                 
                 
                 u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
