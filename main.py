@@ -235,11 +235,7 @@ if __name__ == '__main__':
     
 
     num_rho=1
-<<<<<<< HEAD
-    num_sigma=20
-=======
     num_sigma=1
->>>>>>> 5e82e47e17b99c6aa719871d62aa8fa7cd9f5273
     sigma_values=np.linspace(0.5,10,num_sigma)
     #all_Y_0_values=np.zeros((num_rho,num_keep))
     all_Y_0_values=np.zeros((num_sigma,num_keep))
@@ -247,17 +243,10 @@ if __name__ == '__main__':
     for index in range(num_sigma):
         global rho
         #rho=rho_values[index]
-<<<<<<< HEAD
-        rho=4.0
-        global sigma
-        sigma=sigma_values[index]
-        #sigma=1.0
-=======
         rho=2.0
         global sigma
         #sigma=sigma_values[index]
         sigma=1.0
->>>>>>> 5e82e47e17b99c6aa719871d62aa8fa7cd9f5273
     
         [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
         all_Y_0_values[index]=Y_0_values
