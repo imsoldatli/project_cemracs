@@ -115,7 +115,15 @@ def pi(x):
         x_index=low+1
 
     return(x_index)
-    
+
+def lin_int(x_min,x_max,y_min,y_max,x_get):
+    if x_get>=x_max:
+        return y_max
+    elif x_get<=x_min:
+        return y_min
+    else:
+        return x_min+(y_max-y_min)/(x_max-x_min)*(x_get-x_min)
+
 def forward(u,v,mu_0):
 
     mu=np.zeros((num_t,num_x))
@@ -146,28 +154,50 @@ def backward(mu,u_old,v_old):
 
     for i in reversed(range(num_t-1)):
         for j in range(num_x):
+            x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t)
+                
+            x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t)
+                
+            j_down = pi(x_down)
+
+            j_up = pi(x_up)
+
             if i==num_t-2:
-                j_down = (x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t))
             
-                j_up = (x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t))
-            
-                u[i][j] = (g(j_down) + g(j_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
-                v[i][j] = 1.0/np.sqrt(delta_t) * (g(j_up) - g(j_down))
+                u[i][j] = (g(x_grid[j_down]) + g(x_grid[j_up]))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+                
+                v[i][j] = 1.0/np.sqrt(delta_t) * (g(x_grid[j_up]) - g(x_grid[j_down]))
 
             else:
-                j_down = pi(x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t))
 
-                #j_down = pi((x_grid[j] + b(i+1,j,mu,u,v)*delta_t - sigma*np.sqrt(delta_t)))
-            
-                j_up = pi(x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t))
+                if x_down>x_grid[j_down]:
+                    if j_down<num_x-1:
+                        u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
+                    else:
+                        u_down=u[i+1][j_down]
+                else:
+                    if j_down>0:
+                        u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
+                    else:
+                        u_down=u[i+1][j_down]
+                        
+                if x_up>x_grid[j_up]:
+                    if j_up<num_x-1:
+                        u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
+                    else:
+                        u_up=u[i+1][j_up]
+                else:
+                    if j_up>0:
+                        u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+                    else:
+                        u_up=u[i+1][j_up]
 
-                #j_up = pi((x_grid[j] + b(i+1,j,mu,u,v)*delta_t + sigma*np.sqrt(delta_t)))
-            
-                u[i][j] = (u[i+1][j_down] + u[i+1][j_up])/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+#                u_up = u[i+1][j_up]
+#                u_down = u[i+1][j_down]
+
+                u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
                 
-                #u[i][j] = (u[i+1][j_down] + u[i+1][j_up])/2.0 + delta_t*f(i+1,j,mu,u,v)
-                
-                v[i][j] = 1.0/np.sqrt(delta_t) * (u[i+1][j_up] - u[i+1][j_down])
+                v[i][j] = 1.0/np.sqrt(delta_t) * (u_up - u_down)
 
     return [u,v]
 
