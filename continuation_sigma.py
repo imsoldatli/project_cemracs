@@ -78,7 +78,6 @@ def sigma_continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
             row1=X_initial_probs[j]*np.ones(2**(num_t_total-1))/(2**(num_t_total-1))
             x_probs=np.concatenate((x_probs,row1))
 #    print(x_probs)
-<<<<<<< HEAD
     for k in range(J):            
         for j in range(num_initial*2**(num_t_total-1)):
             Y[num_t_total-1][j]=g(j,X[num_t_total-1],x_probs)
@@ -96,29 +95,6 @@ def sigma_continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
                 for j in range(num_initial*2**i):
                     X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
                     X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
-=======
-    for k in range(J):
-        for i in range(num_t_total-1):
-            for j in range(num_initial*2**i):
-                X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
-                X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
-                
-        for j in range(num_initial*2**(num_t_total-1)):
-            x_vals[j]=X[num_t_total-1][j]
-            
-        for j in range(num_initial*2**(num_t_total-1)):
-            Y[num_t_total-1][j]=g(j,x_vals,x_probs)
-            
-        for i in reversed(range(num_t_total-1)):
-            for j in range(num_initial*2**i):
-#                temp_Y=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z,X_initial_probs)+delta_t_fine*f(i+1,2*j+1,X,Y,Z,X_initial_probs))/2.0
-                temp_Y=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y,Z,X_initial_probs)
-                temp_=delta_t_fine*f(i,j,X,Y,Z,X_initial_probs)
-                Y[i][j]=temp_Y
-                Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
-#                print(k,i,j,temp_)
-            
->>>>>>> 5e82e47e17b99c6aa719871d62aa8fa7cd9f5273
             
         if k>J-num_keep-1:
             Y_0_values[index]=Y[0][0]
@@ -173,13 +149,9 @@ if __name__ == '__main__':
     global g
     g=g_example_73
     global J
-<<<<<<< HEAD
     J=10
     global J_solver_bar
     J_solver_bar=10
-=======
-    J=25
->>>>>>> 5e82e47e17b99c6aa719871d62aa8fa7cd9f5273
     global num_keep
     num_keep=5
     global num_intervals_total
@@ -207,7 +179,6 @@ if __name__ == '__main__':
     x_0=[2.0]
     x_0_probs=[1.0]
 
-<<<<<<< HEAD
     delta_rho=0.2
     rho_min=1.0
     rho_max=2.6
@@ -221,14 +192,6 @@ if __name__ == '__main__':
     sigma_values=np.linspace(sigma_min,sigma_max,num_sigma)
     all_Y_0_values=np.zeros((num_rho,num_keep))
     #all_Y_0_values=np.zeros((num_sigma,num_keep))
-=======
-    num_rho=1
-    rho_values=np.linspace(1,6,num_rho)
-    num_sigma=1
-    sigma_values=np.linspace(0.5,20,num_sigma)
-    #all_Y_0_values=np.zeros((num_rho,num_keep))
-    all_Y_0_values=np.zeros((num_sigma,num_keep))
->>>>>>> 5e82e47e17b99c6aa719871d62aa8fa7cd9f5273
     #for index in range(num_rho):
         
 #    for index in reversed(range(num_sigma)):
@@ -252,7 +215,6 @@ if __name__ == '__main__':
 #    np.save('tree_example_73_E_one_level_changing_sigma',all_Y_0_values)
 
 # first initialization
-<<<<<<< HEAD
 
     for rho_index in range(num_rho):
         global rho
@@ -305,46 +267,6 @@ if __name__ == '__main__':
     np.save('tree_example_73_sigma_continuation_rho_values',rho_values)
     #np.save('tree_example_73_one_level_continuation_sigma_3',all_Y_0_values)
         
-=======
-    X=[]
-    num_initial=len(x_0)
-    for i in range(num_t_total):
-        X.append([])
-        for k in range(num_initial):
-            row1=x_0[k]*np.ones((2**i))
-            X[i]=np.concatenate((X[i],row1))
-            
-    Y=[]
-    for i in range(num_t_total):
-        if i<num_t_total-1:
-            row2=np.zeros((num_initial*2**i))
-            Y.append(row2)
-        else:
-            Y.append([])
-            for k in range(num_initial):
-                row2=g(k,x_0,x_0_probs)*np.ones((2**i))
-                Y[i]=np.concatenate((Y[i],row2))
-  
-    Z=[]
-    for i in range(num_t_total):
-        row3=np.zeros((num_initial*2**i))
-        Z.append(row3)
-#    print(Y)
-    for index in reversed(range(num_sigma)):
-        global rho
-#        rho=rho_values[index]
-        rho=4.0
-        global sigma
-#        sigma=sigma_values[index]
-        sigma=1.0
-#        print(Y)
-        [X,Y,Z,Y_0_values]=sigma_continuation_solver_bar(X,x_0_probs,Y,Z)
-        print('sigma=',sigma)
-#        print(Y)
-        all_Y_0_values[index]=Y_0_values
-        print(Y_0_values)
-        
->>>>>>> 5e82e47e17b99c6aa719871d62aa8fa7cd9f5273
 #    for index in range(num_rho):
 #        global rho
 #        rho=rho_values[index]

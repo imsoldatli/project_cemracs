@@ -237,6 +237,7 @@ if __name__ == '__main__':
     num_rho=1
     num_sigma=20
 
+
     sigma_values=np.linspace(0.5,10,num_sigma)
     #all_Y_0_values=np.zeros((num_rho,num_keep))
     all_Y_0_values=np.zeros((num_sigma,num_keep))
@@ -248,6 +249,7 @@ if __name__ == '__main__':
         global sigma
         sigma=sigma_values[index]
         #sigma=1.0
+
 
         [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
         all_Y_0_values[index]=Y_0_values
