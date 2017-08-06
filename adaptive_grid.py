@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Jul 28 17:37:27 2017
-
 @author: Andrea Angiuli, Christy Graves, Houzhi Li
 """
 
@@ -121,11 +120,11 @@ def backward(mu,u_old,v_old):
 
 if __name__ == '__main__':
     global b
-    b=b_example_72
+    b=b_example_73
     global f
-    f=f_example_72
+    f=f_example_73
     global g
-    g=g_example_72
+    g=g_example_73
     global J
     J=10
     global num_keep
@@ -135,8 +134,8 @@ if __name__ == '__main__':
     global a
     a=0.25
     
-    x_min_goal=-3.0
-    x_max_goal=3.0
+    x_min_goal=0
+    x_max_goal=4.0
     x_center=(x_min_goal+x_max_goal)/2.0
     
     num_rho=20
@@ -152,16 +151,22 @@ if __name__ == '__main__':
         rho=rho_values[index]
         #rho=2.0
         
+        global sigma 
+        #sigma=sigma_values[index]
+        sigma=1
+        
         global num_t
 #        num_t=int(20*rho/rho_values[0])
-        num_t=int(20*math.sqrt(rho/rho_values[0]))
+#        num_t=int(20/math.sqrt(rho/rho_values[0]))
+        num_t=30
         global delta_t
         delta_t=T/(num_t-1)
         global t_grid
         t_grid=np.linspace(0,T,num_t)
         global delta_x
-#        delta_x=delta_t**2
-        delta_x=delta_t
+        delta_x=delta_t**2
+#        delta_x=delta_t**2*(rho_values[0]/rho+sigma)
+#        delta_x=delta_t
         global num_x
         num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
         if num_x%2==0:
@@ -172,11 +177,10 @@ if __name__ == '__main__':
         x_min=x_grid[0]
         global x_max
         x_max=x_grid[num_x-1]
+        print(num_t,delta_x,rho,num_x,x_min)
     
         
-        global sigma 
-        #sigma=sigma_values[index]
-        sigma=1
+
     
         mu_0=np.zeros((num_x))
         mu_0[int(num_x/2)]=1.0
@@ -192,6 +196,7 @@ if __name__ == '__main__':
             if j>J-num_keep-1:
                 all_Y_0_values[index][index2]=u[0][int(num_x/2)]
                 index2+=1
-        print all_Y_0_values[index]
+        #print all_Y_0_values[index]
+        #print np.dot(mu[num_t-1],g(x_grid))
         
     np.save('adaptive_grid_example_72_changing_rho',all_Y_0_values)
