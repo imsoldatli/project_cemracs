@@ -369,10 +369,15 @@ if __name__ == '__main__':
         x_grid=np.linspace(x_min,x_max,num_x)
     elif problem=='trader_Pontryagin':
         sigma=0.7
-        rho=0.05
+        rho=0.01
         c_x=1
-        h_bar=10
+        h_bar=2
         c_g=0.3
+        # sigma=0.7
+        # rho=0.03
+        # c_x=1
+        # h_bar=10
+        # c_g=0.3
         # sigma=0.7
         # rho=0.07
         # c_x=0.1
@@ -385,7 +390,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=20
+        num_t=30
         delta_t=(T-0.06)/(num_t-1)
         t_grid=np.linspace(0.06,T,num_t)
         delta_x=delta_t**(2)
@@ -397,9 +402,9 @@ if __name__ == '__main__':
         # convergence for rho=0.1
     elif problem=='trader_weak':
         sigma=0.7
-        rho=0.03
+        rho=0.01
         c_x=1
-        h_bar=10
+        h_bar=2
         c_g=0.3
         b=b_trader_weak
         f=f_trader_weak
@@ -408,7 +413,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=20
+        num_t=30
         delta_t=(T-0.06)/(num_t-1)
         t_grid=np.linspace(0.06,T,num_t)
         delta_x=delta_t**(2)
