@@ -382,7 +382,7 @@ if __name__ == '__main__':
     global delta_W
     delta_W=math.sqrt(delta_t_fine)
 
-    execution='continuation sigma'
+    execution='continuation rho'
     # possible values in order of appearance:
     # ordinary, changing sigma, changing rho, continuation sigma
     if execution=='ordinary':
@@ -416,6 +416,44 @@ if __name__ == '__main__':
             [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
             all_Y_0_values[index]=Y_0_values
             print(Y_0_values)
+            
+    elif execution=='continuation rho':
+        delta_rho=0.1
+        rho_min=1.0
+        rho_max=3.0
+        num_rho=int((sigma_max-sigma_min)/delta_sigma)+1
+        rho_values=np.linspace(sigma_min,sigma_max,num_sigma)
+        all_Y_0_values=np.zeros((num_rho,num_keep))
+        
+        X=[]
+        num_initial=len(x_0)
+        for i in range(num_t_fine):
+            X.append([])
+            for k in range(num_initial):
+                row1=x_0[k]*np.ones((2**i))
+                X[i]=np.concatenate((X[i],row1))
+                
+        Y=[]
+        for i in range(num_t_fine):
+            if i<num_t_fine-1:
+                row2=np.zeros((num_initial*2**i))
+                Y.append(row2)
+            else:
+                Y.append([])
+                for k in range(num_initial):
+                    row2=g(k,x_0,x_0_probs)*np.ones((2**i))
+                    Y[i]=np.concatenate((Y[i],row2))
+      
+        Z=[]
+        for i in range(num_t_fine):
+            row3=np.zeros((num_initial*2**i))
+            Z.append(row3)
+        
+        for index in range(num_rho):
+            rho=rho_values[index]
+            [X,Y,Z,Y_0_values]=continuation_solver_bar(X,x_0_probs,Y,Z)
+            all_Y_0_values[index]=Y_0_values
+            print(Y_0_values)      
             
     elif execution=='continuation sigma':
         delta_sigma=1.0
