@@ -18,32 +18,25 @@ def b_example_1(i,j,X,Y,Z,X_initial_probs):
         Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
     return -rho*Y_mean
     
-def b_example_72(i,j,X,Y,Z,X_initial_probs):
-    return rho*np.cos(Y[i][j])
-    
-def b_example_73(i,j,X,Y,Z,X_initial_probs):
-    return -rho*Y[i][j]
-
-def b_example_73_E(i,j,X,Y,Z,X_initial_probs):
-    num_initial=len(X[0])
-    Y_mean=0
-    num_per_initial=len(Y[i])/num_initial
-    for k in range(len(Y[i])):
-        index=int(math.floor(k/num_per_initial))
-        Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
-    return -rho*Y_mean
-    
-def b_jet_lag_weak(i,j,X,Y,Z,X_initial_probs):
-    return omega_0-omega_S-1.0/(R*sigma)*Z[i][j]
-
-def b_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs):
-    return omega_0-omega_S-1.0/R*Y[i][j]
-    
 def f_example_1(i,j,X,Y,Z,X_initial_probs):
     return a*Y[i][j]
 
+def g_example_1(index,xi_vals,xi_probs):
+    x=xi_vals[index]
+    return x
+    
+def b_example_72(i,j,X,Y,Z,X_initial_probs):
+    return rho*np.cos(Y[i][j])
+    
 def f_example_72(i,j,X,Y,Z,X_initial_probs):
     return 0
+    
+def g_example_72(index,xi_vals,xi_probs):
+    x=xi_vals[index]
+    return np.sin(x)
+    
+def b_example_73(i,j,X,Y,Z,X_initial_probs):
+    return -rho*Y[i][j]
 
 def f_example_73(i,j,X,Y,Z,X_initial_probs):
     num_initial=len(X[0])
@@ -54,6 +47,26 @@ def f_example_73(i,j,X,Y,Z,X_initial_probs):
         X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
     return -math.atan(X_mean)
     
+def g_example_73(index,xi_vals,xi_probs):
+    x=xi_vals[index]
+    return np.arctan(x)
+
+def b_example_73_E(i,j,X,Y,Z,X_initial_probs):
+    num_initial=len(X[0])
+    Y_mean=0
+    num_per_initial=len(Y[i])/num_initial
+    for k in range(len(Y[i])):
+        index=int(math.floor(k/num_per_initial))
+        Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
+    return -rho*Y_mean
+    
+def g_example_73_E(index,xi_vals,xi_probs):
+    X_mean=np.dot(xi_vals,xi_probs)
+    return np.arctan(X_mean)
+    
+def b_jet_lag_weak(i,j,X,Y,Z,X_initial_probs):
+    return omega_0-omega_S-1.0/(R*sigma)*Z[i][j]
+
 def f_jet_lag_weak(i,j,X,Y,Z,X_initial_probs):
     value1=1.0/sigma*(omega_0-omega_S)*Z[i][j]-1.0/(2*R*sigma**2)*(Z[i][j])**2
     num_initial=len(X[0])
@@ -67,6 +80,12 @@ def f_jet_lag_weak(i,j,X,Y,Z,X_initial_probs):
     c_sun=0.5*(np.sin((X[i][j]-p)/2.0))**2
     value3=F*c_sun
     return value1+value2+value3
+
+def g_jet_lag(index,xi_vals,xi_probs):
+    return 0
+    
+def b_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+    return omega_0-omega_S-1.0/R*Y[i][j]
     
 def f_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs):
     num_initial=len(X[0])
@@ -80,25 +99,76 @@ def f_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs):
     partial_c_sun=0.5*np.sin((X[i][j]-p)/2.0)*np.cos((X[i][j]-p)/2.0)
     value2=-F*partial_c_sun
     return value1+value2
+    
+def b_trader_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+    return -rho*Y[i][j] #rho=1/c_alpha
 
-def g_example_1(index,xi_vals,xi_probs):
-    x=xi_vals[index]
-    return x
-    
-def g_example_72(index,xi_vals,xi_probs):
-    x=xi_vals[index]
-    return np.sin(x)
-    
-def g_example_73(index,xi_vals,xi_probs):
-    x=xi_vals[index]
-    return np.arctan(x)
+def f_trader_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+    num_initial=len(X[0])
+    Y_mean=0
+    num_per_initial=len(Y[i])/num_initial
+    for k in range(len(Y[i])):
+        index=int(math.floor(k/num_per_initial))
+        Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
+    return -c_x*x_grid[j]-h_bar*rho*Y_mean
 
-def g_example_73_E(index,xi_vals,xi_probs):
-    X_mean=np.dot(xi_vals,xi_probs)
-    return np.arctan(X_mean)
+def g_trader_Pontryagin(index,xi_vals,xi_probs):
+    x=xi_vals[index]
+    return c_g *x
+
+def b_trader_weak(i,j,X,Y,Z,X_initial_probs):
+    return -rho*Z[i][j]/sigma #rho=1/c_alpha
+
+def f_trader_weak(i,j,X,Y,Z,X_initial_probs):
+    num_initial=len(X[0])
+    Z_mean=0
+    num_per_initial=len(Z[i])/num_initial
+    for k in range(len(Z[i])):
+        index=int(math.floor(k/num_per_initial))
+        Z_mean+=Z[i][k]*X_initial_probs[index]/num_per_initial
+    return -0.5*c_x*x_grid[j]**2-x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
+
+def g_trader_weak(index,xi_vals,xi_probs):
+    x=xi_vals[index]
+    return c_g*0.5*x**2
     
-def g_jet_lag(index,xi_vals,xi_probs):
-    return 0
+def continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
+    
+    num_initial=len(X_ini[0]) 
+    Y_0_values=np.zeros((num_keep))
+    index=0
+    X=X_ini
+    Y=Y_ini
+    Z=Z_ini
+    x_vals=np.zeros(num_initial*2**(num_t_fine-1))
+    x_probs=[]
+    for j in range(num_initial):
+            row1=X_initial_probs[j]*np.ones(2**(num_t_fine-1))/(2**(num_t_fine-1))
+            x_probs=np.concatenate((x_probs,row1))
+#    print(x_probs)
+    for k in range(J):            
+        for j in range(num_initial*2**(num_t_fine-1)):
+            Y[num_t_fine-1][j]=g(j,X[num_t_fine-1],x_probs)
+            
+        for index2 in range(J_solver_bar):
+            for i in reversed(range(num_t_fine-1)):
+                for j in range(num_initial*2**i):
+    #                temp_Y=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z,X_initial_probs)+delta_t_fine*f(i+1,2*j+1,X,Y,Z,X_initial_probs))/2.0
+                    temp_Y=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y,Z,X_initial_probs)
+                    #temp_=delta_t_fine*f(i,j,X,Y,Z,X_initial_probs)
+                    Y[i][j]=temp_Y
+                    Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
+    #                print(k,i,j,temp_)
+            for i in range(num_t_fine-1):
+                for j in range(num_initial*2**i):
+                    X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
+                    X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
+            
+        if k>J-num_keep-1:
+            Y_0_values[index]=Y[0][0]
+            index+=1
+            
+    return [X,Y,Z,Y_0_values]
 
 def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
     num_initial=len(X[0])
@@ -182,99 +252,283 @@ def solver(level,xi_vals,xi_probs):
     return Y_initial
 
 if __name__ == '__main__':
+    problem ='ex_73' #possible values in order of appearance: jetlag, trader, ex_1, ex_72, ex_73
     global b
-    b=b_example_73
     global f
-    f=f_example_73
     global g
-    g=g_example_73
     global periodic_2_pi
-    periodic_2_pi=False
     global J
-    J=10
     global J_solver_bar
-    J_solver_bar=10
     global num_keep
-    num_keep=5
-    global num_intervals_total
-    num_intervals_total=6
     global T
-    T=1.0
+    global num_t
+
+    global rho
+    global sigma
+    global a
+    global R
+    global K
+    global F
+    global omega_0
+    global omega_S
+    global p
+    global num_intervals_total
     global num_intervals_coarse
-    num_intervals_coarse=1
+
+
+    if problem =='jetlag_Pontryagin':
+        b=b_jet_lag_Pontryagin
+        f=f_jet_lag_Pontryagin
+        g=g_jet_lag
+        periodic_2_pi=True
+        J=25
+        J_solver_bar=10
+        num_keep=5
+        T=24.0*10
+        num_intervals_total=6
+        num_intervals_coarse=1
+        x_0=[0.0]
+        x_0_probs=[1.0]
+    
+        # Varible Jet Lag
+        R=1
+        K=0.01
+        F=0.01
+        omega_0=2*np.pi/24.5
+        omega_S=2*np.pi/24
+        p=(3.0/12.0)*np.pi
+        sigma=0.1
+    elif problem =='jetlag_weak':
+        b=b_jet_lag_weak
+        f=f_jet_lag_weak
+        g=g_jet_lag
+        periodic_2_pi=True
+        J=25
+        J_solver_bar=10
+        num_keep=5
+        T=24.0*10
+        num_intervals_total=6
+        num_intervals_coarse=1
+        x_0=[0.0]
+        x_0_probs=[1.0]
+
+        # Varible Jet Lag
+        R=1.0
+        K=0.01
+        F=0.01
+        omega_0=2*np.pi/24.5
+        omega_S=2*np.pi/24
+        p=(3.0/12.0)*np.pi
+        sigma=0.1
+    elif problem=='ex_1':
+        b=b_example_1
+        f=f_example_1
+        g=g_example_1
+        periodic_2_pi=False
+        J=25
+        J_solver_bar=10
+        num_keep=5
+        T=1.0
+        num_intervals_total=6
+        num_intervals_coarse=1
+        x_0=[2.0]
+        x_0_probs=[1.0]
+        sigma=1
+        rho=0.1
+        a=0.25
+    elif problem=='ex_72':
+        b=b_example_72
+        f=f_example_72
+        g=g_example_72
+        periodic_2_pi=False
+        J=10
+        J_solver_bar=10
+        num_keep=5
+        T=1.0
+        num_intervals_total=6
+        num_intervals_coarse=1
+        x_0=[0.0]
+        x_0_probs=[1.0]
+        sigma=1.0
+        rho=2.0
+    elif problem=='ex_73':
+        b=b_example_73
+        f=f_example_73
+        g=g_example_73
+        periodic_2_pi=False
+        J=25
+        J_solver_bar=10
+        num_keep=5
+        T=1.0
+        num_intervals_total=6
+        num_intervals_coarse=1
+        x_0=[2.0]
+        x_0_probs=[1.0]
+        sigma=1
+        rho=1
+    elif problem=='trader_Pontryagin':
+        sigma=0.7
+        rho=0.05
+        c_x=1
+        h_bar=10
+        c_g=0.3
+        # sigma=0.7
+        # rho=0.07
+        # c_x=0.1
+        # h_bar=0.01
+        # c_g=1
+        b=b_trader_Pontryagin
+        f=f_trader_Pontryagin
+        g=g_trader_Pontryagin
+        periodic_2_pi=False
+        J=25
+        J_solver_bar=10
+        num_keep=5
+        T=1.0
+        num_intervals_total=6
+        num_intervals_coarse=1
+        x_0=[1.0]
+        x_0_probs=[1.0]
+    elif problem=='trader_weak':
+        sigma=0.7
+        rho=0.03
+        c_x=1
+        h_bar=10
+        c_g=0.3
+        b=b_trader_weak
+        f=f_trader_weak
+        g=g_trader_weak
+        periodic_2_pi=False
+        J=25
+        J_solver_bar=10
+        num_keep=5
+        T=1.0
+        num_intervals_total=6
+        num_intervals_coarse=1
+        x_0=[1.0]
+        x_0_probs=[1.0]
+
     global num_t_coarse
     num_t_coarse=num_intervals_coarse+1
     global delta_t_coarse
-    delta_t_coarse=T/(num_t_coarse-1)
+    delta_t_coarse=float(T)/(num_t_coarse-1)
     global num_t_fine
     num_t_fine=num_intervals_total/num_intervals_coarse+1
     global delta_t_fine
     delta_t_fine=delta_t_coarse/(num_t_fine-1)
     global delta_W
-    delta_W=math.sqrt(delta_t_fine) 
-    
-    global a
-    a=0.25
-    global R
-    R=1
-    global K
-    K=0.01
-    global F
-    F=0.01
-    global omega_0
-    omega_0=2*np.pi/24.5
-    global omega_S
-    omega_S=2*np.pi/24
-    global p
-    p=0
-    
-    x_0=[2.0]
-    x_0_probs=[1.0]
+    delta_W=math.sqrt(delta_t_fine)
 
-
-    
-
-    num_rho=1
-    num_sigma=20
-
-
-    sigma_values=np.linspace(0.5,10,num_sigma)
-    #all_Y_0_values=np.zeros((num_rho,num_keep))
-    all_Y_0_values=np.zeros((num_sigma,num_keep))
-    #for index in range(num_rho):
-    for index in range(num_sigma):
-        global rho
-        #rho=rho_values[index]
-        rho=4.0
-        global sigma
-        sigma=sigma_values[index]
-        #sigma=1.0
-
-
+    execution='ordinary'
+    # possible values in order of appearance:
+    # ordinary, changing sigma, changing rho, continuation sigma
+    if execution=='ordinary':
         [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
-        all_Y_0_values[index]=Y_0_values
         print(Y_0_values)
-        #for index2 in range(num_keep):
-            #plt.scatter(rho,Y_0_values[index2])
-            #plt.scatter(sigma,Y_0_values[index2])
-    #plt.savefig('two_level_changing_rho_example_72.eps')
-    #plt.savefig('one_level_example_73_change_sigma.eps')
-    #np.save('tree_example_73_E_sigma_values',sigma_values)
-    #np.save('tree_example_73_E_one_level_changing_sigma',all_Y_0_values)
-    
-    Y_0=0
-    m_0=0
-    for k in range(len(x_0)):
-        Y_0+=Y_initial[k]*x_0_probs[k]
-        m_0+=x_0[k]*x_0_probs[k]
+        if problem=='ex_1':
+            m_0=0
+            for k in range(len(x_0)):
+                m_0+=x_0[k]*x_0_probs[k]
+            true_Y_0=m_0*math.exp(a*T)/(1+rho/a*(math.exp(a*T)-1.0))
+            print('True Answer For Example 1: Y_0=')
+            print(true_Y_0)
 
-    true_Y_0=m_0*math.exp(a*T)/(1+rho/a*(math.exp(a*T)-1.0))
-    print('True Answer For Example 1: Y_0=')
-    print(true_Y_0)
-    print('Our Answer: Y_0=')
-    print(Y_0)
-    
-    print('Log Num Time Steps')
-    print(math.log(num_intervals_total))
-    print('Log Difference')
-    print(math.log(abs(true_Y_0-Y_0)))
+    elif execution=='changing sigma':
+        num_sigma=10
+        sigma_values=np.linspace(0.5,10,num_sigma)
+        all_Y_0_values=np.zeros((num_sigma,num_keep))
+        for index in range(num_sigma):
+            index2=0
+            sigma=sigma_values[index]
+
+            [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
+            all_Y_0_values[index]=Y_0_values
+            print(Y_0_values)
+            
+    elif execution=='changing rho':
+        num_rho=10
+        rho_values=np.linspace(1,10,num_rho)
+        all_Y_0_values=np.zeros((num_rho,num_keep))
+        for index in range(num_rho):
+            index2=0
+            rho=rho_values[index]
+            [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
+            all_Y_0_values[index]=Y_0_values
+            print(Y_0_values)
+            
+    elif execution=='continuation rho':
+        delta_rho=0.1
+        rho_min=1.0
+        rho_max=3.0
+        num_rho=int((sigma_max-sigma_min)/delta_sigma)+1
+        rho_values=np.linspace(sigma_min,sigma_max,num_sigma)
+        all_Y_0_values=np.zeros((num_rho,num_keep))
+        
+        X=[]
+        num_initial=len(x_0)
+        for i in range(num_t_fine):
+            X.append([])
+            for k in range(num_initial):
+                row1=x_0[k]*np.ones((2**i))
+                X[i]=np.concatenate((X[i],row1))
+                
+        Y=[]
+        for i in range(num_t_fine):
+            if i<num_t_fine-1:
+                row2=np.zeros((num_initial*2**i))
+                Y.append(row2)
+            else:
+                Y.append([])
+                for k in range(num_initial):
+                    row2=g(k,x_0,x_0_probs)*np.ones((2**i))
+                    Y[i]=np.concatenate((Y[i],row2))
+      
+        Z=[]
+        for i in range(num_t_fine):
+            row3=np.zeros((num_initial*2**i))
+            Z.append(row3)
+        
+        for index in range(num_rho):
+            rho=rho_values[index]
+            [X,Y,Z,Y_0_values]=continuation_solver_bar(X,x_0_probs,Y,Z)
+            all_Y_0_values[index]=Y_0_values
+            print(Y_0_values)      
+            
+    elif execution=='continuation sigma':
+        delta_sigma=1.0
+        sigma_min=1.0
+        sigma_max=10.0
+        num_sigma=int((sigma_max-sigma_min)/delta_sigma)+1
+        sigma_values=np.linspace(sigma_min,sigma_max,num_sigma)
+        all_Y_0_values=np.zeros((num_sigma,num_keep))
+        
+        X=[]
+        num_initial=len(x_0)
+        for i in range(num_t_fine):
+            X.append([])
+            for k in range(num_initial):
+                row1=x_0[k]*np.ones((2**i))
+                X[i]=np.concatenate((X[i],row1))
+                
+        Y=[]
+        for i in range(num_t_fine):
+            if i<num_t_fine-1:
+                row2=np.zeros((num_initial*2**i))
+                Y.append(row2)
+            else:
+                Y.append([])
+                for k in range(num_initial):
+                    row2=g(k,x_0,x_0_probs)*np.ones((2**i))
+                    Y[i]=np.concatenate((Y[i],row2))
+      
+        Z=[]
+        for i in range(num_t_fine):
+            row3=np.zeros((num_initial*2**i))
+            Z.append(row3)
+        
+        for index in reversed(range(num_sigma)):
+            rho=2.0
+            sigma=sigma_values[index]
+            [X,Y,Z,Y_0_values]=continuation_solver_bar(X,x_0_probs,Y,Z)
+            all_Y_0_values[index]=Y_0_values
+        print(Y_0_values)

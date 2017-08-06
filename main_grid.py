@@ -88,8 +88,7 @@ def f_trader_weak(i,j,mu,u,v):
 def g_trader_weak(x):
     return c_g*0.5*x**2
 
-def pi(x):
-    
+def pi(x):    
     if periodic_2_pi:
         x=x%(2*np.pi)
 
@@ -139,9 +138,6 @@ def forward(u,v,mu_0):
            up=x_grid[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
            up_index=pi(up)
            mu[i+1,up_index]+=mu[i,j]*0.5
-
-    #print(mu)
-    #print('the sum on each row is', mu.sum(axis=1))
     return mu
 
 def backward(mu,u_old,v_old):
@@ -164,36 +160,36 @@ def backward(mu,u_old,v_old):
 
             if i==num_t-2:
             
-                u[i][j] = (g(x_grid[j_down]) + g(x_grid[j_up]))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+                u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
                 
-                v[i][j] = 1.0/np.sqrt(delta_t) * (g(x_grid[j_up]) - g(x_grid[j_down]))
+                v[i][j] = 1.0/np.sqrt(delta_t) * (g(x_up) - g(x_down))
 
             else:
 
-                if x_down>x_grid[j_down]:
-                    if j_down<num_x-1:
-                        u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
-                    else:
-                        u_down=u[i+1][j_down]
-                else:
-                    if j_down>0:
-                        u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
-                    else:
-                        u_down=u[i+1][j_down]
-                        
-                if x_up>x_grid[j_up]:
-                    if j_up<num_x-1:
-                        u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
-                    else:
-                        u_up=u[i+1][j_up]
-                else:
-                    if j_up>0:
-                        u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
-                    else:
-                        u_up=u[i+1][j_up]
+                # if x_down>x_grid[j_down]:
+                #     if j_down<num_x-1:
+                #         u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
+                #     else:
+                #         u_down=u[i+1][j_down]
+                # else:
+                #     if j_down>0:
+                #         u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
+                #     else:
+                #         u_down=u[i+1][j_down]
+                #
+                # if x_up>x_grid[j_up]:
+                #     if j_up<num_x-1:
+                #         u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
+                #     else:
+                #         u_up=u[i+1][j_up]
+                # else:
+                #     if j_up>0:
+                #         u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+                #     else:
+                #         u_up=u[i+1][j_up]
 
-#                u_up = u[i+1][j_up]
-#                u_down = u[i+1][j_down]
+                u_up = u[i+1][j_up]
+                u_down = u[i+1][j_down]
 
                 u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
                 
@@ -203,7 +199,6 @@ def backward(mu,u_old,v_old):
 
 
 if __name__ == '__main__':
-
     problem ='trader_weak' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
     global b
     global f
@@ -223,6 +218,12 @@ if __name__ == '__main__':
     global rho
     global sigma
     global a
+    global R
+    global K
+    global F
+    global omega_0
+    global omega_S
+    global p
 
     if problem =='jetlag_Pontryagin':
         b=b_jet_lag_Pontryagin
@@ -236,39 +237,22 @@ if __name__ == '__main__':
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**2
-        if periodic_2_pi:
-            num_x=int((2*np.pi)/(delta_x))+1
-            delta_x=2*np.pi/num_x
-            x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
-        else:
-            x_min_goal=-1
-            x_max_goal=5
-            x_center=(x_min_goal+x_max_goal)/2.0
-            num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
-            if num_x%2==0:
-                num_x+=1
-            x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
+        num_x=int((2*np.pi)/(delta_x))+1
+        delta_x=2*np.pi/num_x
+        x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
 
         x_min=x_grid[0]
         x_max=x_grid[num_x-1]
 
         # Varible Jet Lag
-        a=0.25
-        global R
         R=1
-        global K
         K=0.01
-        global F
         F=0.01
-        global omega_0
         omega_0=2*np.pi/24.5
-        global omega_S
         omega_S=2*np.pi/24
-        global p
         p=(3.0/12.0)*np.pi
         sigma=0.1
     elif problem =='jetlag_weak':
-        sigma=0.1
         b=b_jet_lag_weak
         f=f_jet_lag_weak
         g=g_jet_lag
@@ -280,39 +264,22 @@ if __name__ == '__main__':
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**2
-        if periodic_2_pi:
-            num_x=int((2*np.pi)/(delta_x))+1
-            delta_x=2*np.pi/num_x
-            x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
-        else:
-            x_min_goal=-1
-            x_max_goal=5
-            x_center=(x_min_goal+x_max_goal)/2.0
-            num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
-            if num_x%2==0:
-                num_x+=1
-            x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
+        num_x=int((2*np.pi)/(delta_x))+1
+        delta_x=2*np.pi/num_x
+        x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
 
         x_min=x_grid[0]
         x_max=x_grid[num_x-1]
 
         # Varible Jet Lag
-
-        global R
         R=1
-        global K
         K=0.01
-        global F
         F=0.01
-        global omega_0
         omega_0=2*np.pi/24.5
-        global omega_S
         omega_S=2*np.pi/24
-        global p
         p=(3.0/12.0)*np.pi
+        sigma=0.1
     elif problem=='ex_1':
-        sigma=1
-        rho=0.1
         b=b_example_1
         f=f_example_1
         g=g_example_1
@@ -328,11 +295,10 @@ if __name__ == '__main__':
         x_max=5
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
-
+        sigma=1
+        rho=0.1
         a=0.25
     elif problem=='ex_72':
-        sigma=1
-        rho=2
         b=b_example_72
         f=f_example_72
         g=g_example_72
@@ -347,11 +313,10 @@ if __name__ == '__main__':
         x_min=-3
         x_max=3
         num_x=int((x_max-x_min)/delta_x)+1
-
         x_grid=np.linspace(x_min,x_max,num_x)
-    elif problem=='ex_73':
         sigma=1
-        rho=1
+        rho=2
+    elif problem=='ex_73':
         b=b_example_73
         f=f_example_73
         g=g_example_73
@@ -367,6 +332,8 @@ if __name__ == '__main__':
         x_max=5
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
+        sigma=1
+        rho=1
     elif problem=='trader_Pontryagin':
         sigma=0.7
         rho=0.01
@@ -413,7 +380,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=30
+        num_t=12
         delta_t=(T-0.06)/(num_t-1)
         t_grid=np.linspace(0.06,T,num_t)
         delta_x=delta_t**(2)
@@ -429,9 +396,6 @@ if __name__ == '__main__':
     # possible values in order of appearance:
     # ordinary, changing sigma, changing rho
     if execution=='ordinary':
-
-
-
     
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
@@ -454,8 +418,7 @@ if __name__ == '__main__':
                 all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
                 index2+=1
         print all_Y_0_values[0]
-        print(mu[num_t-1])
-        np.save('mu_weak',mu)
+        np.save('mu_weak.npy',mu)
 
         ############## evaluating mu_u, mu_v
 
@@ -531,9 +494,11 @@ if __name__ == '__main__':
                 if j>J-num_keep-1:
                     all_Y_0_values[index][index2]=np.dot(u[0],mu[0])
                     index2+=1
-
             print all_Y_0_values[index]
     elif execution=='adaptive':
+        x_min_goal=x_min
+        x_max_goal=x_max
+        x_center=(x_min_goal+x_max_goal)/2.0
         num_rho=20
         rho_values=np.linspace(2,9,num_rho)
 
@@ -559,7 +524,6 @@ if __name__ == '__main__':
             x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
             x_min=x_grid[0]
             x_max=x_grid[num_x-1]
-#            print(num_t,delta_x,rho,num_x,x_min)
 
             mu_0=np.zeros((num_x))
             mu_0[int(num_x/2)]=1.0
@@ -575,13 +539,3 @@ if __name__ == '__main__':
                 if j>J-num_keep-1:
                     all_Y_0_values[index][index2]=np.dot(u[0],mu[0])
                     index2+=1
-
-        #for index2 in range(num_keep):
-            #plt.scatter(rho,Y_0_values[index2])
-            #plt.scatter(sigma,Y_0_values[index2])
-    #plt.savefig('two_level_changing_rho_example_72.eps')
-    #plt.savefig('one_level_example_73_change_sigma.eps')
-    #np.save('grid_example_72_rho_values',rho_values)
-    #np.save('grid_example_72_changing_rho',all_Y_0_values)
-
-    #np.save('mu_jet_lag',mu)
