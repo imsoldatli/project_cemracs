@@ -134,40 +134,6 @@ def backward(mu,u_old,v_old):
 
     for i in reversed(range(num_t-1)):
         for j in range(num_x):
-            if i==num_t-2:
-                j_down = (x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t))
-            
-                j_up = (x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t))
-            
-                u[i][j] = (g(j_down) + g(j_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
-                v[i][j] = 1.0/np.sqrt(delta_t) * (g(j_up) - g(j_down))
-            else:
-                j_down = pi(x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t))
-
-                #j_down = pi((x_grid[j] + b(i+1,j,mu,u,v)*delta_t - sigma*np.sqrt(delta_t)))
-            
-                j_up = pi(x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t))
-
-                #j_up = pi((x_grid[j] + b(i+1,j,mu,u,v)*delta_t + sigma*np.sqrt(delta_t)))
-            
-                u[i][j] = (u[i+1][j_down] + u[i+1][j_up])/2.0 + delta_t*f(i,j,mu,u_old,v_old)
-                
-                #u[i][j] = (u[i+1][j_down] + u[i+1][j_up])/2.0 + delta_t*f(i+1,j,mu,u,v)
-                
-                v[i][j] = 1.0/np.sqrt(delta_t) * (u[i+1][j_up] - u[i+1][j_down])
-
-    return [u,v]
-
-def backward(mu,u_old,v_old):
-    
-    u = np.zeros((num_t,num_x))
-    v = np.zeros((num_t,num_x))
-        
-    u[num_t-1,:] = g(x_grid)
-    v[num_t-1,:] = v_old[num_t-1,:]
-
-    for i in reversed(range(num_t-1)):
-        for j in range(num_x):
             x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t)
                 
             x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t)
@@ -295,7 +261,21 @@ if __name__ == '__main__':
 #        mu[k]=mu_0
 #    u=np.zeros((num_t,num_x))
 #    v=np.zeros((num_t,num_x))
+
+#    mu_0=np.zeros((num_x))
+#    if periodic_2_pi:
+#        mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
+#            #mu_0[0]=1
+#    else:
+#        mu_0[int(num_x/2)]=1.0
+#    print(x_grid[int(num_x/2)])
+#    mu=np.zeros((num_t,num_x))
+#    for k in range(num_t):
+#        mu[k]=mu_0
+#    u=np.zeros((num_t,num_x))
+#    v=np.zeros((num_t,num_x))        
     
+
     for index in range(num_rho):
     #for index in range(num_sigma):
         index2=0
@@ -305,11 +285,10 @@ if __name__ == '__main__':
         global sigma
         #sigma=sigma_values[index]
         sigma=1.0
-    
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
             mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
-            #mu_0[0]=1
+                #mu_0[0]=1
         else:
             mu_0[int(num_x/2)]=1.0
         print(x_grid[int(num_x/2)])
@@ -317,8 +296,7 @@ if __name__ == '__main__':
         for k in range(num_t):
             mu[k]=mu_0
         u=np.zeros((num_t,num_x))
-        v=np.zeros((num_t,num_x))
-    
+        v=np.zeros((num_t,num_x))        
         for j in range(J):
             [u,v]=backward(mu,u,v)
             mu=forward(u,v,mu_0)
