@@ -99,6 +99,44 @@ def f_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs):
     partial_c_sun=0.5*np.sin((X[i][j]-p)/2.0)*np.cos((X[i][j]-p)/2.0)
     value2=-F*partial_c_sun
     return value1+value2
+    
+def continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
+    
+    num_initial=len(X_ini[0]) 
+    Y_0_values=np.zeros((num_keep))
+    index=0
+    X=X_ini
+    Y=Y_ini
+    Z=Z_ini
+    x_vals=np.zeros(num_initial*2**(num_t_fine-1))
+    x_probs=[]
+    for j in range(num_initial):
+            row1=X_initial_probs[j]*np.ones(2**(num_t_fine-1))/(2**(num_t_fine-1))
+            x_probs=np.concatenate((x_probs,row1))
+#    print(x_probs)
+    for k in range(J):            
+        for j in range(num_initial*2**(num_t_fine-1)):
+            Y[num_t_fine-1][j]=g(j,X[num_t_fine-1],x_probs)
+            
+        for index2 in range(J_solver_bar):
+            for i in reversed(range(num_t_fine-1)):
+                for j in range(num_initial*2**i):
+    #                temp_Y=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z,X_initial_probs)+delta_t_fine*f(i+1,2*j+1,X,Y,Z,X_initial_probs))/2.0
+                    temp_Y=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y,Z,X_initial_probs)
+                    #temp_=delta_t_fine*f(i,j,X,Y,Z,X_initial_probs)
+                    Y[i][j]=temp_Y
+                    Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
+    #                print(k,i,j,temp_)
+            for i in range(num_t_fine-1):
+                for j in range(num_initial*2**i):
+                    X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
+                    X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
+            
+        if k>J-num_keep-1:
+            Y_0_values[index]=Y[0][0]
+            index+=1
+            
+    return [X,Y,Z,Y_0_values]
 
 def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
     num_initial=len(X[0])
@@ -149,6 +187,7 @@ def solver(level,xi_vals,xi_probs):
         for k in range(num_initial):
             row1=xi_vals[k]*np.ones((2**i))
             X[i]=np.concatenate((X[i],row1))
+    print(X[num_t_fine-1])
 
     X_terminal_probs=[]
     for k in range(num_initial):
@@ -343,9 +382,9 @@ if __name__ == '__main__':
     global delta_W
     delta_W=math.sqrt(delta_t_fine)
 
-    execution='changing rho'
+    execution='continuation sigma'
     # possible values in order of appearance:
-    # ordinary, changing sigma, changing rho
+    # ordinary, changing sigma, changing rho, continuation sigma
     if execution=='ordinary':
         [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
         all_Y_0_values[index]=Y_0_values
@@ -377,3 +416,42 @@ if __name__ == '__main__':
             [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
             all_Y_0_values[index]=Y_0_values
             print(Y_0_values)
+            
+    elif execution=='continuation sigma':
+        delta_sigma=1.0
+        sigma_min=1.0
+        sigma_max=10.0
+        num_sigma=int((sigma_max-sigma_min)/delta_sigma)+1
+        sigma_values=np.linspace(sigma_min,sigma_max,num_sigma)
+        all_Y_0_values=np.zeros((num_sigma,num_keep))
+        
+        X=[]
+        num_initial=len(x_0)
+        for i in range(num_t_fine):
+            X.append([])
+            for k in range(num_initial):
+                row1=x_0[k]*np.ones((2**i))
+                X[i]=np.concatenate((X[i],row1))
+                
+        Y=[]
+        for i in range(num_t_fine):
+            if i<num_t_fine-1:
+                row2=np.zeros((num_initial*2**i))
+                Y.append(row2)
+            else:
+                Y.append([])
+                for k in range(num_initial):
+                    row2=g(k,x_0,x_0_probs)*np.ones((2**i))
+                    Y[i]=np.concatenate((Y[i],row2))
+      
+        Z=[]
+        for i in range(num_t_fine):
+            row3=np.zeros((num_initial*2**i))
+            Z.append(row3)
+        
+        for index in reversed(range(num_sigma)):
+            rho=2.0
+            sigma=sigma_values[index]
+            [X,Y,Z,Y_0_values]=continuation_solver_bar(X,x_0_probs,Y,Z)
+            all_Y_0_values[index]=Y_0_values
+        print(Y_0_values)
