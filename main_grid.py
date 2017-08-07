@@ -94,26 +94,26 @@ def pi(x):
     
     low=int((x-x_min)/delta_x)
 
-if low>=num_x-1:
-    if periodic_2_pi:
-        if (x-x_grid[num_x-1])<(2*np.pi-x):
+    if low>=num_x-1:
+        if periodic_2_pi:
+            if (x-x_grid[num_x-1])<(2*np.pi-x):
+                x_index=num_x-1
+                else:
+                    x_index=0
+        else:
             x_index=num_x-1
-            else:
-                x_index=0
-    else:
-        x_index=num_x-1
 
-elif low<0:
-    x_index=0
+    elif low<0:
+        x_index=0
+        
+        elif (x-x_min-low*delta_x)<(x_min+(low+1)*delta_x-x):
+            
+            x_index=low
+        else:
+            
+            x_index=low+1
     
-    elif (x-x_min-low*delta_x)<(x_min+(low+1)*delta_x-x):
-        
-        x_index=low
-    else:
-        
-        x_index=low+1
-
-return(x_index)
+    return(x_index)
 
 def lin_int(x_min,x_max,y_min,y_max,x_get):
     if x_get>=x_max:
@@ -279,8 +279,8 @@ if __name__ == '__main__':
         omega_0=2*np.pi/24.5
         omega_S=2*np.pi/24
         p=(3.0/12.0)*np.pi
-elif problem=='ex_1':
-    b=b_example_1
+    elif problem=='ex_1':
+        b=b_example_1
         f=f_example_1
         g=g_example_1
         periodic_2_pi=False
@@ -316,8 +316,8 @@ elif problem=='ex_1':
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
         rho=2
-elif problem=='ex_73':
-    b=b_example_73
+    elif problem=='ex_73':
+        b=b_example_73
         f=f_example_73
         g=g_example_73
         periodic_2_pi=False
@@ -367,8 +367,8 @@ elif problem=='ex_73':
         x_grid=np.linspace(x_min,x_max,num_x)
 # Variable trader
 # convergence for rho=0.1
-elif problem=='trader_weak':
-    sigma=0.7
+    elif problem=='trader_weak':
+        sigma=0.7
         rho=0.01
         c_x=1
         h_bar=2
@@ -424,8 +424,8 @@ elif problem=='trader_weak':
 
 ############## evaluating mu_u, mu_v
 
-mu_u = np.zeros((num_t,num_x))
-    mu_v = np.zeros((num_t,num_x))
+        mu_u = np.zeros((num_t,num_x))
+        mu_v = np.zeros((num_t,num_x))
         
         mu_u[num_t-1,:] = mu[num_t-1,:]
         mu_v[num_t-1,:] = mu[num_t-1,:]
@@ -467,7 +467,7 @@ mu_u = np.zeros((num_t,num_x))
                 if j>J-num_keep-1:
                     all_Y_0_values[index][index2]=np.dot(u[0],mu[0])
                     index2+=1
-print all_Y_0_values[index]
+        print all_Y_0_values[index]
     
     elif execution=='changing rho':
         num_rho=10
@@ -496,9 +496,10 @@ print all_Y_0_values[index]
                 if j>J-num_keep-1:
                     all_Y_0_values[index][index2]=np.dot(u[0],mu[0])
                     index2+=1
-    print all_Y_0_values[index]
-elif execution=='adaptive':
-    x_min_goal=x_min
+        print all_Y_0_values[index]
+        
+    elif execution=='adaptive':
+        x_min_goal=x_min
         x_max_goal=x_max
         x_center=(x_min_goal+x_max_goal)/2.0
         num_rho=20
@@ -532,8 +533,8 @@ elif execution=='adaptive':
             mu=np.zeros((num_t,num_x))
             for k in range(num_t):
                 mu[k]=mu_0
-    u=np.zeros((num_t,num_x))
-        v=np.zeros((num_t,num_x))
+            u=np.zeros((num_t,num_x))
+            v=np.zeros((num_t,num_x))
             
             for j in range(J):
                 [u,v]=backward(mu,u,v)
