@@ -247,7 +247,7 @@ if __name__ == '__main__':
         # Varible Jet Lag
         R=1
         K=0.01
-        F=0.01
+        F=0.001
         omega_0=2*np.pi/24.5
         omega_S=2*np.pi/24
         p=(3.0/12.0)*np.pi
@@ -310,8 +310,8 @@ if __name__ == '__main__':
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
-        x_min=-3
-        x_max=3
+        x_min=-10
+        x_max=10
         num_x=int((x_max-x_min)/delta_x)+1
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
@@ -393,6 +393,7 @@ if __name__ == '__main__':
     # convergence for rho=0.1
 
     execution='adaptive'
+#    execution='changing rho'
     # possible values in order of appearance:
     # ordinary, changing sigma, changing rho
     if execution=='ordinary':
@@ -470,8 +471,8 @@ if __name__ == '__main__':
         print all_Y_0_values[index]
     
     elif execution=='changing rho':
-        num_rho=10
-        rho_values=np.linspace(1,10,num_rho)
+        num_rho=20
+        rho_values=np.linspace(2,9,num_rho)
         all_Y_0_values=np.zeros((num_rho,num_keep))
         for index in range(num_rho):
             index2=0
@@ -497,6 +498,7 @@ if __name__ == '__main__':
                     all_Y_0_values[index][index2]=np.dot(u[0],mu[0])
                     index2+=1
         print all_Y_0_values[index]
+        np.save('grid_example_72_changing_rho_larger_x_domain',all_Y_0_values)
         
     elif execution=='adaptive':
         x_min_0=-3
