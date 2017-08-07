@@ -3,7 +3,7 @@ from __future__ import division
 # -*- coding: utf-8 -*-
 """
 Created on Fri Jul 28 17:37:27 2017
-
+    
 @author: Andrea Angiuli, Christy Graves, Houzhi Li
 """
 
@@ -63,9 +63,9 @@ def b_jet_lag_Pontryagin(i,j,mu,u,v):
 
 def f_jet_lag_Pontryagin(i,j,mu,u,v):
     partial_c_bar=np.dot(0.5*np.sin((x_grid[j]-x_grid)/2.0)*np.cos((x_grid[j]-x_grid)/2.0),mu[i])
-    value1=-K*partial_c_bar
+    value1=K*partial_c_bar
     partial_c_sun=0.5*np.sin((x_grid[j]-p)/2.0)*np.cos((x_grid[j]-p)/2.0)
-    value2=-F*partial_c_sun
+    value2=F*partial_c_sun
     return value1+value2
 
 def b_trader_Pontryagin(i,j,mu,u,v):
@@ -88,14 +88,16 @@ def f_trader_weak(i,j,mu,u,v):
 def g_trader_weak(x):
     return c_g*0.5*x**2
 
+
 def b_trustworthy_trader(i,j,mu,u,v):
     x_mean=np.dot(x_grid,mu[i])
     return -rho*(eta[0,i]*x_grid[j]+(eta_bar[0,i]-eta[0,i])*x_mean)
 
-def pi(x):    
+
+def pi(x):
     if periodic_2_pi:
         x=x%(2*np.pi)
-
+    
     low=int((x-x_min)/delta_x)
 
     if low>=num_x-1:
@@ -109,14 +111,14 @@ def pi(x):
 
     elif low<0:
         x_index=0
-
-    elif (x-x_min-low*delta_x)<(x_min+(low+1)*delta_x-x):
         
+    elif (x-x_min-low*delta_x)<(x_min+(low+1)*delta_x-x):
+            
         x_index=low
     else:
-
+            
         x_index=low+1
-
+    
     return(x_index)
 
 def lin_int(x_min,x_max,y_min,y_max,x_get):
@@ -128,48 +130,48 @@ def lin_int(x_min,x_max,y_min,y_max,x_get):
         return y_min+(y_max-y_min)/(x_max-x_min)*(x_get-x_min)
 
 def forward(u,v,mu_0):
-
+    
     mu=np.zeros((num_t,num_x))
     mu[0,:]=mu_0
-
+    
     for i in range(num_t-1): #t_i
-       for j in range(num_x): #x_j
-
-           low=x_grid[j]+b(i,j,mu,u,v)*delta_t-sigma*math.sqrt(delta_t)
-           low_index=pi(low)
-           mu[i+1,low_index]+=mu[i,j]*0.5
-
-           up=x_grid[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
-           up_index=pi(up)
-           mu[i+1,up_index]+=mu[i,j]*0.5
+        for j in range(num_x): #x_j
+            
+            low=x_grid[j]+b(i,j,mu,u,v)*delta_t-sigma*math.sqrt(delta_t)
+            low_index=pi(low)
+            mu[i+1,low_index]+=mu[i,j]*0.5
+                        
+            up=x_grid[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
+            up_index=pi(up)
+            mu[i+1,up_index]+=mu[i,j]*0.5
     return mu
 
 def backward(mu,u_old,v_old):
     
     u = np.zeros((num_t,num_x))
     v = np.zeros((num_t,num_x))
-        
+    
     u[num_t-1,:] = g(x_grid)
     v[num_t-1,:] = v_old[num_t-1,:]
-
+    
     for i in reversed(range(num_t-1)):
         for j in range(num_x):
             x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t)
-                
-            x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t)
-                
-            j_down = pi(x_down)
-
-            j_up = pi(x_up)
-
-            if i==num_t-2:
             
+            x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t)
+            
+            j_down = pi(x_down)
+            
+            j_up = pi(x_up)
+            
+            if i==num_t-2:
+                
                 u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
                 
                 v[i][j] = 1.0/np.sqrt(delta_t) * (g(x_up) - g(x_down))
-
+        
             else:
-
+                
                 # if x_down>x_grid[j_down]:
                 #     if j_down<num_x-1:
                 #         u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
@@ -191,10 +193,10 @@ def backward(mu,u_old,v_old):
                 #         u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
                 #     else:
                 #         u_up=u[i+1][j_up]
-
+                
                 u_up = u[i+1][j_up]
                 u_down = u[i+1][j_down]
-
+                
                 u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
                 
                 v[i][j] = 1.0/np.sqrt(delta_t) * (u_up - u_down)
@@ -204,6 +206,7 @@ def backward(mu,u_old,v_old):
 
 if __name__ == '__main__':
     problem ='trustworthy_trader' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
+
     global b
     global f
     global g
@@ -212,7 +215,7 @@ if __name__ == '__main__':
     global num_keep
     global T
     global num_t
-
+    
     global delta_t
     global t_grid
     global delta_x
@@ -228,7 +231,7 @@ if __name__ == '__main__':
     global omega_0
     global omega_S
     global p
-
+    
     if problem =='jetlag_Pontryagin':
         b=b_jet_lag_Pontryagin
         f=f_jet_lag_Pontryagin
@@ -244,14 +247,14 @@ if __name__ == '__main__':
         num_x=int((2*np.pi)/(delta_x))+1
         delta_x=2*np.pi/num_x
         x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
-
+        
         x_min=x_grid[0]
         x_max=x_grid[num_x-1]
-
+        
         # Varible Jet Lag
         R=1
         K=0.01
-        F=0.01
+        F=0.001
         omega_0=2*np.pi/24.5
         omega_S=2*np.pi/24
         p=(3.0/12.0)*np.pi
@@ -272,10 +275,10 @@ if __name__ == '__main__':
         num_x=int((2*np.pi)/(delta_x))+1
         delta_x=2*np.pi/num_x
         x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
-
+        
         x_min=x_grid[0]
         x_max=x_grid[num_x-1]
-
+        
         # Varible Jet Lag
         R=1
         K=0.01
@@ -314,8 +317,8 @@ if __name__ == '__main__':
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
-        x_min=-3
-        x_max=3
+        x_min=-10
+        x_max=10
         num_x=int((x_max-x_min)/delta_x)+1
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
@@ -369,8 +372,8 @@ if __name__ == '__main__':
         x_max=4
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
-        # Variable trader
-        # convergence for rho=0.1
+# Variable trader
+# convergence for rho=0.1
     elif problem=='trader_weak':
         sigma=0.7
         rho=.01
@@ -392,7 +395,7 @@ if __name__ == '__main__':
         x_max=4
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
-        # Variable trader
+    # Variable trader
 
     elif problem=='trustworthy_trader':
         sigma=0.7
@@ -433,19 +436,20 @@ if __name__ == '__main__':
             eta[0,t]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/(ratio2-c_g+(ratio2+c_g)*np.exp(2*ratio*(T-t)))
 
     execution='solution_trader'
+
     # possible values in order of appearance:
-    # ordinary, changing sigma, changing rho
+    # ordinary, changing sigma, changing rho, adaptive, solution_trader
     if execution=='ordinary':
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
             mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
-            #mu_0=[mu_0[0][6*i] for i in range(num_x)]
-            #mu_0=mu_0/np.sum(mu_0)                  
-                      
-                #mu_0[0]=1
+        #mu_0=[mu_0[0][6*i] for i in range(num_x)]
+        #mu_0=mu_0/np.sum(mu_0)
+        
+        #mu_0[0]=1
         else:
             mu_0[int(num_x/2)]=1.0
-
+        
         mu=np.zeros((num_t,num_x))
         for k in range(num_t):
             mu[k]=mu_0
@@ -460,6 +464,7 @@ if __name__ == '__main__':
                 all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
                 index2+=1
         print all_Y_0_values[0]
+
         np.save('mu_Pont_t20.npy',mu)
 
 
@@ -482,7 +487,10 @@ if __name__ == '__main__':
         #print(mu_u[num_t//2-1][:])
 
 
-        ###############
+
+
+
+    ###############
     elif execution=='changing sigma':
         num_sigma=10
         sigma_values=np.linspace(0.5,10,num_sigma)
@@ -493,7 +501,7 @@ if __name__ == '__main__':
             mu_0=np.zeros((num_x))
             if periodic_2_pi:
                 mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
-                #mu_0[0]=1
+            #mu_0[0]=1
             else:
                 mu_0[int(num_x/2)]=1.0
             mu=np.zeros((num_t,num_x))
@@ -501,28 +509,28 @@ if __name__ == '__main__':
                 mu[k]=mu_0
             u=np.zeros((num_t,num_x))
             v=np.zeros((num_t,num_x))
-
+            
             for j in range(J):
                 [u,v]=backward(mu,u,v)
                 mu=forward(u,v,mu_0)
                 if j>J-num_keep-1:
                     all_Y_0_values[index][index2]=np.dot(u[0],mu[0])
                     index2+=1
-            print all_Y_0_values[index]
-
+        print all_Y_0_values[index]
+    
     elif execution=='changing rho':
-        num_rho=10
-        rho_values=np.linspace(1,10,num_rho)
+        num_rho=20
+        rho_values=np.linspace(2,9,num_rho)
         all_Y_0_values=np.zeros((num_rho,num_keep))
         for index in range(num_rho):
             index2=0
             rho=rho_values[index]
-
-
+            
+            
             mu_0=np.zeros((num_x))
             if periodic_2_pi:
                 mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
-                #mu_0[0]=1
+            #mu_0[0]=1
             else:
                 mu_0[int(num_x/2)]=1.0
             mu=np.zeros((num_t,num_x))
@@ -530,44 +538,45 @@ if __name__ == '__main__':
                 mu[k]=mu_0
             u=np.zeros((num_t,num_x))
             v=np.zeros((num_t,num_x))
-
+            
             for j in range(J):
                 [u,v]=backward(mu,u,v)
                 mu=forward(u,v,mu_0)
                 if j>J-num_keep-1:
                     all_Y_0_values[index][index2]=np.dot(u[0],mu[0])
                     index2+=1
-            print all_Y_0_values[index]
+        print all_Y_0_values[index]
+        np.save('grid_example_72_changing_rho_larger_x_domain',all_Y_0_values)
+        
     elif execution=='adaptive':
-        x_min_goal=x_min
-        x_max_goal=x_max
-        x_center=(x_min_goal+x_max_goal)/2.0
+        x_min_0=-3
+        x_max_0=3
         num_rho=20
-        rho_values=np.linspace(2,9,num_rho)
-
+        rho_values=np.linspace(0.5,10.0,num_rho)
+        num_t_0=12
+        delta_t_0=T/(num_t_0-1)
+        delta_x=delta_t_0**2
+        
         all_Y_0_values=np.zeros((num_rho,num_keep))
-    #all_Y_0_values=np.zeros((num_sigma,num_keep))
+        #all_Y_0_values=np.zeros((num_sigma,num_keep))
         for index in range(num_rho):
-    #for index in range(num_sigma):
+            #for index in range(num_sigma):
             index2=0
             rho=rho_values[index]
-
-#           num_t=int(20*rho/rho_values[0])
-#           num_t=int(20/math.sqrt(rho/rho_values[0]))
-            num_t=30
-            delta_t=T/(num_t-1)
-            t_grid=np.linspace(0,T,num_t)
-
-#        delta_x=delta_t**2
-            delta_x=(rho+sigma)*delta_t**2
-#        delta_x=delta_t
+            
+#            num_t=int(num_t_0*(rho/rho_values[0]))
+            num_t=12
+            delta_t= T/num_t
+            x_min_goal=x_min_0*math.sqrt(rho/rho_values[0])*2
+            x_max_goal=x_max_0*math.sqrt(rho/rho_values[0])*2
+            x_center=(x_min_goal+x_max_goal)/2.0
             num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
             if num_x%2==0:
                 num_x+=1
             x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
             x_min=x_grid[0]
             x_max=x_grid[num_x-1]
-
+            
             mu_0=np.zeros((num_x))
             mu_0[int(num_x/2)]=1.0
             mu=np.zeros((num_t,num_x))
@@ -575,13 +584,16 @@ if __name__ == '__main__':
                 mu[k]=mu_0
             u=np.zeros((num_t,num_x))
             v=np.zeros((num_t,num_x))
-
+            
             for j in range(J):
                 [u,v]=backward(mu,u,v)
                 mu=forward(u,v,mu_0)
                 if j>J-num_keep-1:
                     all_Y_0_values[index][index2]=np.dot(u[0],mu[0])
                     index2+=1
+            print('rho=',rho)
+            print(all_Y_0_values[index])
+
     elif execution=='solution_trader':
         mu_0=np.zeros((num_x))
         mu_0[int(num_x/2)]=1.0
@@ -594,3 +606,4 @@ if __name__ == '__main__':
         mu=forward(u,v,mu_0)
 
         np.save('solution_trader.npy',mu)
+
