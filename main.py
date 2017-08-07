@@ -110,7 +110,7 @@ def f_trader_Pontryagin(i,j,X,Y,Z,X_initial_probs):
     for k in range(len(Y[i])):
         index=int(math.floor(k/num_per_initial))
         Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
-    return c_x*x_grid[j]+h_bar*rho*Y_mean
+    return c_x*X[i][j]+h_bar*rho*Y_mean
 
 def g_trader_Pontryagin(index,xi_vals,xi_probs):
     x=xi_vals[index]
