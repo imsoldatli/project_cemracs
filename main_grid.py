@@ -2,10 +2,10 @@ from __future__ import division
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-Created on Fri Jul 28 17:37:27 2017
-
-@author: Andrea Angiuli, Christy Graves, Houzhi Li
-"""
+    Created on Fri Jul 28 17:37:27 2017
+    
+    @author: Andrea Angiuli, Christy Graves, Houzhi Li
+    """
 
 import numpy as np
 import math
@@ -88,32 +88,32 @@ def f_trader_weak(i,j,mu,u,v):
 def g_trader_weak(x):
     return c_g*0.5*x**2
 
-def pi(x):    
+def pi(x):
     if periodic_2_pi:
         x=x%(2*np.pi)
-
+    
     low=int((x-x_min)/delta_x)
 
-    if low>=num_x-1:
-        if periodic_2_pi:
-            if (x-x_grid[num_x-1])<(2*np.pi-x):
-                x_index=num_x-1
+if low>=num_x-1:
+    if periodic_2_pi:
+        if (x-x_grid[num_x-1])<(2*np.pi-x):
+            x_index=num_x-1
             else:
                 x_index=0
-        else:
-            x_index=num_x-1
+    else:
+        x_index=num_x-1
 
-    elif low<0:
-        x_index=0
-
+elif low<0:
+    x_index=0
+    
     elif (x-x_min-low*delta_x)<(x_min+(low+1)*delta_x-x):
         
         x_index=low
     else:
-
+        
         x_index=low+1
 
-    return(x_index)
+return(x_index)
 
 def lin_int(x_min,x_max,y_min,y_max,x_get):
     if x_get>=x_max:
@@ -124,48 +124,48 @@ def lin_int(x_min,x_max,y_min,y_max,x_get):
         return y_min+(y_max-y_min)/(x_max-x_min)*(x_get-x_min)
 
 def forward(u,v,mu_0):
-
+    
     mu=np.zeros((num_t,num_x))
     mu[0,:]=mu_0
-
+    
     for i in range(num_t-1): #t_i
-       for j in range(num_x): #x_j
-
-           low=x_grid[j]+b(i,j,mu,u,v)*delta_t-sigma*math.sqrt(delta_t)
-           low_index=pi(low)
-           mu[i+1,low_index]+=mu[i,j]*0.5
-
-           up=x_grid[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
-           up_index=pi(up)
-           mu[i+1,up_index]+=mu[i,j]*0.5
+        for j in range(num_x): #x_j
+            
+            low=x_grid[j]+b(i,j,mu,u,v)*delta_t-sigma*math.sqrt(delta_t)
+                low_index=pi(low)
+                    mu[i+1,low_index]+=mu[i,j]*0.5
+                        
+                        up=x_grid[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
+                            up_index=pi(up)
+                                mu[i+1,up_index]+=mu[i,j]*0.5
     return mu
 
 def backward(mu,u_old,v_old):
     
     u = np.zeros((num_t,num_x))
     v = np.zeros((num_t,num_x))
-        
+    
     u[num_t-1,:] = g(x_grid)
     v[num_t-1,:] = v_old[num_t-1,:]
-
+    
     for i in reversed(range(num_t-1)):
         for j in range(num_x):
             x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t)
-                
-            x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t)
-                
-            j_down = pi(x_down)
-
-            j_up = pi(x_up)
-
-            if i==num_t-2:
             
+            x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t)
+            
+            j_down = pi(x_down)
+            
+            j_up = pi(x_up)
+            
+            if i==num_t-2:
+                
                 u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
                 
                 v[i][j] = 1.0/np.sqrt(delta_t) * (g(x_up) - g(x_down))
-
+        
             else:
-
+                
                 # if x_down>x_grid[j_down]:
                 #     if j_down<num_x-1:
                 #         u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
@@ -187,15 +187,15 @@ def backward(mu,u_old,v_old):
                 #         u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
                 #     else:
                 #         u_up=u[i+1][j_up]
-
+                
                 u_up = u[i+1][j_up]
                 u_down = u[i+1][j_down]
-
+                
                 u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
                 
                 v[i][j] = 1.0/np.sqrt(delta_t) * (u_up - u_down)
 
-    return [u,v]
+return [u,v]
 
 
 if __name__ == '__main__':
@@ -208,7 +208,7 @@ if __name__ == '__main__':
     global num_keep
     global T
     global num_t
-
+    
     global delta_t
     global t_grid
     global delta_x
@@ -224,7 +224,7 @@ if __name__ == '__main__':
     global omega_0
     global omega_S
     global p
-
+    
     if problem =='jetlag_Pontryagin':
         b=b_jet_lag_Pontryagin
         f=f_jet_lag_Pontryagin
@@ -240,10 +240,10 @@ if __name__ == '__main__':
         num_x=int((2*np.pi)/(delta_x))+1
         delta_x=2*np.pi/num_x
         x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
-
+        
         x_min=x_grid[0]
         x_max=x_grid[num_x-1]
-
+        
         # Varible Jet Lag
         R=1
         K=0.01
@@ -268,10 +268,10 @@ if __name__ == '__main__':
         num_x=int((2*np.pi)/(delta_x))+1
         delta_x=2*np.pi/num_x
         x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
-
+        
         x_min=x_grid[0]
         x_max=x_grid[num_x-1]
-
+        
         # Varible Jet Lag
         R=1
         K=0.01
@@ -279,8 +279,8 @@ if __name__ == '__main__':
         omega_0=2*np.pi/24.5
         omega_S=2*np.pi/24
         p=(3.0/12.0)*np.pi
-    elif problem=='ex_1':
-        b=b_example_1
+elif problem=='ex_1':
+    b=b_example_1
         f=f_example_1
         g=g_example_1
         periodic_2_pi=False
@@ -316,8 +316,8 @@ if __name__ == '__main__':
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
         rho=2
-    elif problem=='ex_73':
-        b=b_example_73
+elif problem=='ex_73':
+    b=b_example_73
         f=f_example_73
         g=g_example_73
         periodic_2_pi=False
@@ -365,10 +365,10 @@ if __name__ == '__main__':
         x_max=4
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
-        # Variable trader
-        # convergence for rho=0.1
-    elif problem=='trader_weak':
-        sigma=0.7
+# Variable trader
+# convergence for rho=0.1
+elif problem=='trader_weak':
+    sigma=0.7
         rho=0.01
         c_x=1
         h_bar=2
@@ -388,9 +388,9 @@ if __name__ == '__main__':
         x_max=4
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
-        # Variable trader
+    # Variable trader
 
-        # convergence for rho=0.1
+    # convergence for rho=0.1
 
     execution='ordinary'
     # possible values in order of appearance:
@@ -399,13 +399,13 @@ if __name__ == '__main__':
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
             mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
-            #mu_0=[mu_0[0][6*i] for i in range(num_x)]
-            #mu_0=mu_0/np.sum(mu_0)                  
-                      
-                #mu_0[0]=1
+        #mu_0=[mu_0[0][6*i] for i in range(num_x)]
+        #mu_0=mu_0/np.sum(mu_0)
+        
+        #mu_0[0]=1
         else:
             mu_0[int(num_x/2)]=1.0
-
+        
         mu=np.zeros((num_t,num_x))
         for k in range(num_t):
             mu[k]=mu_0
@@ -422,26 +422,26 @@ if __name__ == '__main__':
         print all_Y_0_values[0]
         np.save('mu_weak.npy',mu)
 
-        ############## evaluating mu_u, mu_v
+############## evaluating mu_u, mu_v
 
-        mu_u = np.zeros((num_t,num_x))
-        mu_v = np.zeros((num_t,num_x))
-
+mu_u = np.zeros((num_t,num_x))
+    mu_v = np.zeros((num_t,num_x))
+        
         mu_u[num_t-1,:] = mu[num_t-1,:]
         mu_v[num_t-1,:] = mu[num_t-1,:]
-
+        
         for i in reversed(range(num_t-1)):
             for j in range(num_x):
-
+                
                 j_down = pi(x_grid[j] + b(i, j, mu, u, v) * delta_t - sigma * np.sqrt(delta_t))
                 j_up = pi(x_grid[j] + b(i, j, mu, u, v) * delta_t + sigma * np.sqrt(delta_t))
                 mu_u[i][j] = mu[i+1][j_down]+mu[i+1][j_up]
                 mu_v[i][j] = mu[i+1][j_down]+mu[i+1][j_up]
         test=np.zeros((num_t,num_x))
-        #print(mu_u[num_t//2-1][:])
+    #print(mu_u[num_t//2-1][:])
 
 
-        ###############
+    ###############
     elif execution=='changing sigma':
         num_sigma=10
         sigma_values=np.linspace(0.5,10,num_sigma)
@@ -452,7 +452,7 @@ if __name__ == '__main__':
             mu_0=np.zeros((num_x))
             if periodic_2_pi:
                 mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
-                #mu_0[0]=1
+            #mu_0[0]=1
             else:
                 mu_0[int(num_x/2)]=1.0
             mu=np.zeros((num_t,num_x))
@@ -460,15 +460,15 @@ if __name__ == '__main__':
                 mu[k]=mu_0
             u=np.zeros((num_t,num_x))
             v=np.zeros((num_t,num_x))
-
+            
             for j in range(J):
                 [u,v]=backward(mu,u,v)
                 mu=forward(u,v,mu_0)
                 if j>J-num_keep-1:
                     all_Y_0_values[index][index2]=np.dot(u[0],mu[0])
                     index2+=1
-            print all_Y_0_values[index]
-
+print all_Y_0_values[index]
+    
     elif execution=='changing rho':
         num_rho=10
         rho_values=np.linspace(1,10,num_rho)
@@ -476,12 +476,12 @@ if __name__ == '__main__':
         for index in range(num_rho):
             index2=0
             rho=rho_values[index]
-
-
+            
+            
             mu_0=np.zeros((num_x))
             if periodic_2_pi:
                 mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
-                #mu_0[0]=1
+            #mu_0[0]=1
             else:
                 mu_0[int(num_x/2)]=1.0
             mu=np.zeros((num_t,num_x))
@@ -489,52 +489,52 @@ if __name__ == '__main__':
                 mu[k]=mu_0
             u=np.zeros((num_t,num_x))
             v=np.zeros((num_t,num_x))
-
+            
             for j in range(J):
                 [u,v]=backward(mu,u,v)
                 mu=forward(u,v,mu_0)
                 if j>J-num_keep-1:
                     all_Y_0_values[index][index2]=np.dot(u[0],mu[0])
                     index2+=1
-            print all_Y_0_values[index]
-    elif execution=='adaptive':
-        x_min_goal=x_min
+    print all_Y_0_values[index]
+elif execution=='adaptive':
+    x_min_goal=x_min
         x_max_goal=x_max
         x_center=(x_min_goal+x_max_goal)/2.0
         num_rho=20
         rho_values=np.linspace(2,9,num_rho)
-
+        
         all_Y_0_values=np.zeros((num_rho,num_keep))
-    #all_Y_0_values=np.zeros((num_sigma,num_keep))
+        #all_Y_0_values=np.zeros((num_sigma,num_keep))
         for index in range(num_rho):
-    #for index in range(num_sigma):
+            #for index in range(num_sigma):
             index2=0
             rho=rho_values[index]
-
-#           num_t=int(20*rho/rho_values[0])
-#           num_t=int(20/math.sqrt(rho/rho_values[0]))
+            
+            #           num_t=int(20*rho/rho_values[0])
+            #           num_t=int(20/math.sqrt(rho/rho_values[0]))
             num_t=30
             delta_t=T/(num_t-1)
             t_grid=np.linspace(0,T,num_t)
-
-#        delta_x=delta_t**2
+            
+            #        delta_x=delta_t**2
             delta_x=(rho+sigma)*delta_t**2
-#        delta_x=delta_t
+            #        delta_x=delta_t
             num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
             if num_x%2==0:
                 num_x+=1
             x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
             x_min=x_grid[0]
             x_max=x_grid[num_x-1]
-
+            
             mu_0=np.zeros((num_x))
             mu_0[int(num_x/2)]=1.0
             mu=np.zeros((num_t,num_x))
             for k in range(num_t):
                 mu[k]=mu_0
-            u=np.zeros((num_t,num_x))
-            v=np.zeros((num_t,num_x))
-
+    u=np.zeros((num_t,num_x))
+        v=np.zeros((num_t,num_x))
+            
             for j in range(J):
                 [u,v]=backward(mu,u,v)
                 mu=forward(u,v,mu_0)
