@@ -2,10 +2,10 @@ from __future__ import division
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-    Created on Fri Jul 28 17:37:27 2017
+Created on Fri Jul 28 17:37:27 2017
     
-    @author: Andrea Angiuli, Christy Graves, Houzhi Li
-    """
+@author: Andrea Angiuli, Christy Graves, Houzhi Li
+"""
 
 import numpy as np
 import math
@@ -199,7 +199,7 @@ def backward(mu,u_old,v_old):
 
 
 if __name__ == '__main__':
-    problem ='jetlag_Pontryagin' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
+    problem ='ex_72' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
     global b
     global f
     global g
@@ -392,7 +392,7 @@ if __name__ == '__main__':
 
     # convergence for rho=0.1
 
-    execution='ordinary'
+    execution='adaptive'
     # possible values in order of appearance:
     # ordinary, changing sigma, changing rho
     if execution=='ordinary':
@@ -499,11 +499,13 @@ if __name__ == '__main__':
         print all_Y_0_values[index]
         
     elif execution=='adaptive':
-        x_min_goal=x_min
-        x_max_goal=x_max
-        x_center=(x_min_goal+x_max_goal)/2.0
+        x_min_0=-3
+        x_max_0=3
         num_rho=20
-        rho_values=np.linspace(2,9,num_rho)
+        rho_values=np.linspace(0.5,10.0,num_rho)
+        num_t_0=12
+        delta_t_0=T/(num_t_0-1)
+        delta_x=delta_t_0**2
         
         all_Y_0_values=np.zeros((num_rho,num_keep))
         #all_Y_0_values=np.zeros((num_sigma,num_keep))
@@ -512,15 +514,12 @@ if __name__ == '__main__':
             index2=0
             rho=rho_values[index]
             
-            #           num_t=int(20*rho/rho_values[0])
-            #           num_t=int(20/math.sqrt(rho/rho_values[0]))
-            num_t=30
-            delta_t=T/(num_t-1)
-            t_grid=np.linspace(0,T,num_t)
-            
-            #        delta_x=delta_t**2
-            delta_x=(rho+sigma)*delta_t**2
-            #        delta_x=delta_t
+#            num_t=int(num_t_0*(rho/rho_values[0]))
+            num_t=12
+            delta_t= T/num_t
+            x_min_goal=x_min_0*math.sqrt(rho/rho_values[0])*2
+            x_max_goal=x_max_0*math.sqrt(rho/rho_values[0])*2
+            x_center=(x_min_goal+x_max_goal)/2.0
             num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
             if num_x%2==0:
                 num_x+=1
@@ -542,3 +541,5 @@ if __name__ == '__main__':
                 if j>J-num_keep-1:
                     all_Y_0_values[index][index2]=np.dot(u[0],mu[0])
                     index2+=1
+            print('rho=',rho)   
+            print(all_Y_0_values[index])
