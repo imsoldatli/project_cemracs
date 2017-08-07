@@ -62,7 +62,7 @@ def b_jet_lag_Pontryagin(i,j,mu,u,v):
     return omega_0-omega_S-1.0/R*u[i][j]
 
 def f_jet_lag_Pontryagin(i,j,mu,u,v):
-    partial_c_bar=np.dot(0.5*np.sin((x_grid-x_grid[j])/2.0)*np.cos((x_grid-x_grid[j])/2.0),mu[i])
+    partial_c_bar=np.dot(0.5*np.sin((x_grid[j]-x_grid)/2.0)*np.cos((x_grid[j]-x_grid)/2.0),mu[i])
     value1=-K*partial_c_bar
     partial_c_sun=0.5*np.sin((x_grid[j]-p)/2.0)*np.cos((x_grid[j]-p)/2.0)
     value2=-F*partial_c_sun
@@ -73,7 +73,7 @@ def b_trader_Pontryagin(i,j,mu,u,v):
 
 def f_trader_Pontryagin(i,j,mu,u,v):
     Y_mean=np.dot(u[i],mu[i])
-    return -c_x*x_grid[j]-h_bar*rho*Y_mean
+    return c_x*x_grid[j]+h_bar*rho*Y_mean
 
 def g_trader_Pontryagin(x):
     return c_g *x
@@ -83,7 +83,7 @@ def b_trader_weak(i,j,mu,u,v):
 
 def f_trader_weak(i,j,mu,u,v):
     Z_mean=np.dot(v[i],mu[i])
-    return -0.5*c_x*x_grid[j]**2-x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
+    return 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma+rho*0.5*v[i][j]**2/sigma**2
 
 def g_trader_weak(x):
     return c_g*0.5*x**2
@@ -199,7 +199,7 @@ def backward(mu,u_old,v_old):
 
 
 if __name__ == '__main__':
-    problem ='trader_weak' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
+    problem ='jetlag_Pontryagin' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
     global b
     global f
     global g
@@ -253,13 +253,14 @@ if __name__ == '__main__':
         p=(3.0/12.0)*np.pi
         sigma=0.1
     elif problem =='jetlag_weak':
+        sigma=0.1
         b=b_jet_lag_weak
         f=f_jet_lag_weak
         g=g_jet_lag
         periodic_2_pi=True
         J=25
         num_keep=5
-        T=24.0*10
+        T=24.0*2
         num_t=int(T)*5+1
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
@@ -278,7 +279,6 @@ if __name__ == '__main__':
         omega_0=2*np.pi/24.5
         omega_S=2*np.pi/24
         p=(3.0/12.0)*np.pi
-        sigma=0.1
     elif problem=='ex_1':
         b=b_example_1
         f=f_example_1
@@ -396,10 +396,12 @@ if __name__ == '__main__':
     # possible values in order of appearance:
     # ordinary, changing sigma, changing rho
     if execution=='ordinary':
-    
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
-                mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
+            mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
+            #mu_0=[mu_0[0][6*i] for i in range(num_x)]
+            #mu_0=mu_0/np.sum(mu_0)                  
+                      
                 #mu_0[0]=1
         else:
             mu_0[int(num_x/2)]=1.0
