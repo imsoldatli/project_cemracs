@@ -110,7 +110,7 @@ def f_trader_Pontryagin(i,j,X,Y,Z,X_initial_probs):
     for k in range(len(Y[i])):
         index=int(math.floor(k/num_per_initial))
         Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
-    return -c_x*x_grid[j]-h_bar*rho*Y_mean
+    return c_x*x_grid[j]+h_bar*rho*Y_mean
 
 def g_trader_Pontryagin(index,xi_vals,xi_probs):
     x=xi_vals[index]
@@ -126,7 +126,7 @@ def f_trader_weak(i,j,X,Y,Z,X_initial_probs):
     for k in range(len(Z[i])):
         index=int(math.floor(k/num_per_initial))
         Z_mean+=Z[i][k]*X_initial_probs[index]/num_per_initial
-    return -0.5*c_x*x_grid[j]**2-x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
+    return 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma+rho*0.5*v[i][j]**2/sigma**2
 
 def g_trader_weak(index,xi_vals,xi_probs):
     x=xi_vals[index]
@@ -252,7 +252,7 @@ def solver(level,xi_vals,xi_probs):
     return Y_initial
 
 if __name__ == '__main__':
-    problem ='ex_73' #possible values in order of appearance: jetlag, trader, ex_1, ex_72, ex_73
+    problem ='jetlag_weak' #possible values in order of appearance: jetlag, trader, ex_1, ex_72, ex_73
     global b
     global f
     global g
@@ -304,7 +304,7 @@ if __name__ == '__main__':
         g=g_jet_lag
         periodic_2_pi=True
         J=25
-        J_solver_bar=10
+        J_solver_bar=1
         num_keep=5
         T=24.0*10
         num_intervals_total=6
