@@ -11,7 +11,7 @@ import math
 import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
-    thing=np.load('10_grid_example_72_changing_rho.npy')
+#    thing=np.load('grid_example_73_changing_rho.npy')
 #    rho_values_1=np.load('tree_example_73_rho_values_1.npy')
 #    rho_values_01=np.load('tree_example_73_rho_values_01.npy')
 #    rho_values_001=np.load('tree_example_73_rho_values_001.npy')
@@ -59,8 +59,6 @@ if __name__ == '__main__':
 
 
 #    rho_values=np.load('tree_example_73_continuation_sigma_rho_values.npy')
-    rho_values=0.5+0.5*np.arange(20)
-
 #    tree_Y_0_values_1=np.load('tree_example_73_one_level_continuation_sigma_1.npy')
 #    tree_Y_0_values_2=np.load('tree_example_73_one_level_continuation_sigma_2.npy')
 #    tree_Y_0_values_3=np.load('tree_example_73_one_level_continuation_sigma_3.npy')

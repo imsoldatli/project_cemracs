@@ -98,20 +98,20 @@ def pi(x):
         if periodic_2_pi:
             if (x-x_grid[num_x-1])<(2*np.pi-x):
                 x_index=num_x-1
-                else:
-                    x_index=0
+            else:
+                x_index=0
         else:
             x_index=num_x-1
 
     elif low<0:
         x_index=0
         
-        elif (x-x_min-low*delta_x)<(x_min+(low+1)*delta_x-x):
+    elif (x-x_min-low*delta_x)<(x_min+(low+1)*delta_x-x):
             
-            x_index=low
-        else:
+        x_index=low
+    else:
             
-            x_index=low+1
+        x_index=low+1
     
     return(x_index)
 
@@ -132,12 +132,12 @@ def forward(u,v,mu_0):
         for j in range(num_x): #x_j
             
             low=x_grid[j]+b(i,j,mu,u,v)*delta_t-sigma*math.sqrt(delta_t)
-                low_index=pi(low)
-                    mu[i+1,low_index]+=mu[i,j]*0.5
+            low_index=pi(low)
+            mu[i+1,low_index]+=mu[i,j]*0.5
                         
-                        up=x_grid[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
-                            up_index=pi(up)
-                                mu[i+1,up_index]+=mu[i,j]*0.5
+            up=x_grid[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
+            up_index=pi(up)
+            mu[i+1,up_index]+=mu[i,j]*0.5
     return mu
 
 def backward(mu,u_old,v_old):
@@ -195,7 +195,7 @@ def backward(mu,u_old,v_old):
                 
                 v[i][j] = 1.0/np.sqrt(delta_t) * (u_up - u_down)
 
-return [u,v]
+    return [u,v]
 
 
 if __name__ == '__main__':
