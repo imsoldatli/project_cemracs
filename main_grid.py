@@ -63,9 +63,9 @@ def b_jet_lag_Pontryagin(i,j,mu,u,v):
 
 def f_jet_lag_Pontryagin(i,j,mu,u,v):
     partial_c_bar=np.dot(0.5*np.sin((x_grid[j]-x_grid)/2.0)*np.cos((x_grid[j]-x_grid)/2.0),mu[i])
-    value1=-K*partial_c_bar
+    value1=K*partial_c_bar
     partial_c_sun=0.5*np.sin((x_grid[j]-p)/2.0)*np.cos((x_grid[j]-p)/2.0)
-    value2=-F*partial_c_sun
+    value2=F*partial_c_sun
     return value1+value2
 
 def b_trader_Pontryagin(i,j,mu,u,v):

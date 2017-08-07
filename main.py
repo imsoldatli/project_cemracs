@@ -95,9 +95,9 @@ def f_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs):
         index=int(math.floor(k/num_per_initial))
         X_probs[k]=X_initial_probs[index]/num_per_initial
     partial_c_bar=np.dot(0.5*np.sin((X[i][j]-X[i])/2.0)*np.cos((X[i][j]-X[i])/2.0),X_probs)
-    value1=-K*partial_c_bar
+    value1=K*partial_c_bar
     partial_c_sun=0.5*np.sin((X[i][j]-p)/2.0)*np.cos((X[i][j]-p)/2.0)
-    value2=-F*partial_c_sun
+    value2=F*partial_c_sun
     return value1+value2
     
 def b_trader_Pontryagin(i,j,X,Y,Z,X_initial_probs):
