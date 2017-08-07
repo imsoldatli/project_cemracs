@@ -252,7 +252,7 @@ def solver(level,xi_vals,xi_probs):
     return Y_initial
 
 if __name__ == '__main__':
-    problem ='jetlag_weak' #possible values in order of appearance: jetlag, trader, ex_1, ex_72, ex_73
+    problem ='ex_72' #possible values in order of appearance: jetlag, trader, ex_1, ex_72, ex_73
     global b
     global f
     global g
@@ -341,7 +341,7 @@ if __name__ == '__main__':
         f=f_example_72
         g=g_example_72
         periodic_2_pi=False
-        J=10
+        J=25
         J_solver_bar=10
         num_keep=5
         T=1.0
@@ -350,7 +350,7 @@ if __name__ == '__main__':
         x_0=[0.0]
         x_0_probs=[1.0]
         sigma=1.0
-        rho=2.0
+        rho=3.5
     elif problem=='ex_73':
         b=b_example_73
         f=f_example_73
@@ -419,7 +419,7 @@ if __name__ == '__main__':
     global delta_W
     delta_W=math.sqrt(delta_t_fine)
 
-    execution='ordinary'
+    execution='changing sigma'
     # possible values in order of appearance:
     # ordinary, changing sigma, changing rho, continuation sigma
     if execution=='ordinary':
@@ -434,7 +434,7 @@ if __name__ == '__main__':
             print(true_Y_0)
 
     elif execution=='changing sigma':
-        num_sigma=10
+        num_sigma=20
         sigma_values=np.linspace(0.5,10,num_sigma)
         all_Y_0_values=np.zeros((num_sigma,num_keep))
         for index in range(num_sigma):
@@ -444,6 +444,7 @@ if __name__ == '__main__':
             [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
             all_Y_0_values[index]=Y_0_values
             print(Y_0_values)
+        np.save('tree_example_72_one_level_changing_sigma_rho_3_5',all_Y_0_values)
             
     elif execution=='changing rho':
         num_rho=10
