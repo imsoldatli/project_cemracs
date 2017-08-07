@@ -150,30 +150,30 @@ def backward(mu,u_old,v_old):
 
             else:
 
-                if x_down>x_grid[j_down]:
-                    if j_down<num_x-1:
-                        u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
-                    else:
-                        u_down=u[i+1][j_down]
-                else:
-                    if j_down>0:
-                        u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
-                    else:
-                        u_down=u[i+1][j_down]
-                        
-                if x_up>x_grid[j_up]:
-                    if j_up<num_x-1:
-                        u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
-                    else:
-                        u_up=u[i+1][j_up]
-                else:
-                    if j_up>0:
-                        u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
-                    else:
-                        u_up=u[i+1][j_up]
+#                if x_down>x_grid[j_down]:
+#                    if j_down<num_x-1:
+#                        u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
+#                    else:
+#                        u_down=u[i+1][j_down]
+#                else:
+#                    if j_down>0:
+#                        u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
+#                    else:
+#                        u_down=u[i+1][j_down]
+#                        
+#                if x_up>x_grid[j_up]:
+#                    if j_up<num_x-1:
+#                        u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
+#                    else:
+#                        u_up=u[i+1][j_up]
+#                else:
+#                    if j_up>0:
+#                        u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+#                    else:
+#                        u_up=u[i+1][j_up]
 
-#                u_up = u[i+1][j_up]
-#                u_down = u[i+1][j_down]
+                u_up = u[i+1][j_up]
+                u_down = u[i+1][j_down]
                 
                 
                 u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
@@ -199,34 +199,7 @@ if __name__ == '__main__':
     global T
 #    T=24.0*10
     T=1.0
-    global num_t
-#    num_t=int(T)*5+1
-    num_t=21
-    global delta_t
-    delta_t=T/(num_t-1)
-    global t_grid
-    t_grid=np.linspace(0,T,num_t)
-    global delta_x
-    delta_x=delta_t**2
-    global num_x
-    global x_grid
-    global x_min
-    global x_max
-    if periodic_2_pi:
-        num_x=int((2*np.pi)/(delta_x))+1
-        delta_x=2*np.pi/num_x
-        x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
-    else:
-        x_min_goal=-3
-        x_max_goal=3
-        x_center=(x_min_goal+x_max_goal)/2.0
-        num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
-        if num_x%2==0:
-            num_x+=1
-        x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
-        
-    x_min=x_grid[0]
-    x_max=x_grid[num_x-1]
+
     
     global a
     a=0.25
@@ -285,6 +258,34 @@ if __name__ == '__main__':
         global sigma
         #sigma=sigma_values[index]
         sigma=1.0
+        global num_t
+        num_t=int(T)*5+1
+        num_t=21
+        global delta_t
+        delta_t=T/(num_t-1)
+        global t_grid
+        t_grid=np.linspace(0,T,num_t)
+        global delta_x
+        delta_x=delta_t**2
+        global num_x
+        global x_grid
+        global x_min
+        global x_max
+        if periodic_2_pi:
+            num_x=int((2*np.pi)/(delta_x))+1
+            delta_x=2*np.pi/num_x
+            x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
+        else:
+            x_min_goal=-10
+            x_max_goal=10
+            x_center=(x_min_goal+x_max_goal)/2.0
+            num_x=int((x_max_goal-x_min_goal)/(delta_x))+1
+            if num_x%2==0:
+                num_x+=1
+            x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
+            
+        x_min=x_grid[0]
+        x_max=x_grid[num_x-1]
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
             mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
@@ -296,7 +297,7 @@ if __name__ == '__main__':
         for k in range(num_t):
             mu[k]=mu_0
         u=np.zeros((num_t,num_x))
-        v=np.zeros((num_t,num_x))        
+        v=np.zeros((num_t,num_x))   
         for j in range(J):
             [u,v]=backward(mu,u,v)
             mu=forward(u,v,mu_0)
@@ -305,8 +306,8 @@ if __name__ == '__main__':
                 index2+=1
         print ('rho=',rho)
         print all_Y_0_values[index]
-        #for index2 in range(num_keep):
-            #plt.scatter(rho,Y_0_values[index2])
+#        for index2 in range(num_keep):
+#            plt.scatter(rho,Y_0_values[index2])
             #plt.scatter(sigma,Y_0_values[index2])
     #plt.savefig('two_level_changing_rho_example_72.eps')
     #plt.savefig('one_level_example_73_change_sigma.eps')
