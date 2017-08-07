@@ -83,7 +83,7 @@ def b_trader_weak(i,j,mu,u,v):
 
 def f_trader_weak(i,j,mu,u,v):
     Z_mean=np.dot(v[i],mu[i])
-    return 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma+rho*0.5*v[i][j]**2/sigma**2
+    return 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
 
 def g_trader_weak(x):
     return c_g*0.5*x**2
