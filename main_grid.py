@@ -154,6 +154,9 @@ def backward(mu,u_old,v_old):
     u[num_t-1,:] = g(x_grid)
     v[num_t-1,:] = v_old[num_t-1,:]
     
+    global linear_int
+    linear_int=False
+    
     for i in reversed(range(num_t-1)):
         for j in range(num_x):
             x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t)
@@ -171,31 +174,32 @@ def backward(mu,u_old,v_old):
                 v[i][j] = 1.0/np.sqrt(delta_t) * (g(x_up) - g(x_down))
         
             else:
+                if linear_int:
+                    if x_down>x_grid[j_down]:
+                        if j_down<num_x-1:
+                            u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
+                        else:
+                            u_down=u[i+1][j_down]
+                    else:
+                        if j_down>0:
+                            u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
+                        else:
+                            u_down=u[i+1][j_down]
+                    
+                    if x_up>x_grid[j_up]:
+                        if j_up<num_x-1:
+                            u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
+                        else:
+                            u_up=u[i+1][j_up]
+                    else:
+                        if j_up>0:
+                            u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+                        else:
+                            u_up=u[i+1][j_up]
+                else:
                 
-                # if x_down>x_grid[j_down]:
-                #     if j_down<num_x-1:
-                #         u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
-                #     else:
-                #         u_down=u[i+1][j_down]
-                # else:
-                #     if j_down>0:
-                #         u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
-                #     else:
-                #         u_down=u[i+1][j_down]
-                #
-                # if x_up>x_grid[j_up]:
-                #     if j_up<num_x-1:
-                #         u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
-                #     else:
-                #         u_up=u[i+1][j_up]
-                # else:
-                #     if j_up>0:
-                #         u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
-                #     else:
-                #         u_up=u[i+1][j_up]
-                
-                u_up = u[i+1][j_up]
-                u_down = u[i+1][j_down]
+                    u_up = u[i+1][j_up]
+                    u_down = u[i+1][j_down]
                 
                 u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
                 
@@ -234,6 +238,7 @@ if __name__ == '__main__':
     global c_x
     global h_bar
     global c_g
+
     
     if problem =='jetlag_Pontryagin':
         b=b_jet_lag_Pontryagin
