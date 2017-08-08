@@ -274,7 +274,7 @@ if __name__ == '__main__':
         F=0.01
         omega_0=2*np.pi/24.5
         omega_S=2*np.pi/24
-        p=(0.5/12.0)*np.pi
+        p=(9.0/12.0)*np.pi
         sigma=0.1
     elif problem =='jetlag_weak':
         sigma=0.1
