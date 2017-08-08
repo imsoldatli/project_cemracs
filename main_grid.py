@@ -215,7 +215,7 @@ def backward(mu,u_old,v_old):
 
 if __name__ == '__main__':
 
-    problem ='trader_weak' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
+    problem ='jetlag_Pontryagin' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
 
 
     global b
@@ -252,7 +252,7 @@ if __name__ == '__main__':
         f=f_jet_lag_Pontryagin
         g=g_jet_lag
         periodic_2_pi=True
-        J=100
+        J=25
         num_keep=5
         T=24.0*1
         #num_t=int(T)*5+1
@@ -451,7 +451,7 @@ if __name__ == '__main__':
             eta_bar[0,t]=-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down)/(((delta_down*np.exp(delta_delta*(T-t))-delta_up))-c_g*B*(np.exp(delta_delta*(T-t))-1))
             eta[0,t]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/(ratio2-c_g+(ratio2+c_g)*np.exp(2*ratio*(T-t)))
 
-    execution='ordinary'
+    execution='true_start'
 
     # possible values in order of appearance:
     # ordinary, changing sigma, changing rho, adaptive, solution_trader
@@ -624,18 +624,19 @@ if __name__ == '__main__':
 
         np.save('solution_trader.npy',mu)
     elif execution=='true_start':
-        mu_0=np.zeros((num_x))
         if periodic_2_pi:
-            mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
-            #mu_0=[mu_0[0][6*i] for i in range(num_x)]
-            #mu_0=mu_0/np.sum(mu_0)
-
-            #mu_0[0]=1
+            #mu=scipy.io.loadmat('mu_reference_set_158.mat')['mu']
+            mu=np.load('mu_reference_set_158.npy')
         elif problem=='trader_weak' or problem=='trader_Pontryagin':
             mu=true_solution=np.load('solution_trader.npy')
+          
+        for k in range(num_t):
+            u=np.zeros((num_t,num_x))
+            v=np.zeros((num_t,num_x))  
         index2=0
         all_Y_0_values=np.zeros((1,num_keep))
         for j in range(J):
+            mu_0=mu[0]
             [u,v]=backward(mu,u,v)
             mu=forward(u,v,mu_0)
             if j>J-num_keep-1:
