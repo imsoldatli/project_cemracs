@@ -625,19 +625,19 @@ if __name__ == '__main__':
         np.save('solution_trader.npy',mu)
     elif execution=='true_start':
         if periodic_2_pi:
-            #mu=scipy.io.loadmat('mu_reference_set_158.mat')['mu']
-            mu=np.load('mu_reference_set_158.npy')
+            mu=np.load('mu_reference_set_158.npy')*delta_x
+            u=np.load('u_reference_set_158.npy')
         elif problem=='trader_weak' or problem=='trader_Pontryagin':
             mu=true_solution=np.load('solution_trader.npy')
           
         for k in range(num_t):
-            u=np.zeros((num_t,num_x))
+            #u=np.zeros((num_t,num_x))
             v=np.zeros((num_t,num_x))  
         index2=0
         all_Y_0_values=np.zeros((1,num_keep))
         for j in range(J):
             mu_0=mu[0]
-            [u,v]=backward(mu,u,v)
+            #[u,v]=backward(mu,u,v)
             mu=forward(u,v,mu_0)
             if j>J-num_keep-1:
                 all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
