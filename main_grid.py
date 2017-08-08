@@ -215,7 +215,9 @@ def backward(mu,u_old,v_old):
 
 if __name__ == '__main__':
 
-    problem ='trader_weak' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
+    problem ='trader_Pontryagin'
+    #possible values in order of appearance:
+    # jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
 
 
     global b
@@ -451,10 +453,11 @@ if __name__ == '__main__':
             eta_bar[0,t]=-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down)/(((delta_down*np.exp(delta_delta*(T-t))-delta_up))-c_g*B*(np.exp(delta_delta*(T-t))-1))
             eta[0,t]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/(ratio2-c_g+(ratio2+c_g)*np.exp(2*ratio*(T-t)))
 
-    execution='ordinary'
+    execution='true_start'
 
     # possible values in order of appearance:
-    # ordinary, changing sigma, changing rho, adaptive, solution_trader
+    # ordinary, changing sigma, changing rho, adaptive,
+    # solution_trader, true_start
     if execution=='ordinary':
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
@@ -469,8 +472,8 @@ if __name__ == '__main__':
         mu=np.zeros((num_t,num_x))
         for k in range(num_t):
             mu[k]=mu_0
-            u=np.zeros((num_t,num_x))
-            v=np.zeros((num_t,num_x))
+        u=np.zeros((num_t,num_x))
+        v=np.zeros((num_t,num_x))
         index2=0
         all_Y_0_values=np.zeros((1,num_keep))
         for j in range(J):
@@ -633,15 +636,19 @@ if __name__ == '__main__':
             #mu_0[0]=1
         elif problem=='trader_weak' or problem=='trader_Pontryagin':
             mu=true_solution=np.load('solution_trader.npy')
-        index2=0
-        all_Y_0_values=np.zeros((1,num_keep))
-        for j in range(J):
-            [u,v]=backward(mu,u,v)
-            mu=forward(u,v,mu_0)
-            if j>J-num_keep-1:
-                all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
-                index2+=1
-        print all_Y_0_values[0]
+            mu_0=mu[0]
+            u=np.zeros((num_t,num_x))
+            v=np.zeros((num_t,num_x))
+            index2=0
+            all_Y_0_values=np.zeros((1,num_keep))
+            for j in range(J):
+                [u,v]=backward(mu,u,v)
+                mu=forward(u,v,mu_0)
+                if j>J-num_keep-1:
+                    all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
+                    index2+=1
+            print all_Y_0_values[0]
 
-        np.save('mu_trader_true_start_t20.npy',mu)
+
+            np.save('mu_trader_true_start_t20.npy',mu)
 
