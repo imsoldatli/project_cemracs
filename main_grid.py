@@ -274,7 +274,7 @@ if __name__ == '__main__':
         F=0.01
         omega_0=2*np.pi/24.5
         omega_S=2*np.pi/24
-        p=(9.0/12.0)*np.pi
+        p=(0.5/12.0)*np.pi
         sigma=0.1
     elif problem =='jetlag_weak':
         sigma=0.1
@@ -637,7 +637,7 @@ if __name__ == '__main__':
         all_Y_0_values=np.zeros((1,num_keep))
         for j in range(J):
             mu_0=mu[0]
-            #[u,v]=backward(mu,u,v)
+            [u,v]=backward(mu,u,v)
             mu=forward(u,v,mu_0)
             if j>J-num_keep-1:
                 all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
