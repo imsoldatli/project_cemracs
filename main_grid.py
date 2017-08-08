@@ -215,9 +215,8 @@ def backward(mu,u_old,v_old):
 
 if __name__ == '__main__':
 
-    problem ='trader_Pontryagin'
-    #possible values in order of appearance:
-    # jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
+
+    problem ='jetlag_Pontryagin' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
 
 
     global b
@@ -254,7 +253,7 @@ if __name__ == '__main__':
         f=f_jet_lag_Pontryagin
         g=g_jet_lag
         periodic_2_pi=True
-        J=100
+        J=25
         num_keep=5
         T=24.0*1
         #num_t=int(T)*5+1
@@ -627,13 +626,9 @@ if __name__ == '__main__':
 
         np.save('solution_trader.npy',mu)
     elif execution=='true_start':
-        mu_0=np.zeros((num_x))
         if periodic_2_pi:
-            mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
-            #mu_0=[mu_0[0][6*i] for i in range(num_x)]
-            #mu_0=mu_0/np.sum(mu_0)
-
-            #mu_0[0]=1
+            mu=np.load('mu_reference_set_158.npy')*delta_x
+            u=np.load('u_reference_set_158.npy')
         elif problem=='trader_weak' or problem=='trader_Pontryagin':
             mu=true_solution=np.load('solution_trader.npy')
             mu_0=mu[0]
@@ -648,6 +643,7 @@ if __name__ == '__main__':
                     all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
                     index2+=1
             print all_Y_0_values[0]
+
 
 
             np.save('mu_trader_true_start_t20.npy',mu)
