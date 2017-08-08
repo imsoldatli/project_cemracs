@@ -209,7 +209,7 @@ def backward(mu,u_old,v_old):
 
 
 if __name__ == '__main__':
-    problem ='trustworthy_trader' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
+    problem ='jetlag_Pontryagin' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
 
     global b
     global f
@@ -245,14 +245,16 @@ if __name__ == '__main__':
         f=f_jet_lag_Pontryagin
         g=g_jet_lag
         periodic_2_pi=True
-        J=25
+        J=100
         num_keep=5
-        T=24.0*10
-        num_t=int(T)*5+1
+        T=24.0*1
+        #num_t=int(T)*5+1
+        num_t=697
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
-        delta_x=delta_t**2
-        num_x=int((2*np.pi)/(delta_x))+1
+        #delta_x=delta_t**2
+        #num_x=int((2*np.pi)/(delta_x))+1
+        num_x=158
         delta_x=2*np.pi/num_x
         x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
         
@@ -262,10 +264,10 @@ if __name__ == '__main__':
         # Varible Jet Lag
         R=1
         K=0.01
-        F=0.001
+        F=0.01
         omega_0=2*np.pi/24.5
         omega_S=2*np.pi/24
-        p=(3.0/12.0)*np.pi
+        p=(9.0/12.0)*np.pi
         sigma=0.1
     elif problem =='jetlag_weak':
         sigma=0.1
@@ -443,18 +445,18 @@ if __name__ == '__main__':
             eta_bar[0,t]=-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down)/(((delta_down*np.exp(delta_delta*(T-t))-delta_up))-c_g*B*(np.exp(delta_delta*(T-t))-1))
             eta[0,t]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/(ratio2-c_g+(ratio2+c_g)*np.exp(2*ratio*(T-t)))
 
-    execution='solution_trader'
+    execution='ordinary'
 
     # possible values in order of appearance:
     # ordinary, changing sigma, changing rho, adaptive, solution_trader
     if execution=='ordinary':
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
-            mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
-        #mu_0=[mu_0[0][6*i] for i in range(num_x)]
-        #mu_0=mu_0/np.sum(mu_0)
-        
-        #mu_0[0]=1
+            mu_0=np.load('mu_initial_reference_set_158.npy')
+            #mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
+            #mu_0=[mu_0[0][6*i] for i in range(num_x)]
+            #mu_0=mu_0/np.sum(mu_0)
+            #mu_0[0]=1
         else:
             mu_0[int(num_x/2)]=1.0
         
@@ -473,7 +475,7 @@ if __name__ == '__main__':
                 index2+=1
         print all_Y_0_values[0]
 
-        np.save('mu_Pont_t20.npy',mu)
+        np.save('mu.npy',mu)
 
 
         ############## evaluating mu_u, mu_v
