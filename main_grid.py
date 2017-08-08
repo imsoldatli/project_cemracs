@@ -231,6 +231,9 @@ if __name__ == '__main__':
     global omega_0
     global omega_S
     global p
+    global c_x
+    global h_bar
+    global c_g
     
     if problem =='jetlag_Pontryagin':
         b=b_jet_lag_Pontryagin
