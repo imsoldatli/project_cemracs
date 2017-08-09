@@ -1,10 +1,11 @@
+from __future__ import division
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-    Created on Mon Jul 24 09:24:22 2017
-    @author: Andrea Angiuli, Christy Graves, Houzhi Li
-    """
-#boring comment
+Created on Mon Jul 24 09:24:22 2017
+@author: Andrea Angiuli, Christy Graves, Houzhi Li
+"""
+
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -131,6 +132,33 @@ def f_trader_weak(i,j,X,Y,Z,X_initial_probs):
 def g_trader_weak(index,xi_vals,xi_probs):
     x=xi_vals[index]
     return c_g*0.5*x**2
+    
+def b_flocking_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+    return -Y[i][j]
+
+def f_flocking_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+    num_initial=len(X[0])
+    X_mean=0
+    num_per_initial=len(X[i])/num_initial
+    for k in range(len(X[i])):
+        index=int(math.floor(k/num_per_initial))
+        X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
+    return X[i][j]-X_mean
+
+def g_flocking(index,xi_vals,xi_probs):
+    return 0
+    
+def b_flocking_weak(i,j,X,Y,Z,X_initial_probs):
+    return -Z[i][j]/sigma
+
+def f_flocking_weak(i,j,X,Y,Z,X_initial_probs):
+    num_initial=len(X[0])
+    X_mean=0
+    num_per_initial=len(X[i])/num_initial
+    for k in range(len(X[i])):
+        index=int(math.floor(k/num_per_initial))
+        X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
+    return -1.0/(2*sigma**2)*(Z[i][j])**2+0.5*(X[i][j]-X_mean)**2
 
 def continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
     
@@ -250,7 +278,7 @@ def solver(level,xi_vals,xi_probs):
     return Y_initial
 
 if __name__ == '__main__':
-    problem ='ex_72' #possible values in order of appearance: jetlag, trader, ex_1, ex_72, ex_73
+    problem ='flocking_Pontryagin' #possible values in order of appearance: jetlag, trader, ex_1, ex_72, ex_73, flocking
     global b
     global f
     global g
@@ -408,13 +436,41 @@ if __name__ == '__main__':
         num_intervals_coarse=1
         x_0=[1.0]
         x_0_probs=[1.0]
+    elif problem=='flocking_Pontryagin':
+        sigma=1.0
+        b=b_flocking_Pontryagin
+        f=f_flocking_Pontryagin
+        g=g_flocking
+        periodic_2_pi=False
+        J=25
+        J_solver_bar=10
+        num_keep=5
+        T=1.0
+        num_intervals_total=6
+        num_intervals_coarse=1
+        x_0=[0.0]
+        x_0_probs=[1.0]
+    elif problem=='flocking_weak':
+        sigma=1.0
+        b=b_flocking_weak
+        f=f_flocking_weak
+        g=g_flocking
+        periodic_2_pi=False
+        J=25
+        J_solver_bar=10
+        num_keep=5
+        T=1.0
+        num_intervals_total=6
+        num_intervals_coarse=1
+        x_0=[0.0]
+        x_0_probs=[1.0]
     
     global num_t_coarse
     num_t_coarse=num_intervals_coarse+1
     global delta_t_coarse
     delta_t_coarse=float(T)/(num_t_coarse-1)
     global num_t_fine
-    num_t_fine=num_intervals_total/num_intervals_coarse+1
+    num_t_fine=int(num_intervals_total/num_intervals_coarse)+1
     global delta_t_fine
     delta_t_fine=delta_t_coarse/(num_t_fine-1)
     global delta_W
