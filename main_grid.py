@@ -1,16 +1,33 @@
-from __future__ import division
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
 Created on Fri Jul 28 17:37:27 2017
     
 @author: Andrea Angiuli, Christy Graves, Houzhi Li
+
+This code implements the grid algorithm described in
+Delarue, Menozzi to solve FBSDEs of McKean Vlasov type.
+
+The FBSDEs to be solved are the following:
+    dX_t=b(X,Y,Z,Law(X),Law(Y),Law(Z))dt+sigma dW_t
+    X_0=x_0
+    dY_t=-f(X,Y,Z,Law(X),Law(Y),Law(Z)) dt+Z_t dW_t
+    Y_t=g(X_T,Law(X_T))
+    
+Possible future extensions include time dependency of b and f, sigma
+non constant, and multidimensional state space.
+
 """
 
+from __future__ import division
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 import scipy
+import time
+
+
+#Define functions b, f, and g for a variety of problems:
 
 def b_dummy(i,j,mu,u,v):
     return 0
@@ -125,7 +142,8 @@ def f_flocking_weak(i,j,mu,u,v):
     X_mean=np.dot(x_grid,mu[i])
     return -1.0/(2*sigma**2)*(v[i][j])**2+0.5*(x_grid[j]-X_mean)**2
 
-def pi(x):
+#project the value x onto the nearest value in x_grid
+def pi_old(x):
     if periodic_2_pi:
         x=x%(2*np.pi)
     
@@ -151,7 +169,32 @@ def pi(x):
         x_index=low+1
     
     return(x_index)
+    
+def pi_old_2(x):
+    if periodic_2_pi:
+        x=x%(2*np.pi)
+    index=int(round(((x-x_min)/delta_x)))
+    
+    if periodic_2_pi:
+        index=index%num_x
+    else:
+        index=min(num_x-1,index)
+    index=max(0,index)
 
+    return index
+    
+def pi(x):
+    if periodic_2_pi:
+        x=x%(2*np.pi)
+        index=int(round(((x-x_min)/delta_x)))
+        index=index%num_x
+    else:
+        index=int(round(((x-x_min)/delta_x)))
+        index=min(num_x-1,index)
+        index=max(0,index)
+    return index
+
+#used to linearly interpolate u(x) using u on x_grid
 def lin_int(x_min,x_max,y_min,y_max,x_get):
     if x_get>=x_max:
         return y_max
@@ -160,6 +203,7 @@ def lin_int(x_min,x_max,y_min,y_max,x_get):
     else:
         return y_min+(y_max-y_min)/(x_max-x_min)*(x_get-x_min)
 
+#use mu_0, u, v, to go forward in mu
 def forward(u,v,mu_0):
     
     mu=np.zeros((num_t,num_x))
@@ -177,6 +221,7 @@ def forward(u,v,mu_0):
             mu[i+1,up_index]+=mu[i,j]*0.5
     return mu
 
+#use mu, u_old, v_old to go backwards in u and v
 def backward(mu,u_old,v_old):
     
     u = np.zeros((num_t,num_x))
@@ -239,15 +284,147 @@ def backward(mu,u_old,v_old):
     return [u,v]
 
 
+# Suppose that x_grid_1 is included in x_grid_2
+def transform_grid(x_grid_1,mu_1,x_grid_2):
+    num_x_1=len(x_grid_1)
+    num_x_2=len(x_grid_2)
+    mu_2=np.zeros(num_x_2)
+    
+    if num_x_1<num_x_2:
+        diff_0=int((x_grid_1[0]-x_grid_2[0])/delta_x)
+        mu_2[diff_0:diff_0+num_x_1]=mu_1
+        
+    else:
+        diff_0=int((x_grid_2[0]-x_grid_1[0])/delta_x)
+        mu_2=mu_1[diff_0:diff_0+num_x_2]
+        
+    return mu_2
+
+
+
+def forward_bar(u,v,num_x_level,mu_0):
+    
+    mu=np.zeros((num_t,num_x_level))
+    mu[0,:]=mu_0
+    
+    for i in range(num_t-1): #t_i
+        for j in range(num_x_level): #x_j
+            
+            low=x_grid[j]+b(i,j,mu,u,v)*delta_t-sigma*math.sqrt(delta_t)
+            low_index=pi(low)
+            mu[i+1,low_index]+=mu[i,j]*0.5
+                        
+            up=x_grid[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
+            up_index=pi(up)
+            mu[i+1,up_index]+=mu[i,j]*0.5
+    return mu
+
+
+def backward_bar(mu,u_old,v_old,num_x_level,Y_terminal):
+    
+    u = np.zeros((num_t,num_x_level))
+    v = np.zeros((num_t,num_x_level))
+    
+    u[num_t-1,:] = Y_terminal
+    v[num_t-1,:] = v_old[num_t-1,:]
+    
+    global linear_int
+    linear_int=False
+    
+    for i in reversed(range(num_t-1)):
+        for j in range(num_x_level):
+            x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t)
+            
+            x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t)
+            
+            j_down = pi(x_down)
+            
+            j_up = pi(x_up)
+            
+            if i==num_t-2:
+                
+                u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+                
+                v[i][j] = 1.0/np.sqrt(delta_t) * (g(x_up) - g(x_down))
+        
+            else:
+                if linear_int:
+                    if x_down>x_grid[j_down]:
+                        if j_down<num_x_level-1:
+                            u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
+                        else:
+                            u_down=u[i+1][j_down]
+                    else:
+                        if j_down>0:
+                            u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
+                        else:
+                            u_down=u[i+1][j_down]
+                    
+                    if x_up>x_grid[j_up]:
+                        if j_up<num_x_level-1:
+                            u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
+                        else:
+                            u_up=u[i+1][j_up]
+                    else:
+                        if j_up>0:
+                            u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+                        else:
+                            u_up=u[i+1][j_up]
+                else:
+                
+                    u_up = u[i+1][j_up]
+                    u_down = u[i+1][j_down]
+                
+                u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+                
+                v[i][j] = 1.0/np.sqrt(delta_t) * (u_up - u_down)
+
+    return [u,v]
+
+def solver_grid(level,mu_0,X_grids):
+#    num_x=len(mu)
+    if level==num_level-1:
+        Y_terminal=g(X_grids[level])
+        return Y_terminal
+    
+    num_x_level=len(X_grids[level])
+    u=np.zeros((num_t,num_x_level))
+    v=np.zeros((num_t,num_x_level))
+    mu=np.zeros((num_t,num_x_level))
+    mu[0,:]=mu_0
+#    Y_terminal=g(X_grids[level+1])
+    
+    for j in range(J):
+        [u,v]=backward_bar(mu,u,v,num_x_level,Y_terminal)
+        mu=forward_bar(u,v,x_level,mu_0)
+
+    mu_next=mu[num_t-1,:]
+    mu_next=transform_grid(X_grids[level],mu_next,X_grids[level+1])
+
+    if level==0:
+        Y_0_values=np.zeros((num_keep))
+        index=0
+        
+    for j in range(J):
+        Y_terminal=solver_grid(level+1,mu_next,X_grids)
+        Y_terminal=transform_grid(X_grids[level+1],Y_terminal,X_grids[level])
+        [u,v]=backward_bar(mu,u,v,num_x_level,Y_terminal)
+        mu=forward_bar(u,v,x_level,mu_0)
+        if level==0 and j>J-num_keep-1:
+            Y_0_values[index]=np.dot(u[0],mu[0])
+            index+=1
+    return Y_0_values
+
+
+
 if __name__ == '__main__':
-
-
-    problem='trader_Pontryagin'
-    execution='true_start'
-
-    #possible values in order of appearance:
-    # jetlag_weak, jetlag_Pontryagin, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
-    # solution_trader
+    start_time=time.time()
+    problem='jetlag_Pontryagin'
+    #possible values in order of appearance: jetlag(_Pontryagin,_weak),
+    #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
+    execution='ordinary'
+    # possible values in order of appearance:
+    # ordinary, changing_sigma, changing_rho, adaptive, solution_trader, true_start
 
     # possible values in order of appearance:
     # ordinary, changing sigma, changing rho, adaptive,
@@ -256,20 +433,23 @@ if __name__ == '__main__':
     global b
     global f
     global g
-    global periodic_2_pi
-    global J
-    global num_keep
-    global T
-    global num_t
+    global periodic_2_pi #if True, use periodic domain [0,2pi)
+    global J #number of Picard iterations
+    global num_keep #number of last Picard iterations to print and save
+    global T #finite time horizon
+    global num_t #number of time points (one more than the number of time steps)
     
     global delta_t
     global t_grid
     global delta_x
-    global x_min
-    global x_max
+    global x_min #used to set the size of x_grid
+    global x_max #used to set the size of x_grid
     global x_grid
+    
+    global sigma #diffusion coefficient
+    
+    #parameters that are specific to certain problems
     global rho
-    global sigma
     global a
     global R
     global K
@@ -281,7 +461,7 @@ if __name__ == '__main__':
     global h_bar
     global c_g
 
-    
+    #set the above variables depending on 'problem'
     if problem =='jetlag_Pontryagin':
         b=b_jet_lag_Pontryagin
         f=f_jet_lag_Pontryagin
@@ -524,11 +704,6 @@ if __name__ == '__main__':
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
         
-
-
-    # possible values in order of appearance:
-    # ordinary, changing sigma, changing rho, adaptive,
-    # solution_trader, true_start
     if execution=='ordinary':
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
@@ -589,7 +764,7 @@ if __name__ == '__main__':
 
 
     ###############
-    elif execution=='changing sigma':
+    elif execution=='changing_sigma':
         num_sigma=10
         sigma_values=np.linspace(0.5,10,num_sigma)
         all_Y_0_values=np.zeros((num_sigma,num_keep))
@@ -619,6 +794,7 @@ if __name__ == '__main__':
     elif execution=='changing rho':
         num_rho=15
         rho_values=np.linspace(2.5,5,num_rho)
+
         all_Y_0_values=np.zeros((num_rho,num_keep))
         value_x=num_keep*[1]
         plot_cx = plt.figure()
@@ -737,4 +913,7 @@ if __name__ == '__main__':
 
 
             np.save('mu_trader_true_start_t20.npy',mu)
+            
+    end_time=time.time()
+    print('Time elapsted:',end_time-start_time)
 
