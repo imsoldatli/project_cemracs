@@ -1,13 +1,30 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-    Created on Mon Jul 24 09:24:22 2017
-    @author: Andrea Angiuli, Christy Graves, Houzhi Li
-    """
-#boring comment
+Created on Mon Jul 24 09:24:22 2017
+@author: Andrea Angiuli, Christy Graves, Houzhi Li
+
+
+This code implements the continuation in time tree algorithm described in
+Chassagneux, Crisan, Delarue to solve FBSDEs of McKean Vlasov type.
+
+The FBSDEs to be solved are the following:
+    dX_t=b(X,Y,Z,Law(X),Law(Y),Law(Z))dt+sigma dW_t
+    X_0=x_0
+    dY_t=-f(X,Y,Z,Law(X),Law(Y),Law(Z)) dt+Z_t dW_t
+    Y_t=g(X_T,Law(X_T))
+    
+Possible future extensions include time dependency of b and f, sigma
+non constant, and multidimensional state space.
+
+"""
+
+from __future__ import division
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+
+#Define functions b, f, and g for a variety of problems:
 
 def b_example_1(i,j,X,Y,Z,X_initial_probs):
     num_initial=len(X[0])
@@ -131,7 +148,37 @@ def f_trader_weak(i,j,X,Y,Z,X_initial_probs):
 def g_trader_weak(index,xi_vals,xi_probs):
     x=xi_vals[index]
     return c_g*0.5*x**2
+    
+def b_flocking_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+    return -Y[i][j]
 
+def f_flocking_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+    num_initial=len(X[0])
+    X_mean=0
+    num_per_initial=len(X[i])/num_initial
+    for k in range(len(X[i])):
+        index=int(math.floor(k/num_per_initial))
+        X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
+    return X[i][j]-X_mean
+
+def g_flocking(index,xi_vals,xi_probs):
+    return 0
+    
+def b_flocking_weak(i,j,X,Y,Z,X_initial_probs):
+    return -Z[i][j]/sigma
+
+def f_flocking_weak(i,j,X,Y,Z,X_initial_probs):
+    num_initial=len(X[0])
+    X_mean=0
+    num_per_initial=len(X[i])/num_initial
+    for k in range(len(X[i])):
+        index=int(math.floor(k/num_per_initial))
+        X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
+    return -1.0/(2*sigma**2)*(Z[i][j])**2+0.5*(X[i][j]-X_mean)**2
+
+#This function is essentially solver_bar, except it is used for the
+#continuation to initialize with the previous solution. It is written to be
+#used with only one level.
 def continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
     
     num_initial=len(X_ini[0])
@@ -145,7 +192,6 @@ def continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
     for j in range(num_initial):
         row1=X_initial_probs[j]*np.ones(2**(num_t_fine-1))/(2**(num_t_fine-1))
         x_probs=np.concatenate((x_probs,row1))
-    #    print(x_probs)
     for k in range(J):
         for j in range(num_initial*2**(num_t_fine-1)):
             Y[num_t_fine-1][j]=g(j,X[num_t_fine-1],x_probs)
@@ -153,12 +199,10 @@ def continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
             for index2 in range(J_solver_bar):
                 for i in reversed(range(num_t_fine-1)):
                     for j in range(num_initial*2**i):
-                        #                temp_Y=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z,X_initial_probs)+delta_t_fine*f(i+1,2*j+1,X,Y,Z,X_initial_probs))/2.0
+                        #temp_Y=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z,X_initial_probs)+delta_t_fine*f(i+1,2*j+1,X,Y,Z,X_initial_probs))/2.0
                         temp_Y=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y,Z,X_initial_probs)
-                        #temp_=delta_t_fine*f(i,j,X,Y,Z,X_initial_probs)
                         Y[i][j]=temp_Y
                         Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
-                #                print(k,i,j,temp_)
                 for i in range(num_t_fine-1):
                     for j in range(num_initial*2**i):
                         X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
@@ -169,6 +213,7 @@ def continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
             index+=1
     return [X,Y,Z,Y_0_values]
 
+#solver_bar as defined in Chassagneux, Crisan, Delarue
 def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
     num_initial=len(X[0])
     Y=[]
@@ -203,11 +248,10 @@ def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
                 X[i+1][2*j+1]=X[i+1][2*j+1]%(2*np.pi)
     return [X,Y,Z]
 
+#solver as defined in Chassagneux, Crisan, Delarue
 def solver(level,xi_vals,xi_probs):
-    #print('Executing solver[level] for level=',level)
     num_initial=len(xi_vals)
     if level==num_t_coarse-1:
-        #print('break condition')
         Y_terminal=np.zeros((num_initial))
         for index in range(num_initial):
             Y_terminal[index]=g(index,xi_vals,xi_probs)
@@ -250,19 +294,27 @@ def solver(level,xi_vals,xi_probs):
     return Y_initial
 
 if __name__ == '__main__':
-    problem ='ex_72' #possible values in order of appearance: jetlag, trader, ex_1, ex_72, ex_73
+    problem ='flocking_weak'
+    #possible values in order of appearance: jetlag(_Pontryagin,_weak),
+    #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
+    execution='ordinary'
+    # possible values in order of appearance:
+    # ordinary, changing_rho, changing_sigma, continuation_rho, continuation_sigma
     global b
     global f
     global g
-    global periodic_2_pi
-    global J
-    global J_solver_bar
-    global num_keep
-    global T
-    global num_t
+    global periodic_2_pi #if True, use periodic domain [0,2pi)
+    global J #number of Picard iterations in solver
+    global J_solver_bar #number of Picard iterations in solver_bar
+    global num_keep #number of last Picard iterations to print and save
+    global T #finite time horizon
     
+    global sigma #diffusion coefficient
+    global num_intervals_total #total number of intervals at the fine discretization
+    global num_intervals_coarse #number of intervals at the coarse discretization (levels)
+    
+    #parameters that are specific to certain problems
     global rho
-    global sigma
     global a
     global R
     global K
@@ -270,13 +322,11 @@ if __name__ == '__main__':
     global omega_0
     global omega_S
     global p
-    global num_intervals_total
-    global num_intervals_coarse
     global c_x
     global h_bar
     global c_g
     
-    
+    #set the above variables depending on 'problem'
     if problem =='jetlag_Pontryagin':
         b=b_jet_lag_Pontryagin
         f=f_jet_lag_Pontryagin
@@ -408,21 +458,47 @@ if __name__ == '__main__':
         num_intervals_coarse=1
         x_0=[1.0]
         x_0_probs=[1.0]
+    elif problem=='flocking_Pontryagin':
+        sigma=1.0
+        b=b_flocking_Pontryagin
+        f=f_flocking_Pontryagin
+        g=g_flocking
+        periodic_2_pi=False
+        J=25
+        J_solver_bar=10
+        num_keep=5
+        T=1.0
+        num_intervals_total=6
+        num_intervals_coarse=1
+        x_0=[0.0]
+        x_0_probs=[1.0]
+    elif problem=='flocking_weak':
+        sigma=1.0
+        b=b_flocking_weak
+        f=f_flocking_weak
+        g=g_flocking
+        periodic_2_pi=False
+        J=25
+        J_solver_bar=10
+        num_keep=5
+        T=1.0
+        num_intervals_total=6
+        num_intervals_coarse=1
+        x_0=[0.0]
+        x_0_probs=[1.0]
     
-    global num_t_coarse
+    #use num_intervals_total, and num_intervals_coarse to calculate:
+    global num_t_coarse #number of time points at the coarse discretization
     num_t_coarse=num_intervals_coarse+1
-    global delta_t_coarse
+    global delta_t_coarse #length of a coarse time interval
     delta_t_coarse=float(T)/(num_t_coarse-1)
-    global num_t_fine
-    num_t_fine=num_intervals_total/num_intervals_coarse+1
-    global delta_t_fine
+    global num_t_fine #number of time points at the fine discretization
+    num_t_fine=int(num_intervals_total/num_intervals_coarse)+1
+    global delta_t_fine #length of a fine time interval
     delta_t_fine=delta_t_coarse/(num_t_fine-1)
-    global delta_W
+    global delta_W #quantization of the Brownian Motion into 2 points
     delta_W=math.sqrt(delta_t_fine)
     
-    execution='ordinary'
-    # possible values in order of appearance:
-    # ordinary, changing sigma, changing rho, continuation sigma
     if execution=='ordinary':
         [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
         print(Y_0_values)
@@ -433,7 +509,19 @@ if __name__ == '__main__':
             true_Y_0=m_0*math.exp(a*T)/(1+rho/a*(math.exp(a*T)-1.0))
             print('True Answer For Example 1: Y_0=')
             print(true_Y_0)
-    elif execution=='changing sigma':
+            
+    elif execution=='changing_rho':
+        num_rho=10
+        rho_values=np.linspace(1,10,num_rho)
+        all_Y_0_values=np.zeros((num_rho,num_keep))
+        for index in range(num_rho):
+            index2=0
+            rho=rho_values[index]
+            [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
+            all_Y_0_values[index]=Y_0_values
+            print(Y_0_values)
+            
+    elif execution=='changing_sigma':
         num_sigma=20
         sigma_values=np.linspace(0.5,10,num_sigma)
         all_Y_0_values=np.zeros((num_sigma,num_keep))
@@ -444,19 +532,8 @@ if __name__ == '__main__':
             [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
             all_Y_0_values[index]=Y_0_values
             print(Y_0_values)
-            
-    elif execution=='changing rho':
-        num_rho=10
-        rho_values=np.linspace(1,10,num_rho)
-        all_Y_0_values=np.zeros((num_rho,num_keep))
-        for index in range(num_rho):
-            index2=0
-            rho=rho_values[index]
-            [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
-            all_Y_0_values[index]=Y_0_values
-            print(Y_0_values)
 
-    elif execution=='continuation rho':
+    elif execution=='continuation_rho':
         delta_rho=0.1
         rho_min=1.0
         rho_max=3.0
@@ -494,7 +571,7 @@ if __name__ == '__main__':
             all_Y_0_values[index]=Y_0_values
             print(Y_0_values)
 
-    elif execution=='continuation sigma':
+    elif execution=='continuation_sigma':
         delta_sigma=1.0
         sigma_min=1.0
         sigma_max=10.0

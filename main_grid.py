@@ -1,16 +1,32 @@
-from __future__ import division
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
 Created on Fri Jul 28 17:37:27 2017
     
 @author: Andrea Angiuli, Christy Graves, Houzhi Li
+
+This code implements the grid algorithm described in
+Delarue, Menozzi to solve FBSDEs of McKean Vlasov type.
+
+The FBSDEs to be solved are the following:
+    dX_t=b(X,Y,Z,Law(X),Law(Y),Law(Z))dt+sigma dW_t
+    X_0=x_0
+    dY_t=-f(X,Y,Z,Law(X),Law(Y),Law(Z)) dt+Z_t dW_t
+    Y_t=g(X_T,Law(X_T))
+    
+Possible future extensions include time dependency of b and f, sigma
+non constant, and multidimensional state space.
+
 """
 
+from __future__ import division
 import numpy as np
 import math
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import scipy
+
+
+#Define functions b, f, and g for a variety of problems:
 
 def b_dummy(i,j,mu,u,v):
     return 0
@@ -98,7 +114,25 @@ def f_trustworthy_trader(i,j,mu,u,v):
 
 def g_trustworthy_trader(x):
     return 0
+    
+def b_flocking_Pontryagin(i,j,mu,u,v):
+    return -u[i][j]
 
+def f_flocking_Pontryagin(i,j,mu,u,v):
+    X_mean=np.dot(x_grid,mu[i])
+    return x_grid[j]-X_mean
+
+def g_flocking(x):
+    return 0
+    
+def b_flocking_weak(i,j,mu,u,v):
+    return -v[i][j]/sigma
+
+def f_flocking_weak(i,j,mu,u,v):
+    X_mean=np.dot(x_grid,mu[i])
+    return -1.0/(2*sigma**2)*(v[i][j])**2+0.5*(x_grid[j]-X_mean)**2
+
+#project the value x onto the nearest value in x_grid
 def pi(x):
     if periodic_2_pi:
         x=x%(2*np.pi)
@@ -126,6 +160,7 @@ def pi(x):
     
     return(x_index)
 
+#used to linearly interpolate u(x) using u on x_grid
 def lin_int(x_min,x_max,y_min,y_max,x_get):
     if x_get>=x_max:
         return y_max
@@ -134,14 +169,7 @@ def lin_int(x_min,x_max,y_min,y_max,x_get):
     else:
         return y_min+(y_max-y_min)/(x_max-x_min)*(x_get-x_min)
 
-def transform_grid(x_grid1,mu_1,x_grid2):
-    num_x_1=len(x_grid1)
-    num_x_2=len(x_grid2)
-    mu_2=np.zeros(num_x_2)
-    diff_0=int((x_grid_1[0]-x_grid_2[0])/delta_x)
-    mu_2[diff_0:]=mu_1
-    return mu_2
-
+#use mu_0, u, v, to go forward in mu
 def forward(u,v,mu_0):
     
     mu=np.zeros((num_t,num_x))
@@ -159,6 +187,7 @@ def forward(u,v,mu_0):
             mu[i+1,up_index]+=mu[i,j]*0.5
     return mu
 
+#use mu, u_old, v_old to go backwards in u and v
 def backward(mu,u_old,v_old):
     
     u = np.zeros((num_t,num_x))
@@ -352,29 +381,36 @@ def solver_grid(level,mu_0,X_grids):
     return Y_0_values
 
 
+
 if __name__ == '__main__':
-
-
-    problem ='jetlag_Pontryagin' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
+    problem='trader_Pontryagin'
+    #possible values in order of appearance: jetlag(_Pontryagin,_weak),
+    #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
+    execution='ordinary'
+    # possible values in order of appearance:
+    # ordinary, changing_sigma, changing_rho, adaptive, solution_trader, true_start
 
 
     global b
     global f
     global g
-    global periodic_2_pi
-    global J
-    global num_keep
-    global T
-    global num_t
+    global periodic_2_pi #if True, use periodic domain [0,2pi)
+    global J #number of Picard iterations
+    global num_keep #number of last Picard iterations to print and save
+    global T #finite time horizon
+    global num_t #number of time points (one more than the number of time steps)
     
     global delta_t
     global t_grid
     global delta_x
-    global x_min
-    global x_max
+    global x_min #used to set the size of x_grid
+    global x_max #used to set the size of x_grid
     global x_grid
+    
+    global sigma #diffusion coefficient
+    
+    #parameters that are specific to certain problems
     global rho
-    global sigma
     global a
     global R
     global K
@@ -386,7 +422,7 @@ if __name__ == '__main__':
     global h_bar
     global c_g
 
-    
+    #set the above variables depending on 'problem'
     if problem =='jetlag_Pontryagin':
         b=b_jet_lag_Pontryagin
         f=f_jet_lag_Pontryagin
@@ -500,8 +536,8 @@ if __name__ == '__main__':
         rho=1
     elif problem=='trader_Pontryagin':
         sigma=0.7
-        rho=0.01
-        c_x=1
+        rho=1.5
+        c_x=2
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -533,8 +569,8 @@ if __name__ == '__main__':
 # convergence for rho=0.1
     elif problem=='trader_weak':
         sigma=0.7
-        rho=.01
-        c_x=1
+        rho=1.5
+        c_x=2
         h_bar=2
         c_g=0.3
         b=b_trader_weak
@@ -556,15 +592,16 @@ if __name__ == '__main__':
 
     elif problem=='trustworthy_trader':
         sigma=0.7
-        rho=.01
-        c_x=1
+        rho=1
+        c_x=0.1
         h_bar=2
         c_g=0.3
         b=b_trustworthy_trader
         f=f_trustworthy_trader
         g=g_trustworthy_trader
         periodic_2_pi=False
-
+        J=25
+        num_keep=5
         T=1
         num_t=20
         delta_t=(T-0.06)/(num_t-1)
@@ -591,11 +628,43 @@ if __name__ == '__main__':
             eta_bar[0,t]=-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down)/(((delta_down*np.exp(delta_delta*(T-t))-delta_up))-c_g*B*(np.exp(delta_delta*(T-t))-1))
             eta[0,t]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/(ratio2-c_g+(ratio2+c_g)*np.exp(2*ratio*(T-t)))
 
-    execution='true_start'
 
-    # possible values in order of appearance:
-    # ordinary, changing sigma, changing rho, adaptive,
-    # solution_trader, true_start
+    elif problem=='flocking_Pontryagin':
+        b=b_flocking_Pontryagin
+        f=f_flocking_Pontryagin
+        g=g_flocking
+        periodic_2_pi=False
+        J=25
+        num_keep=5
+        T=10
+        num_t=10*20
+        delta_t=T/(num_t-1)
+        t_grid=np.linspace(0,T,num_t)
+        delta_x=delta_t**(2)
+        x_min=-3
+        x_max=3
+        num_x=int((x_max-x_min)/delta_x+1)
+        x_grid=np.linspace(x_min,x_max,num_x)
+        sigma=1
+        
+    elif problem=='flocking_weak':
+        b=b_flocking_weak
+        f=f_flocking_weak
+        g=g_flocking
+        periodic_2_pi=False
+        J=25
+        num_keep=5
+        T=1
+        num_t=20
+        delta_t=T/(num_t-1)
+        t_grid=np.linspace(0,T,num_t)
+        delta_x=delta_t**(2)
+        x_min=-3
+        x_max=3
+        num_x=int((x_max-x_min)/delta_x+1)
+        x_grid=np.linspace(x_min,x_max,num_x)
+        sigma=1
+        
     if execution=='ordinary':
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
@@ -622,7 +691,7 @@ if __name__ == '__main__':
                 index2+=1
         print all_Y_0_values[0]
 
-        np.save('mu_weak_t20.npy',mu)
+        #np.save('mu_Pont_t20.npy',mu)
 
 
 
@@ -649,7 +718,7 @@ if __name__ == '__main__':
 
 
     ###############
-    elif execution=='changing sigma':
+    elif execution=='changing_sigma':
         num_sigma=10
         sigma_values=np.linspace(0.5,10,num_sigma)
         all_Y_0_values=np.zeros((num_sigma,num_keep))
@@ -676,13 +745,15 @@ if __name__ == '__main__':
                     index2+=1
         print all_Y_0_values[index]
     
-    elif execution=='changing rho':
+    elif execution=='changing_rho':
         num_rho=20
-        rho_values=np.linspace(2,9,num_rho)
+        rho_values=np.linspace(1,21,num_rho)
         all_Y_0_values=np.zeros((num_rho,num_keep))
+        value_x=num_keep*[1]
         for index in range(num_rho):
             index2=0
-            rho=rho_values[index]
+            #rho=rho_values[index]
+            c_x=rho_values[index]
             
             
             mu_0=np.zeros((num_x))
@@ -703,9 +774,17 @@ if __name__ == '__main__':
                 if j>J-num_keep-1:
                     all_Y_0_values[index][index2]=np.dot(u[0],mu[0])
                     index2+=1
-        print all_Y_0_values[index]
-        np.save('grid_example_72_changing_rho_larger_x_domain',all_Y_0_values)
-        
+            print all_Y_0_values[index]
+
+            plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index])
+        plt.title('$\sigma = 0.7$, $\rho = 1.5$, $\bar{h}=2$, $c_g=0.3$, $c_x \in [1,20]$')
+        plt.show()
+
+        plt.savefig('grid_trader_pontryagin_changing_cx.png')
+        #np.save('grid_trader_pontryagin_rho_larger_x_domain.npy',all_Y_0_values)
+
+
+
     elif execution=='adaptive':
         x_min_0=-3
         x_max_0=3

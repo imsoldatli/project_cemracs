@@ -3,17 +3,22 @@ __author__ = 'angiuli'
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
-from matplotlib.animation import FuncAnimation
+
+# load solutions
 weak=np.load('mu_weak_t20.npy')
 Pont=np.load('mu_Pont_t20.npy')
 true_solution=np.load('solution_trader.npy')
 true_start=np.load('mu_trader_true_start_t20.npy')
 
-compare_weak_pont=0
-compare_weak_true=0
-compare_pont_true=0
-compare_true_start_solution=0
+# intialize counters of matching points between the solutions
 
+compare_weak_pont=0 #compare weak vs pontryagin
+compare_weak_true=0 #compare weak vs true solution
+compare_pont_true=0 #compare pont vs true solution
+compare_true_start_solution=0 #compare true vs pontryagin started from the true solution
+compare_shift=0
+
+# construct x_grid (it will be necessary for the animation and to calculate the mean)
 T=1
 num_t=20
 delta_t=(T-0.06)/(num_t-1)
@@ -24,42 +29,53 @@ x_max=4
 num_x=int((x_max-x_min)/delta_x+1)
 x_grid=np.linspace(x_min,x_max,num_x)
 
-compare_shift=0
+# dimension of the solutions
 row=len(weak)
 col=len(weak[0])
-max_diff_weak_Pont=[]
-max_diff_true_weak=[]
-max_diff_true_Pont=[]
-max_diff_true_start_solut=[]
-max_diff_true_start_Pont=[]
+
+# max_diff[t]: max of the differences between two solutions at time t
+# max_diff initialization
+max_diff_weak_Pont=[] # Weak solution vs Pontryagin solution
+max_diff_true_weak=[] # true solution vs Weak solution
+max_diff_true_Pont=[] # true solution vs Pontryagin solution
+max_diff_true_start_true_solut=[] # Pontryagin solution started in the true solution vs true solution
+max_diff_true_start_Pont=[] # Pontryagin solution started in the true solution  vs Pontryagin solution
+
+# clean the solutions by all values behind a threshold and save the index of the remaining values
+threshold=10**(-3)
+# weak
 w=[]
 index_w=[]
+# Pontryagin
 P=[]
 index_P=[]
+# true solution
 T=[]
 index_T=[]
+
 row_c=[]
-mean_w=[]
-mean_P=[]
-mean_T=[]
+
+# initializing the mean of each solution
+mean_weak=[]
+mean_Pont=[]
+mean_true_solution=[]
 
 for i in range(row):
-
+    # evaluation of the max_diff
     max_diff_weak_Pont.append(np.max(abs(weak[i]-Pont[i])))
     max_diff_true_weak.append(np.max(abs(weak[i]-true_solution[i])))
     max_diff_true_Pont.append(np.max(abs(true_solution[i]-Pont[i])))
-    max_diff_true_start_solut.append(np.max(abs(true_solution[i]-true_start[i])))
+    max_diff_true_start_true_solut.append(np.max(abs(true_solution[i]-true_start[i])))
     max_diff_true_start_Pont.append(np.max(abs(Pont[i]-true_start[i])))
 
+    # cleaning the solutions & counting matching points
     row_iw=[]
     row_w=[]
     row_P=[]
     row_iP=[]
-    row_t=[]
-    row_it=[]
-    #index_w.append([])
-#    P.append([])
-    #index_P.append([])
+    row_T=[]
+    row_iT=[]
+
     for j in range(col):
         if weak[i][j]>5*10**-2:
             row_w.append(weak[i][j])
@@ -68,8 +84,8 @@ for i in range(row):
             row_P.append(Pont[i][j])
             row_iP.append(j)
         if true_solution[i][j]>10**-2:
-            row_t.append(true_solution[i][j])
-            row_it.append(j)
+            row_T.append(true_solution[i][j])
+            row_iT.append(j)
 
         if abs(weak[i][j]-Pont[i][j])<10**(-2):
             compare_weak_pont=compare_weak_pont+1
@@ -77,55 +93,42 @@ for i in range(row):
             compare_weak_true=compare_weak_true+1
         if abs(Pont[i][j]-true_solution[i][j])<10**(-2):
             compare_pont_true=compare_pont_true+1
-    mean_w.append(np.dot(x_grid,weak[i]))
-    mean_P.append(np.dot(x_grid,Pont[i]))
-    mean_T.append(np.dot(x_grid,true_solution[i]))
+    mean_weak.append(np.dot(x_grid,weak[i]))
+    mean_Pont.append(np.dot(x_grid,Pont[i]))
+    mean_true_solution.append(np.dot(x_grid,true_solution[i]))
 
     w.append(row_w)
-    #w[i]=np.concatenate((w[i],row_w))
     index_w.append(row_iw)
     P.append(row_P)
     index_P.append(row_iP)
-    T.append(row_t)
-    index_T.append(row_it)
-max_diff_wP=[]
-for i in range(len(w)):
-    print(len(w[i]),len(P[i]),len(T[i]))
-
-#    if i<5:
-#        max_diff_wP.append(np.max(abs(np.array(w[i])-np.array(P[i]))))
-    #print(np.sum(w[i]),np.sum(P[i]))
-
-    #for j in range(len(w[i])):
-    #
-    #     if abs(w[i][j]-P[i][j])<10**-2:
-    #         compare_shift+=1
+    T.append(row_T)
+    index_T.append(row_iT)
 
 
+# print max diff
+print('max diff: weak vs Pont',max_diff_weak_Pont)
+print('max diff: true vs Pont',max_diff_true_Pont)
+print('max diff: true vs weak',max_diff_true_weak)
+print('max diff: true start vs true solution',max_diff_true_start_true_solut)
+print('max diff: true start vs Pont',max_diff_true_start_Pont)
 
-
-print('weak vs Pont',max_diff_weak_Pont)
-print(max_diff_wP)
-print('true vs Pont',max_diff_true_Pont)
-print('true vs weak',max_diff_true_weak)
-print('true start vs solution',max_diff_true_start_solut)
-print('true start vs Pont',max_diff_true_start_Pont)
-#print(compare,col*row)
-#print(compare_shift)
+# print a specific time of the cleaned vectors
 print('w',w[4])
 print('P',P[4])
 print('T',T[4])
 
-print('mean_w',mean_w)
-print('mean_P',mean_P)
-print('mean_T',mean_T)
+# print mean
+print('mean_w',mean_weak)
+print('mean_P',mean_Pont)
+print('mean_T',mean_true_solution)
 
 
 #Writer = animation.writers['ffmpeg']
 #writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
 
+# animation: plot all the s
 fig = plt.figure()
-ax1 = plt.axes(xlim=(-2, 4), ylim=(0,1))
+ax1 = plt.axes(xlim=(-1, 3), ylim=(0,.8))
 line, = ax1.plot([], [],'o')
 plotlays, plotcols = [3], ["green","yellow","red"]
 labels=['weak','Pont','true']
@@ -180,9 +183,9 @@ def animate(i):
 
 # call the animator.  blit=True means only re-draw the parts that have changed.
 anim = animation.FuncAnimation(fig, animate, init_func=init,
-                               frames=frame_num, interval=350, blit=False)
+                               frames=frame_num, interval=450, blit=False)
 
 
 plt.show()
 
-#anim.save('comparison_mu_trader.mp4')
+anim.save('comparison_mu_trader.mp4')
