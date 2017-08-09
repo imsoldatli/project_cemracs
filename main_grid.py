@@ -1,16 +1,32 @@
-from __future__ import division
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
 Created on Fri Jul 28 17:37:27 2017
     
 @author: Andrea Angiuli, Christy Graves, Houzhi Li
+
+This code implements the grid algorithm described in
+Delarue, Menozzi to solve FBSDEs of McKean Vlasov type.
+
+The FBSDEs to be solved are the following:
+    dX_t=b(X,Y,Z,Law(X),Law(Y),Law(Z))dt+sigma dW_t
+    X_0=x_0
+    dY_t=-f(X,Y,Z,Law(X),Law(Y),Law(Z)) dt+Z_t dW_t
+    Y_t=g(X_T,Law(X_T))
+    
+Possible future extensions include time dependency of b and f, sigma
+non constant, and multidimensional state space.
+
 """
 
+from __future__ import division
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 import scipy
+
+
+#Define functions b, f, and g for a variety of problems:
 
 def b_dummy(i,j,mu,u,v):
     return 0
@@ -116,6 +132,7 @@ def f_flocking_weak(i,j,mu,u,v):
     X_mean=np.dot(x_grid,mu[i])
     return -1.0/(2*sigma**2)*(v[i][j])**2+0.5*(x_grid[j]-X_mean)**2
 
+#project the value x onto the nearest value in x_grid
 def pi(x):
     if periodic_2_pi:
         x=x%(2*np.pi)
@@ -143,6 +160,7 @@ def pi(x):
     
     return(x_index)
 
+#used to linearly interpolate u(x) using u on x_grid
 def lin_int(x_min,x_max,y_min,y_max,x_get):
     if x_get>=x_max:
         return y_max
@@ -151,6 +169,7 @@ def lin_int(x_min,x_max,y_min,y_max,x_get):
     else:
         return y_min+(y_max-y_min)/(x_max-x_min)*(x_get-x_min)
 
+#use mu_0, u, v, to go forward in mu
 def forward(u,v,mu_0):
     
     mu=np.zeros((num_t,num_x))
@@ -168,6 +187,7 @@ def forward(u,v,mu_0):
             mu[i+1,up_index]+=mu[i,j]*0.5
     return mu
 
+#use mu, u_old, v_old to go backwards in u and v
 def backward(mu,u_old,v_old):
     
     u = np.zeros((num_t,num_x))
@@ -229,36 +249,35 @@ def backward(mu,u_old,v_old):
 
     return [u,v]
 
-
 if __name__ == '__main__':
-
-
     problem='trader_Pontryagin'
-    execution='changing rho'
-
-    #possible values in order of appearance:
-    # jetlag_weak, jetlag_Pontryagin, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
-    # trustworthy_trader
-
+    #possible values in order of appearance: jetlag(_Pontryagin,_weak),
+    #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
+    execution='ordinary'
+    # possible values in order of appearance:
+    # ordinary, changing_sigma, changing_rho, adaptive, solution_trader, true_start
 
 
     global b
     global f
     global g
-    global periodic_2_pi
-    global J
-    global num_keep
-    global T
-    global num_t
+    global periodic_2_pi #if True, use periodic domain [0,2pi)
+    global J #number of Picard iterations
+    global num_keep #number of last Picard iterations to print and save
+    global T #finite time horizon
+    global num_t #number of time points (one more than the number of time steps)
     
     global delta_t
     global t_grid
     global delta_x
-    global x_min
-    global x_max
+    global x_min #used to set the size of x_grid
+    global x_max #used to set the size of x_grid
     global x_grid
+    
+    global sigma #diffusion coefficient
+    
+    #parameters that are specific to certain problems
     global rho
-    global sigma
     global a
     global R
     global K
@@ -270,7 +289,7 @@ if __name__ == '__main__':
     global h_bar
     global c_g
 
-    
+    #set the above variables depending on 'problem'
     if problem =='jetlag_Pontryagin':
         b=b_jet_lag_Pontryagin
         f=f_jet_lag_Pontryagin
@@ -513,11 +532,6 @@ if __name__ == '__main__':
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
         
-
-
-    # possible values in order of appearance:
-    # ordinary, changing sigma, changing rho, adaptive,
-    # solution_trader, true_start
     if execution=='ordinary':
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
@@ -571,7 +585,7 @@ if __name__ == '__main__':
 
 
     ###############
-    elif execution=='changing sigma':
+    elif execution=='changing_sigma':
         num_sigma=10
         sigma_values=np.linspace(0.5,10,num_sigma)
         all_Y_0_values=np.zeros((num_sigma,num_keep))
@@ -598,7 +612,7 @@ if __name__ == '__main__':
                     index2+=1
         print all_Y_0_values[index]
     
-    elif execution=='changing rho':
+    elif execution=='changing_rho':
         num_rho=20
         rho_values=np.linspace(1,21,num_rho)
         all_Y_0_values=np.zeros((num_rho,num_keep))
