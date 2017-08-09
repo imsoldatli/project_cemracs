@@ -24,6 +24,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 import scipy
+import time
 
 
 #Define functions b, f, and g for a variety of problems:
@@ -133,7 +134,7 @@ def f_flocking_weak(i,j,mu,u,v):
     return -1.0/(2*sigma**2)*(v[i][j])**2+0.5*(x_grid[j]-X_mean)**2
 
 #project the value x onto the nearest value in x_grid
-def pi(x):
+def pi_old(x):
     if periodic_2_pi:
         x=x%(2*np.pi)
     
@@ -159,6 +160,30 @@ def pi(x):
         x_index=low+1
     
     return(x_index)
+    
+def pi_old_2(x):
+    if periodic_2_pi:
+        x=x%(2*np.pi)
+    index=int(round(((x-x_min)/delta_x)))
+    
+    if periodic_2_pi:
+        index=index%num_x
+    else:
+        index=min(num_x-1,index)
+    index=max(0,index)
+
+    return index
+    
+def pi(x):
+    if periodic_2_pi:
+        x=x%(2*np.pi)
+        index=int(round(((x-x_min)/delta_x)))
+        index=index%num_x
+    else:
+        index=int(round(((x-x_min)/delta_x)))
+        index=min(num_x-1,index)
+        index=max(0,index)
+    return index
 
 #used to linearly interpolate u(x) using u on x_grid
 def lin_int(x_m,x_M,y_m,y_M,x_get):
@@ -397,7 +422,8 @@ def solver_grid(level,mu_0,X_grids):
 
 
 if __name__ == '__main__':
-    problem='trader_Pontryagin'
+    start_time=time.time()
+    problem='jetlag_Pontryagin'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
     execution='ordinary'
@@ -879,4 +905,7 @@ if __name__ == '__main__':
 
 
             np.save('mu_trader_true_start_t20.npy',mu)
+            
+    end_time=time.time()
+    print('Time elapsted:',end_time-start_time)
 
