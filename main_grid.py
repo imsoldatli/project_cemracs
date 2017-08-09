@@ -88,15 +88,24 @@ def f_trader_weak(i,j,mu,u,v):
 def g_trader_weak(x):
     return c_g*0.5*x**2
 
+def b_trader_weak_trunc(i,j,mu,u,v):
+    return -rho*v[i][j]/sigma #rho=1/c_alpha
 
-def b_trustworthy_trader(i,j,mu,u,v):
+def f_trader_weak_trunc(i,j,mu,u,v):
+    Z_mean=np.dot(v[i],mu[i])
+    return 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
+
+def g_trader_weak(x):
+    return c_g*0.5*x**2
+
+def b_solution_trader(i,j,mu,u,v):
     x_mean=np.dot(x_grid,mu[i])
     return -rho*(eta[0,i]*x_grid[j]+(eta_bar[0,i]-eta[0,i])*x_mean)
 
-def f_trustworthy_trader(i,j,mu,u,v):
+def f_solution_trader(i,j,mu,u,v):
     return 0
 
-def g_trustworthy_trader(x):
+def g_solution_trader(x):
     return 0
     
 def b_flocking_Pontryagin(i,j,mu,u,v):
@@ -234,13 +243,15 @@ if __name__ == '__main__':
 
 
     problem='trader_Pontryagin'
-    execution='changing rho'
+    execution='true_start'
 
     #possible values in order of appearance:
     # jetlag_weak, jetlag_Pontryagin, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
-    # trustworthy_trader
+    # solution_trader
 
-
+    # possible values in order of appearance:
+    # ordinary, changing sigma, changing rho, adaptive,
+    # solution_trader, true_start
 
     global b
     global f
@@ -384,8 +395,8 @@ if __name__ == '__main__':
         rho=1
     elif problem=='trader_Pontryagin':
         sigma=0.7
-        rho=1.5
-        c_x=2
+        rho=1
+        c_x=0.7
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -417,8 +428,8 @@ if __name__ == '__main__':
 # convergence for rho=0.1
     elif problem=='trader_weak':
         sigma=0.7
-        rho=1.5
-        c_x=2
+        rho=1
+        c_x=.7
         h_bar=2
         c_g=0.3
         b=b_trader_weak
@@ -438,15 +449,15 @@ if __name__ == '__main__':
         x_grid=np.linspace(x_min,x_max,num_x)
     # Variable trader
 
-    elif problem=='trustworthy_trader':
+    elif problem=='solution_trader':
         sigma=0.7
         rho=1
-        c_x=0.1
+        c_x=0.7
         h_bar=2
         c_g=0.3
-        b=b_trustworthy_trader
-        f=f_trustworthy_trader
-        g=g_trustworthy_trader
+        b=b_solution_trader
+        f=f_solution_trader
+        g=g_solution_trader
         periodic_2_pi=False
         J=25
         num_keep=5
@@ -544,7 +555,14 @@ if __name__ == '__main__':
                 index2+=1
         print all_Y_0_values[0]
 
-        #np.save('mu_Pont_t20.npy',mu)
+        # bounds=np.zeros(2,num_t)
+        # for j in range(num_t):
+        #     bounds[0,j]=min(u[t])
+        #     bounds[1,j]=max(u[t])
+
+
+        #np.save('bounds_Z_weak.npy',mu)
+        np.save('mu_Pont_t20.npy',mu)
 
 
 
@@ -599,14 +617,15 @@ if __name__ == '__main__':
         print all_Y_0_values[index]
     
     elif execution=='changing rho':
-        num_rho=20
-        rho_values=np.linspace(1,21,num_rho)
+        num_rho=15
+        rho_values=np.linspace(2.5,5,num_rho)
         all_Y_0_values=np.zeros((num_rho,num_keep))
         value_x=num_keep*[1]
+        plot_cx = plt.figure()
         for index in range(num_rho):
             index2=0
             #rho=rho_values[index]
-            c_x=rho_values[index]
+            rho=rho_values[index]
             
             
             mu_0=np.zeros((num_x))
@@ -629,11 +648,11 @@ if __name__ == '__main__':
                     index2+=1
             print all_Y_0_values[index]
 
-            plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index])
-        plt.title('$\sigma = 0.7$, $\rho = 1.5$, $\bar{h}=2$, $c_g=0.3$, $c_x \in [1,20]$')
+            plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index],'o')
+        plt.title('$sigma = 0.7$, $rho \in [1,10]$, $c_x = 2, $h_bar=2$, $c_g=0.3$')
         plt.show()
 
-        plt.savefig('grid_trader_pontryagin_changing_cx.png')
+        #plt.savefig('grid_trader_pontryagin_changing_cx.eps')
         #np.save('grid_trader_pontryagin_rho_larger_x_domain.npy',all_Y_0_values)
 
 
@@ -696,7 +715,7 @@ if __name__ == '__main__':
         mu=forward(u,v,mu_0)
 
         np.save('solution_trader.npy',mu)
-    elif execution=='true_start':
+    elif execution=='true_start': # problem has to be 'trader_Pontryagin'
         if periodic_2_pi:
             mu=np.load('mu_reference_set_158.npy')*delta_x
             u=np.load('u_reference_set_158.npy')
