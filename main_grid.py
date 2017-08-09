@@ -98,6 +98,23 @@ def f_trustworthy_trader(i,j,mu,u,v):
 
 def g_trustworthy_trader(x):
     return 0
+    
+def b_flocking_Pontryagin(i,j,mu,u,v):
+    return -u[i][j]
+
+def f_flocking_Pontryagin(i,j,mu,u,v):
+    X_mean=np.dot(x_grid,mu[i])
+    return x_grid[j]-X_mean
+
+def g_flocking(x):
+    return 0
+    
+def b_flocking_weak(i,j,mu,u,v):
+    return -v[i][j]/sigma
+
+def f_flocking_weak(i,j,mu,u,v):
+    X_mean=np.dot(x_grid,mu[i])
+    return -1.0/(2*sigma**2)*(v[i][j])**2+0.5*(x_grid[j]-X_mean)**2
 
 def pi(x):
     if periodic_2_pi:
@@ -222,6 +239,7 @@ if __name__ == '__main__':
     #possible values in order of appearance:
     # jetlag_weak, jetlag_Pontryagin, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
     # trustworthy_trader
+
 
 
     global b
@@ -457,6 +475,44 @@ if __name__ == '__main__':
         for t in range(num_t):
             eta_bar[0,t]=-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down)/(((delta_down*np.exp(delta_delta*(T-t))-delta_up))-c_g*B*(np.exp(delta_delta*(T-t))-1))
             eta[0,t]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/(ratio2-c_g+(ratio2+c_g)*np.exp(2*ratio*(T-t)))
+
+
+    elif problem=='flocking_Pontryagin':
+        b=b_flocking_Pontryagin
+        f=f_flocking_Pontryagin
+        g=g_flocking
+        periodic_2_pi=False
+        J=25
+        num_keep=5
+        T=10
+        num_t=10*20
+        delta_t=T/(num_t-1)
+        t_grid=np.linspace(0,T,num_t)
+        delta_x=delta_t**(2)
+        x_min=-3
+        x_max=3
+        num_x=int((x_max-x_min)/delta_x+1)
+        x_grid=np.linspace(x_min,x_max,num_x)
+        sigma=1
+        
+    elif problem=='flocking_weak':
+        b=b_flocking_weak
+        f=f_flocking_weak
+        g=g_flocking
+        periodic_2_pi=False
+        J=25
+        num_keep=5
+        T=1
+        num_t=20
+        delta_t=T/(num_t-1)
+        t_grid=np.linspace(0,T,num_t)
+        delta_x=delta_t**(2)
+        x_min=-3
+        x_max=3
+        num_x=int((x_max-x_min)/delta_x+1)
+        x_grid=np.linspace(x_min,x_max,num_x)
+        sigma=1
+        
 
 
     # possible values in order of appearance:
