@@ -24,6 +24,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 import scipy
+import time
 
 
 #Define functions b, f, and g for a variety of problems:
@@ -383,7 +384,8 @@ def solver_grid(level,mu_0,X_grids):
 
 
 if __name__ == '__main__':
-    problem='trader_Pontryagin'
+    start_time=time.time()
+    problem='ex_1'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
     execution='ordinary'
@@ -865,4 +867,7 @@ if __name__ == '__main__':
 
 
             np.save('mu_trader_true_start_t20.npy',mu)
+            
+    end_time=time.time()
+    print('Time elapsted:',end_time-start_time)
 

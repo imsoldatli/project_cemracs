@@ -23,6 +23,7 @@ from __future__ import division
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import time
 
 #Define functions b, f, and g for a variety of problems:
 
@@ -294,6 +295,7 @@ def solver(level,xi_vals,xi_probs):
     return Y_initial
 
 if __name__ == '__main__':
+    start_time=time.time()
     problem ='flocking_weak'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
@@ -609,3 +611,5 @@ if __name__ == '__main__':
             [X,Y,Z,Y_0_values]=continuation_solver_bar(X,x_0_probs,Y,Z)
             all_Y_0_values[index]=Y_0_values
         print(Y_0_values)
+    end_time=time.time()
+    print('Time elapsted:',end_time-start_time)
