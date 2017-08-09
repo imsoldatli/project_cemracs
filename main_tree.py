@@ -1,14 +1,30 @@
-from __future__ import division
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
 Created on Mon Jul 24 09:24:22 2017
 @author: Andrea Angiuli, Christy Graves, Houzhi Li
+
+
+This code implements the continuation in time tree algorithm described in
+Chassagneux, Crisan, Delarue to solve FBSDEs of McKean Vlasov type.
+
+The FBSDEs to be solved are the following:
+    dX_t=b(X,Y,Z,Law(X),Law(Y),Law(Z))dt+sigma dW_t
+    X_0=x_0
+    dY_t=-f(X,Y,Z,Law(X),Law(Y),Law(Z)) dt+Z_t dW_t
+    Y_t=g(X_T,Law(X_T))
+    
+Possible future extensions include time dependency of b and f, sigma
+non constant, and multidimensional state space.
+
 """
 
+from __future__ import division
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+
+#Define functions b, f, and g for a variety of problems:
 
 def b_example_1(i,j,X,Y,Z,X_initial_probs):
     num_initial=len(X[0])
@@ -160,6 +176,9 @@ def f_flocking_weak(i,j,X,Y,Z,X_initial_probs):
         X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
     return -1.0/(2*sigma**2)*(Z[i][j])**2+0.5*(X[i][j]-X_mean)**2
 
+#This function is essentially solver_bar, except it is used for the
+#continuation to initialize with the previous solution. It is written to be
+#used with only one level.
 def continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
     
     num_initial=len(X_ini[0])
@@ -197,6 +216,7 @@ def continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
             index+=1
     return [X,Y,Z,Y_0_values]
 
+#solver_bar as defined in Chassagneux, Crisan, Delarue
 def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
     num_initial=len(X[0])
     Y=[]
@@ -231,6 +251,7 @@ def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
                 X[i+1][2*j+1]=X[i+1][2*j+1]%(2*np.pi)
     return [X,Y,Z]
 
+#solver as defined in Chassagneux, Crisan, Delarue
 def solver(level,xi_vals,xi_probs):
     #print('Executing solver[level] for level=',level)
     num_initial=len(xi_vals)

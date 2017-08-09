@@ -188,4 +188,4 @@ anim = animation.FuncAnimation(fig, animate, init_func=init,
 
 plt.show()
 
-#anim.save('comparison_mu_trader.mp4')
+anim.save('comparison_mu_trader.mp4')
