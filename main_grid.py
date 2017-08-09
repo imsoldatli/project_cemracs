@@ -233,7 +233,7 @@ def backward(mu,u_old,v_old):
 if __name__ == '__main__':
 
 
-    problem ='flocking_weak' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73, flocking_Pontryagin
+    problem ='jetlag_Pontryagin' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73, flocking_Pontryagin
 
 
     global b
@@ -476,8 +476,8 @@ if __name__ == '__main__':
         periodic_2_pi=False
         J=25
         num_keep=5
-        T=1
-        num_t=20
+        T=10
+        num_t=10*20
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)

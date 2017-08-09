@@ -11,20 +11,20 @@ import math
 import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
-    rho_values=np.load('tree_example_72_rho_values.npy')
-    tree_Y_0_values_1=np.load('tree_example_72_one_level_changing_rho.npy')
-    tree_Y_0_values_2=np.load('tree_example_72_two_level_changing_rho.npy')
-    grid_Y_0_values=np.load('grid_example_72_changing_rho_larger_x_domain.npy')
-    
-    num_keep=5
-    for index2 in range(num_keep):
-        for index in range(len(rho_values)):
-            tree_1=plt.scatter(rho_values[index],tree_Y_0_values_1[index][index2],color='blue')
-            tree_2=plt.scatter(rho_values[index],tree_Y_0_values_2[index][index2],color='red')
-            grid=plt.scatter(rho_values[index],grid_Y_0_values[index][index2],color='black')
-    plt.xlabel('rho')
-    plt.ylabel('Y_0')
-    plt.savefig('tree_and_grid_example_72_changing_rho_larger_x_domain.eps')
+#    rho_values=np.load('tree_example_72_rho_values.npy')
+#    tree_Y_0_values_1=np.load('tree_example_72_one_level_changing_rho.npy')
+#    tree_Y_0_values_2=np.load('tree_example_72_two_level_changing_rho.npy')
+#    grid_Y_0_values=np.load('grid_example_72_changing_rho_larger_x_domain.npy')
+#    
+#    num_keep=5
+#    for index2 in range(num_keep):
+#        for index in range(len(rho_values)):
+#            tree_1=plt.scatter(rho_values[index],tree_Y_0_values_1[index][index2],color='blue')
+#            tree_2=plt.scatter(rho_values[index],tree_Y_0_values_2[index][index2],color='red')
+#            grid=plt.scatter(rho_values[index],grid_Y_0_values[index][index2],color='black')
+#    plt.xlabel('rho')
+#    plt.ylabel('Y_0')
+#    plt.savefig('tree_and_grid_example_72_changing_rho_larger_x_domain.eps')
     
     
     
@@ -57,3 +57,27 @@ if __name__ == '__main__':
 #    plt.xlabel('rho')
 #    plt.ylabel('Y_0')
 #    plt.savefig('adaptive_grid_example_72.eps')
+
+#    plt.scatter(x_grid,mu[348]/delta_x)
+#    plt.xlabel('x')
+#    plt.ylabel('$\mu(x)$')
+#    plt.title('Jetlag, PDE Approach, T/2')
+#    plt.savefig('PDE_jetlag.eps')
+
+#    plt.scatter(x_grid,-u[348])
+#    plt.xlabel('x')
+#    plt.ylabel('alpha(T/2,x)')
+#    plt.title('Jetlag, PDE Approach, T/2')
+#    plt.savefig('PDE_jetlag_feedback.eps')
+    
+#    plt.scatter(x_grid,mu[348]/delta_x)
+#    plt.xlabel('x')
+#    plt.ylabel('$\mu(x)$')
+#    plt.title('Jetlag, Grid Algorithm, Pontryagin Approach, T/2')
+#    plt.savefig('grid_jetlag_Pontryagin.eps')
+    
+    plt.scatter(x_grid,-u[348])
+    plt.xlabel('x')
+    plt.ylabel('alpha(T/2,x)')
+    plt.title('Jetlag, Grid Algorithm, Pontryagin Approach, T/2')
+    plt.savefig('grid_jetlag_Pontryagin_feedback.eps')

@@ -278,7 +278,7 @@ def solver(level,xi_vals,xi_probs):
     return Y_initial
 
 if __name__ == '__main__':
-    problem ='flocking_Pontryagin' #possible values in order of appearance: jetlag, trader, ex_1, ex_72, ex_73, flocking
+    problem ='flocking_weak' #possible values in order of appearance: jetlag, trader, ex_1, ex_72, ex_73, flocking
     global b
     global f
     global g
