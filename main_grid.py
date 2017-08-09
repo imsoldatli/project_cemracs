@@ -161,13 +161,13 @@ def pi(x):
     return(x_index)
 
 #used to linearly interpolate u(x) using u on x_grid
-def lin_int(x_min,x_max,y_min,y_max,x_get):
-    if x_get>=x_max:
-        return y_max
-    elif x_get<=x_min:
-        return y_min
+def lin_int(x_m,x_M,y_m,y_M,x_get):
+    if x_get>=x_M:
+        return y_M
+    elif x_get<=x_m:
+        return y_m
     else:
-        return y_min+(y_max-y_min)/(x_max-x_min)*(x_get-x_min)
+        return y_m+(y_M-y_m)/(x_M-x_m)*(x_get-x_m)
 
 #use mu_0, u, v, to go forward in mu
 def forward(u,v,mu_0):
@@ -196,7 +196,6 @@ def backward(mu,u_old,v_old):
     u[num_t-1,:] = g(x_grid)
     v[num_t-1,:] = v_old[num_t-1,:]
     
-    global linear_int
     linear_int=False
     
     for i in reversed(range(num_t-1)):
@@ -250,7 +249,23 @@ def backward(mu,u_old,v_old):
     return [u,v]
 
 
-# Suppose that x_grid_1 is included in x_grid_2
+def pi_lv(x,x_grid_lv):
+    num_x_lv=len(x_grid_lv)
+    x_min_lv=x_grid_lv[0]
+
+    if periodic_2_pi:
+        x=x%(2*np.pi)
+        index=int(round(((x-x_min_lv)/delta_x)))
+        index=index%num_x_lv
+    else:
+        index=int(round(((x-x_min_lv)/delta_x)))
+        index=min(num_x_lv-1,index)
+        index=max(0,index)
+    return index
+    
+
+# Suppose that x_grid_1 is included in x_grid_2 or 2 included in 1
+# Define the law given by mu_1 on x_grid_2
 def transform_grid(x_grid_1,mu_1,x_grid_2):
     num_x_1=len(x_grid_1)
     num_x_2=len(x_grid_2)
@@ -267,72 +282,69 @@ def transform_grid(x_grid_1,mu_1,x_grid_2):
     return mu_2
 
 
-def forward_bar(u,v,num_x_level,mu_0):
-    
-    mu=np.zeros((num_t,num_x_level))
+def forward_lv(u,v,x_grid_lv,mu_0):
+    num_x_lv=len(x_grid_lv)
+    mu=np.zeros((num_t,num_x_lv))
     mu[0,:]=mu_0
     
     for i in range(num_t-1): #t_i
-        for j in range(num_x_level): #x_j
+        for j in range(num_x_lv): #x_j
             
-            low=x_grid[j]+b(i,j,mu,u,v)*delta_t-sigma*math.sqrt(delta_t)
-            low_index=pi(low)
+            low=x_grid_lv[j]+b(i,j,mu,u,v)*delta_t-sigma*math.sqrt(delta_t)
+            low_index=pi_lv(low,x_grid_lv)
             mu[i+1,low_index]+=mu[i,j]*0.5
                         
-            up=x_grid[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
-            up_index=pi(up)
+            up=x_grid_lv[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
+            up_index=pi_lv(up,x_grid_lv)
             mu[i+1,up_index]+=mu[i,j]*0.5
     return mu
 
 
-def backward_bar(mu,u_old,v_old,num_x_level,Y_terminal):
+def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
     
-    u = np.zeros((num_t,num_x_level))
-    v = np.zeros((num_t,num_x_level))
+    num_x_lv=len(x_grid_lv)
+    u=np.zeros((num_t,num_x_lv))
+    v=np.zeros((num_t,num_x_lv))
     
-    u[num_t-1,:] = Y_terminal
-    v[num_t-1,:] = v_old[num_t-1,:]
+    u[num_t-1,:]=Y_terminal
+    v[num_t-1,:]=v_old[num_t-1,:]
     
-    global linear_int
     linear_int=False
     
     for i in reversed(range(num_t-1)):
-        for j in range(num_x_level):
-            x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t)
+        for j in range(num_x_lv):
             
-            x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t)
+            x_down=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t-sigma*np.sqrt(delta_t)
+            j_down=pi(x_down,x_grid_lv)
             
-            j_down = pi(x_down)
-            
-            j_up = pi(x_up)
+            x_up=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t+sigma*np.sqrt(delta_t)
+            j_up=pi(x_up,x_grid_lv)
             
             if i==num_t-2:
-                
-                u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
-                
-                v[i][j] = 1.0/np.sqrt(delta_t) * (g(x_up) - g(x_down))
+                u[i][j] = (Y_terminal[j_down] + Y_terminal[j_up])/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+                v[i][j] = 1.0/np.sqrt(delta_t) * (Y_terminal[j_up] - Y_terminal[j_down])
         
             else:
                 if linear_int:
-                    if x_down>x_grid[j_down]:
-                        if j_down<num_x_level-1:
-                            u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
+                    if x_down>x_grid_lv[j_down]:
+                        if j_down<num_x_lv-1:
+                            u_down= lin_int(x_grid_lv[j_down],x_grid_lv[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
                         else:
                             u_down=u[i+1][j_down]
                     else:
                         if j_down>0:
-                            u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
+                            u_down= lin_int(x_grid_lv[j_down],x_grid_lv[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
                         else:
                             u_down=u[i+1][j_down]
                     
-                    if x_up>x_grid[j_up]:
-                        if j_up<num_x_level-1:
-                            u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
+                    if x_up>x_grid_lv[j_up]:
+                        if j_up<num_x_lv-1:
+                            u_up= lin_int(x_grid_lv[j_up],x_grid_lv[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
                         else:
                             u_up=u[i+1][j_up]
                     else:
                         if j_up>0:
-                            u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+                            u_up= lin_int(x_grid_lv[j_up],x_grid_lv[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
                         else:
                             u_up=u[i+1][j_up]
                 else:
@@ -342,26 +354,27 @@ def backward_bar(mu,u_old,v_old,num_x_level,Y_terminal):
                 
                 u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
                 
-                v[i][j] = 1.0/np.sqrt(delta_t) * (u_up - u_down)
+                v[i][j] = 1.0/np.sqrt(delta_t)*(u_up-u_down)
 
     return [u,v]
 
 def solver_grid(level,mu_0,X_grids):
 #    num_x=len(mu)
-    if level==num_level-1:
-        Y_terminal=g(X_grids[level])
+    if level==num_level:
+        Y_terminal=g(X_grids[level-1])
         return Y_terminal
     
-    num_x_level=len(X_grids[level])
-    u=np.zeros((num_t,num_x_level))
-    v=np.zeros((num_t,num_x_level))
-    mu=np.zeros((num_t,num_x_level))
+    num_x_lv=len(X_grids[level])
+    u=np.zeros((num_t,num_x_lv))
+    v=np.zeros((num_t,num_x_lv))
+    mu=np.zeros((num_t,num_x_lv))
     mu[0,:]=mu_0
-#    Y_terminal=g(X_grids[level+1])
+    Y_terminal=np.zeros(num_x_lv)
+#    Y_terminal=g(X_grids[level])
     
     for j in range(J):
-        [u,v]=backward_bar(mu,u,v,num_x_level,Y_terminal)
-        mu=forward_bar(u,v,x_level,mu_0)
+        [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
+        mu=forward_lv(u,v,X_grids[level],mu_0)
 
     mu_next=mu[num_t-1,:]
     mu_next=transform_grid(X_grids[level],mu_next,X_grids[level+1])
@@ -372,13 +385,14 @@ def solver_grid(level,mu_0,X_grids):
         
     for j in range(J):
         Y_terminal=solver_grid(level+1,mu_next,X_grids)
-        Y_terminal=transform_grid(X_grids[level+1],Y_terminal,X_grids[level])
-        [u,v]=backward_bar(mu,u,v,num_x_level,Y_terminal)
-        mu=forward_bar(u,v,x_level,mu_0)
+        if level<num_level-1:
+            Y_terminal=transform_grid(X_grids[level+1],Y_terminal,X_grids[level])
+        [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
+        mu=forward_lv(u,v,X_grids[level],mu_0)
         if level==0 and j>J-num_keep-1:
-            Y_0_values[index]=np.dot(u[0],mu[0])
+            Y_0_values[index]=np.dot(u[0,:],mu_0)
             index+=1
-    return Y_0_values
+    return u[0,:]
 
 
 
