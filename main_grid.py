@@ -9,7 +9,7 @@ Created on Fri Jul 28 17:37:27 2017
 
 import numpy as np
 import math
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import scipy
 
 def b_dummy(i,j,mu,u,v):
@@ -216,7 +216,12 @@ def backward(mu,u_old,v_old):
 if __name__ == '__main__':
 
 
-    problem ='jetlag_Pontryagin' #possible values in order of appearance: jetlag, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
+    problem='trader_Pontryagin'
+    execution='changing rho'
+
+    #possible values in order of appearance:
+    # jetlag_weak, jetlag_Pontryagin, trader_weak, trader_Pontryagin, ex_1, ex_72, ex_73
+    # trustworthy_trader
 
 
     global b
@@ -361,8 +366,8 @@ if __name__ == '__main__':
         rho=1
     elif problem=='trader_Pontryagin':
         sigma=0.7
-        rho=0.01
-        c_x=1
+        rho=1.5
+        c_x=2
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -394,8 +399,8 @@ if __name__ == '__main__':
 # convergence for rho=0.1
     elif problem=='trader_weak':
         sigma=0.7
-        rho=.01
-        c_x=1
+        rho=1.5
+        c_x=2
         h_bar=2
         c_g=0.3
         b=b_trader_weak
@@ -417,15 +422,16 @@ if __name__ == '__main__':
 
     elif problem=='trustworthy_trader':
         sigma=0.7
-        rho=.01
-        c_x=1
+        rho=1
+        c_x=0.1
         h_bar=2
         c_g=0.3
         b=b_trustworthy_trader
         f=f_trustworthy_trader
         g=g_trustworthy_trader
         periodic_2_pi=False
-
+        J=25
+        num_keep=5
         T=1
         num_t=20
         delta_t=(T-0.06)/(num_t-1)
@@ -452,7 +458,6 @@ if __name__ == '__main__':
             eta_bar[0,t]=-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down)/(((delta_down*np.exp(delta_delta*(T-t))-delta_up))-c_g*B*(np.exp(delta_delta*(T-t))-1))
             eta[0,t]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/(ratio2-c_g+(ratio2+c_g)*np.exp(2*ratio*(T-t)))
 
-    execution='true_start'
 
     # possible values in order of appearance:
     # ordinary, changing sigma, changing rho, adaptive,
@@ -483,7 +488,7 @@ if __name__ == '__main__':
                 index2+=1
         print all_Y_0_values[0]
 
-        np.save('mu_weak_t20.npy',mu)
+        #np.save('mu_Pont_t20.npy',mu)
 
 
 
@@ -539,11 +544,13 @@ if __name__ == '__main__':
     
     elif execution=='changing rho':
         num_rho=20
-        rho_values=np.linspace(2,9,num_rho)
+        rho_values=np.linspace(1,21,num_rho)
         all_Y_0_values=np.zeros((num_rho,num_keep))
+        value_x=num_keep*[1]
         for index in range(num_rho):
             index2=0
-            rho=rho_values[index]
+            #rho=rho_values[index]
+            c_x=rho_values[index]
             
             
             mu_0=np.zeros((num_x))
@@ -564,9 +571,17 @@ if __name__ == '__main__':
                 if j>J-num_keep-1:
                     all_Y_0_values[index][index2]=np.dot(u[0],mu[0])
                     index2+=1
-        print all_Y_0_values[index]
-        np.save('grid_example_72_changing_rho_larger_x_domain',all_Y_0_values)
-        
+            print all_Y_0_values[index]
+
+            plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index])
+        plt.title('$\sigma = 0.7$, $\rho = 1.5$, $\bar{h}=2$, $c_g=0.3$, $c_x \in [1,20]$')
+        plt.show()
+
+        plt.savefig('grid_trader_pontryagin_changing_cx.png')
+        #np.save('grid_trader_pontryagin_rho_larger_x_domain.npy',all_Y_0_values)
+
+
+
     elif execution=='adaptive':
         x_min_0=-3
         x_max_0=3
