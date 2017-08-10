@@ -290,8 +290,6 @@ def backward(mu,u_old,v_old):
     u[num_t-1,:] = g(x_grid)
     v[num_t-1,:] = v_old[num_t-1,:]
     
-    linear_int=False
-    
     for i in reversed(range(num_t-1)):
         for j in range(num_x):
             x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * sqrt_delta_t
@@ -495,18 +493,19 @@ def solver_grid(level,mu_0,X_grids):
 
 if __name__ == '__main__':
     start_time=time.time()
-    problem='jetlag_weak'
+    global problem
+    problem='ex_1'
 #    problem='ex_72'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
-    execution='ordinary'
-#    execution='continuation_in_time'
+    global execution
+    execution='continuation_in_time'
     # possible values in order of appearance:
-    # ordinary, changing_sigma, changing_rho, adaptive, solution_trader, true_start
-
-    # possible values in order of appearance:
-    # ordinary, changing sigma, changing rho, adaptive,
-    # solution_trader, true_start
+    # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
+    #true_start, continuation_in_time
+    
+    global linear_int
+    linear_int=False
 
     global b
     global f
