@@ -7,7 +7,7 @@ from matplotlib import animation
 # load solutions
 weak=np.load('./Data/trader/mu_weak_t20.npy')
 Pont=np.load('./Data/trader/mu_Pont_t20.npy')
-true_solution=np.load('./Data/trader/solution_trader.npy')
+true_solution=np.load('./Data/trader/trader_solution.npy')
 true_start=np.load('./Data/trader/mu_trader_true_start_t20.npy')
 
 # intialize counters of matching points between the solutions
@@ -110,13 +110,13 @@ plt.axes(xlim=(0, 1), ylim=(0,0.6))
 print('max diff: weak vs Pont',max_diff_weak_Pont)
 plt.plot(t_grid,max_diff_weak_Pont,'o',label='weak vs Pont')
 print('max diff: true vs Pont',max_diff_true_Pont)
-plt.plot(t_grid,max_diff_true_Pont,'o',label='true vs Pont')
+#plt.plot(t_grid,max_diff_true_Pont,'o',label='true vs Pont')
 print('max diff: true vs weak',max_diff_true_weak)
-plt.plot(t_grid,max_diff_true_weak,'o',label='true vs weak')
+#plt.plot(t_grid,max_diff_true_weak,'o',label='true vs weak')
 print('max diff: true start vs true solution',max_diff_true_start_true_solut)
-plt.plot(t_grid,max_diff_true_start_true_solut,'o',label='Pont start by true vs true solution')
+#plt.plot(t_grid,max_diff_true_start_true_solut,'o',label='Pont start by true vs true solution')
 print('max diff: true start vs Pont',max_diff_true_start_Pont)
-plt.plot(t_grid,max_diff_true_start_Pont,'o',label='Pont start by true vs Pont')
+#plt.plot(t_grid,max_diff_true_start_Pont,'o',label='Pont start by true vs Pont')
 plt.xlabel('time grid')
 plt.ylabel('max difference')
 plt.title('max of the differences between two solutions at time t')
@@ -130,6 +130,10 @@ plt.savefig('grid_trader_error_max_diff.eps')
 print('w',w[4])
 print('P',P[4])
 print('T',T[4])
+print('index_w',index_w[4])
+print('index_P',index_P[4])
+print('index_T',index_T[4])
+
 
 # print mean
 print('mean_w',mean_weak)
