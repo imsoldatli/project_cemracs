@@ -66,7 +66,14 @@ def b_jet_lag_weak(i,j,mu,u,v):
 
 def f_jet_lag_weak(i,j,mu,u,v):
     value1=1.0/sigma*(omega_0-omega_S)*v[i][j]-1.0/(2*R*sigma**2)*(v[i][j])**2
-    c_bar=np.dot(0.5*(np.sin((x_grid[j]-x_grid)/2.0))**2,mu[i])
+
+    mu_pad=np.zeros((3*num_x-2))
+    mu_pad[0:num_x]=mu[i][:]
+    c_bar_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+    c_bar=c_bar_2[num_x-1:2*num_x-1][j]
+    c_bar=np.real(c_bar)
+    #print(c_bar)
+    #c_bar=np.dot(0.5*(np.sin((x_grid[j]-x_grid)/2.0))**2,mu[i])
     value2=K*c_bar
     c_sun=0.5*(np.sin((p-x_grid[j])/2.0))**2
     value3=F*c_sun
@@ -74,16 +81,37 @@ def f_jet_lag_weak(i,j,mu,u,v):
 
 def g_jet_lag(x):
     return 0
+    
+def get_h_jet_lag_weak():
+    temp=[0.5*np.sin((i)*delta_x/2.0)**2 for i in range(num_x)]
+    temp=np.asanyarray(temp)
+    temp2=[temp[num_x-i-1] for i in range(num_x)]
+    temp2=np.asanyarray(temp2)
+    h_array=np.concatenate((temp2,temp[1:len(temp)]))
+    return h_array
 
 def b_jet_lag_Pontryagin(i,j,mu,u,v):
     return omega_0-omega_S-1.0/R*u[i][j]
 
 def f_jet_lag_Pontryagin(i,j,mu,u,v):
-    partial_c_bar=np.dot(0.5*np.sin((x_grid[j]-x_grid)/2.0)*np.cos((x_grid[j]-x_grid)/2.0),mu[i])
+    mu_pad=np.zeros((3*num_x-2))
+    mu_pad[0:num_x]=mu[i][:]
+    partial_c_bar_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+    partial_c_bar=partial_c_bar_2[num_x-1:2*num_x-1][j]
+    partial_c_bar=np.real(partial_c_bar)
+    #partial_c_bar=np.dot(0.5*np.sin((x_grid[j]-x_grid)/2.0)*np.cos((x_grid[j]-x_grid)/2.0),mu[i])
     value1=K*partial_c_bar
     partial_c_sun=0.5*np.sin((x_grid[j]-p)/2.0)*np.cos((x_grid[j]-p)/2.0)
     value2=F*partial_c_sun
     return value1+value2
+    
+def get_h_jet_lag_Pontryagin():
+    temp=[0.5*np.sin(i*delta_x/2.0)*np.cos(i*delta_x/2.0) for i in range(num_x)]
+    temp=np.asanyarray(temp)
+    temp2=[-temp[num_x-i-1] for i in range(num_x)]
+    temp2=np.asanyarray(temp2)
+    h_array=np.concatenate((temp2,temp[1:len(temp)]))
+    return h_array
 
 def b_trader_Pontryagin(i,j,mu,u,v):
     return -rho*u[i][j] #rho=1/c_alpha
@@ -125,7 +153,7 @@ def f_flocking_Pontryagin(i,j,mu,u,v):
 
 def g_flocking(x):
     return 0
-    
+
 def b_flocking_weak(i,j,mu,u,v):
     return -v[i][j]/sigma
 
@@ -447,6 +475,7 @@ if __name__ == '__main__':
     global c_x
     global h_bar
     global c_g
+    global ftt_h_pad
 
     #set the above variables depending on 'problem'
     if problem =='jetlag_Pontryagin':
@@ -478,6 +507,10 @@ if __name__ == '__main__':
         omega_S=2*np.pi/24
         p=(9.0/12.0)*np.pi
         sigma=0.1
+        h_array=get_h_jet_lag_Pontryagin()
+        h_pad=np.zeros((3*num_x-2))
+        h_pad[0:2*num_x-1]=h_array
+        fft_h_pad=np.fft.fft(h_pad)
     elif problem =='jetlag_weak':
         sigma=0.1
         b=b_jet_lag_weak
@@ -486,12 +519,14 @@ if __name__ == '__main__':
         periodic_2_pi=True
         J=25
         num_keep=5
-        T=24.0*2
-        num_t=int(T)*5+1
+        T=24.0*1
+        #num_t=int(T)*5+1
+        num_t=697
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
-        delta_x=delta_t**2
-        num_x=int((2*np.pi)/(delta_x))+1
+        #delta_x=delta_t**2
+        #num_x=int((2*np.pi)/(delta_x))+1
+        num_x=158
         delta_x=2*np.pi/num_x
         x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
         
@@ -504,7 +539,11 @@ if __name__ == '__main__':
         F=0.01
         omega_0=2*np.pi/24.5
         omega_S=2*np.pi/24
-        p=(3.0/12.0)*np.pi
+        p=(9.0/12.0)*np.pi
+        h_array=get_h_jet_lag_weak()
+        h_pad=np.zeros((3*num_x-2))
+        h_pad[0:2*num_x-1]=h_array
+        fft_h_pad=np.fft.fft(h_pad)
     elif problem=='ex_1':
         b=b_example_1
         f=f_example_1
@@ -696,7 +735,7 @@ if __name__ == '__main__':
         if periodic_2_pi:
             mu_0=np.load('mu_initial_reference_set_158.npy')
             #mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
-            #mu_0=[mu_0[0][6*i] for i in range(num_x)]
+            #mu_0=[mu_0[int(i/6)] for i in range(num_x)]
             #mu_0=mu_0/np.sum(mu_0)
             #mu_0[0]=1
         else:
