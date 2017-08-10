@@ -413,8 +413,8 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
             j_up=pi_lv(x_up,x_grid_lv)
 
             if i==num_t-2:
-                u[i][j] = (Y_terminal[j_down] + Y_terminal[j_up])/2.0 + delta_t*f(i,j,mu,u_old,v_old)
-                v[i][j] = 1.0/sqrt_delta_t * (Y_terminal[j_up] - Y_terminal[j_down])
+                u[i][j]=(Y_terminal[j_down]+Y_terminal[j_up])/2.0+delta_t*f(i,j,mu,u_old,v_old)
+                v[i][j]=1.0/sqrt_delta_t*(Y_terminal[j_up]-Y_terminal[j_down])
         
             else:
                 if linear_int:
@@ -453,7 +453,7 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
 def solver_grid(level,mu_0,X_grids):
 #    num_x=len(mu)
     if level>=num_level:
-        Y_terminal=g(X_grids[level])
+        Y_terminal=g(X_grids[level-1])
         return Y_terminal
     
     num_x_lv=len(X_grids[level])
@@ -464,24 +464,25 @@ def solver_grid(level,mu_0,X_grids):
     Y_terminal=np.zeros(num_x_lv)
 #    Y_terminal=g(X_grids[level])
     
-    for j in range(J):
+    for j in range(J_1):
         [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
         mu=forward_lv(u,v,X_grids[level],mu_0)
 
     mu_next=mu[num_t-1,:]
-    mu_next=transform_grid(X_grids[level],mu_next,X_grids[level+1])
+    if level<num_level-1:
+        mu_next=transform_grid(X_grids[level],mu_next,X_grids[level+1])
 
     if level==0:
         all_Y_0_values=np.zeros((num_keep))
         index=0
         
-    for j in range(J):
+    for j in range(J_2):
         Y_terminal=solver_grid(level+1,mu_next,X_grids)
         if level<num_level-1:
             Y_terminal=transform_grid(X_grids[level+1],Y_terminal,X_grids[level])
         [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
         mu=forward_lv(u,v,X_grids[level],mu_0)
-        if level==0 and j>J-num_keep-1:
+        if level==0 and j>J_2-num_keep-1:
             all_Y_0_values[index]=np.dot(u[0,:],mu_0)
             index+=1
             
@@ -494,6 +495,10 @@ def solver_grid(level,mu_0,X_grids):
 if __name__ == '__main__':
     start_time=time.time()
 
+<<<<<<< HEAD
+=======
+    global problem
+>>>>>>> 3b14b852b4e37770a5a2ea22166611cbaa004f52
     problem='ex_1'
 #    problem='ex_72'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
@@ -638,8 +643,8 @@ if __name__ == '__main__':
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
-        x_min=-10
-        x_max=10
+        x_min=0
+        x_max=4
         num_x=int((x_max-x_min)/delta_x)+1
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
@@ -1012,13 +1017,16 @@ if __name__ == '__main__':
             
             
     elif execution=='continuation_in_time':
+        global J_1,J_2
+        J_1=3
+        J_2=10
         global num_level
         num_level=2
-        x_min_goal=-3
-        x_max_goal=3
-        num_t=11
+        x_min_goal=-2
+        x_max_goal=6
+        num_t=12
         delta_t=T/num_level/(num_t-1)
-        delta_x=delta_t**2
+        delta_x=(delta_t*num_level)**2
         num_x=int((x_max_goal-x_min_goal)/delta_x)+1
         if num_x%2==0:
             num_x+=1
@@ -1026,8 +1034,9 @@ if __name__ == '__main__':
         x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
         x_max=x_grid[num_x-1]
         x_min=x_grid[0]
+        # x_grid for each level, should be an increasing sequence
         X_grids=[]
-        for i in range(num_level+1):
+        for i in range(num_level):
             X_grids.append(x_grid)
         
         mu_0=np.zeros((num_x))
