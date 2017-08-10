@@ -67,13 +67,13 @@ def b_jet_lag_weak(i,j,mu,u,v):
 def f_jet_lag_weak(i,j,mu,u,v):
     value1=1.0/sigma*(omega_0-omega_S)*v[i][j]-1.0/(2*R*sigma**2)*(v[i][j])**2
 
-    mu_pad=np.zeros((3*num_x-2))
-    mu_pad[0:num_x]=mu[i][:]
-    c_bar_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
-    c_bar=c_bar_2[num_x-1:2*num_x-1][j]
-    c_bar=np.real(c_bar)
-    #print(c_bar)
+#    mu_pad=np.zeros((3*num_x-2))
+#    mu_pad[0:num_x]=mu[i][:]
+#    c_bar_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+#    c_bar=c_bar_2[num_x-1:2*num_x-1][j]
+#    c_bar=np.real(c_bar)
     #c_bar=np.dot(0.5*(np.sin((x_grid[j]-x_grid)/2.0))**2,mu[i])
+    c_bar=convolution[i][j]
     value2=K*c_bar
     c_sun=0.5*(np.sin((p-x_grid[j])/2.0))**2
     value3=F*c_sun
@@ -94,12 +94,13 @@ def b_jet_lag_Pontryagin(i,j,mu,u,v):
     return omega_0-omega_S-1.0/R*u[i][j]
 
 def f_jet_lag_Pontryagin(i,j,mu,u,v):
-    mu_pad=np.zeros((3*num_x-2))
-    mu_pad[0:num_x]=mu[i][:]
-    partial_c_bar_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
-    partial_c_bar=partial_c_bar_2[num_x-1:2*num_x-1][j]
-    partial_c_bar=np.real(partial_c_bar)
+#    mu_pad=np.zeros((3*num_x-2))
+#    mu_pad[0:num_x]=mu[i][:]
+#    partial_c_bar_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+#    partial_c_bar=partial_c_bar_2[num_x-1:2*num_x-1][j]
+#    partial_c_bar=np.real(partial_c_bar)
     #partial_c_bar=np.dot(0.5*np.sin((x_grid[j]-x_grid)/2.0)*np.cos((x_grid[j]-x_grid)/2.0),mu[i])
+    partial_c_bar=convolution[i][j]
     value1=K*partial_c_bar
     partial_c_sun=0.5*np.sin((x_grid[j]-p)/2.0)*np.cos((x_grid[j]-p)/2.0)
     value2=F*partial_c_sun
@@ -251,6 +252,16 @@ def forward(u,v,mu_0):
 
 #use mu, u_old, v_old to go backwards in u and v
 def backward(mu,u_old,v_old):
+    global convolution
+    if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+        convolution=np.zeros((num_t,num_x))
+        for i in range(num_t):
+            mu_pad=np.zeros((3*num_x-2))
+            mu_pad[0:num_x]=mu[i][:]
+            conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+            conv=conv_2[num_x-1:2*num_x-1]
+            conv=np.real(conv)
+            convolution[i]=conv
     
     u = np.zeros((num_t,num_x))
     v = np.zeros((num_t,num_x))
