@@ -142,8 +142,16 @@ def b_trader_weak_trunc(i,j,mu,u,v):
     return -rho*v[i][j]/sigma #rho=1/c_alpha
 
 def f_trader_weak_trunc(i,j,mu,u,v):
-    Z_mean=np.dot(v[i],mu[i])
-    return 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
+    #Z_mean=np.dot(v[i],mu[i])
+    Z_mean=Z_mean_all[i]
+
+    if v[i,j]**2<bounds[0,i]:
+        value=0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*bounds[0,i]**2/sigma**2
+    elif v[i,j] > bounds[1,i]:
+        v[i,j]= 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*bounds[1,i]**2/sigma**2
+    else:
+        value=0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
+    return(value)
 
 def g_trader_weak_trunc(x):
     return c_g*0.5*x**2
@@ -250,7 +258,7 @@ def forward(u,v,mu_0):
         Z_mean_all=np.zeros((num_t))
         for i in range(num_t):
             Z_mean_all[i]=np.dot(x_grid,v[i])
-    
+
     mu=np.zeros((num_t,num_x))
     mu[0,:]=mu_0
     
@@ -289,54 +297,91 @@ def backward(mu,u_old,v_old):
     
     u[num_t-1,:] = g(x_grid)
     v[num_t-1,:] = v_old[num_t-1,:]
-    
-    for i in reversed(range(num_t-1)):
-        for j in range(num_x):
-            x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * sqrt_delta_t
-            
-            x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * sqrt_delta_t
-            
-            j_down = pi(x_down)
-            
-            j_up = pi(x_up)
-            
-            if i==num_t-2:
-                
-                u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
-                
-                v[i][j] = 1.0/sqrt_delta_t * (g(x_up) - g(x_down))
-        
-            else:
-                if linear_int:
-                    if x_down>x_grid[j_down]:
-                        if j_down<num_x-1:
-                            u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
-                        else:
-                            u_down=u[i+1][j_down]
-                    else:
-                        if j_down>0:
-                            u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
-                        else:
-                            u_down=u[i+1][j_down]
-                    
-                    if x_up>x_grid[j_up]:
-                        if j_up<num_x-1:
-                            u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
-                        else:
-                            u_up=u[i+1][j_up]
-                    else:
-                        if j_up>0:
-                            u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
-                        else:
-                            u_up=u[i+1][j_up]
+    if problem=='trader_weak_trunc':
+        for i in reversed(range(num_t-1)):
+            for j in range(num_x):
+                x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * sqrt_delta_t
+
+                x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * sqrt_delta_t
+
+                j_down = pi(x_down)
+
+                j_up = pi(x_up)
+
+                if i==num_t-2:
+
+                    u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+
+                    v[i][j] = 1.0/sqrt_delta_t * (g(x_up) - g(x_down))
+
+                    if v[i,j]<bounds[0,i]:
+                        v[i,j]=bounds[0,i]
+                    elif v[i,j]>bounds[1,i]:
+                        v[i,j]=bounds[1,i]
+
+
                 else:
-                
+
+
                     u_up = u[i+1][j_up]
                     u_down = u[i+1][j_down]
-                
-                u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
-                
-                v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
+
+                    u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+
+                    v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
+                    if v[i,j]<bounds[0,i]:
+                        v[i,j]=bounds[0,i]
+                    elif v[i,j]>bounds[1,i]:
+                        v[i,j]=bounds[1,i]
+
+    else:
+        for i in reversed(range(num_t-1)):
+            for j in range(num_x):
+                x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * sqrt_delta_t
+
+                x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * sqrt_delta_t
+
+                j_down = pi(x_down)
+
+                j_up = pi(x_up)
+
+                if i==num_t-2:
+
+                    u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+
+                    v[i][j] = 1.0/sqrt_delta_t * (g(x_up) - g(x_down))
+
+                else:
+                    if linear_int:
+                        if x_down>x_grid[j_down]:
+                            if j_down<num_x-1:
+                                u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
+                            else:
+                                u_down=u[i+1][j_down]
+                        else:
+                            if j_down>0:
+                                u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
+                            else:
+                                u_down=u[i+1][j_down]
+
+                        if x_up>x_grid[j_up]:
+                            if j_up<num_x-1:
+                                u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
+                            else:
+                                u_up=u[i+1][j_up]
+                        else:
+                            if j_up>0:
+                                u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+                            else:
+                                u_up=u[i+1][j_up]
+                    else:
+
+                        u_up = u[i+1][j_up]
+                        u_down = u[i+1][j_down]
+
+                    u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+
+                    v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
 
     return [u,v]
 
@@ -498,12 +543,12 @@ if __name__ == '__main__':
 
     global problem
 
-    problem='ex_1'
+    problem='trader_Pontryagin'
 #    problem='ex_72'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
-    #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
+    #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
     global execution
-    execution='continuation_in_time'
+    execution='ordinary'
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
     #true_start, continuation_in_time
@@ -720,7 +765,32 @@ if __name__ == '__main__':
         x_max=4
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
+
+    elif problem=='trader_weak_truncation':
+        sigma=0.7
+        rho=1
+        c_x=.7
+        h_bar=2
+        c_g=0.3
+        b=b_trader_weak
+        f=f_trader_weak
+        g=g_trader_weak
+        periodic_2_pi=False
+        J=25
+        num_keep=5
+        T=1
+        num_t=20
+        delta_t=(T-0.06)/(num_t-1)
+        t_grid=np.linspace(0.06,T,num_t)
+        delta_x=delta_t**(2)
+        x_min=-2
+        x_max=4
+        num_x=int((x_max-x_min)/delta_x+1)
+        x_grid=np.linspace(x_min,x_max,num_x)
+        global bounds
+        bounds=np.load('./Data/trader/value_y_Pont_to_trunc_z_weak.npy')
     # Variable trader
+
 
     elif problem=='trader_solution':
         sigma=0.7
@@ -798,6 +868,7 @@ if __name__ == '__main__':
         sigma=1
     sqrt_delta_t=np.sqrt(delta_t)
     if execution=='ordinary':
+
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
             mu_0=np.load('mu_initial_reference_set_158.npy')
@@ -823,18 +894,23 @@ if __name__ == '__main__':
                 index2+=1
         print all_Y_0_values[0]
 
-        # bounds=np.zeros(2,num_t)
-        # for j in range(num_t):
-        #     bounds[0,j]=min(u[t])
-        #     bounds[1,j]=max(u[t])
 
 
-        #np.save('bounds_Z_weak.npy',mu)
+            # for j in range(num_t):
+            #     bounds[0,j]=min(u[t])
+            #     bounds[1,j]=max(u[t])
+
+
 
         if problem=='trader_Pontryagin':
-            np.save('mu_Pont_t20.npy',mu)
+            bounds=np.zeros(2,num_t)
+            for t in range(num_t):
+                bounds[0,t]=min(u[t])
+                bounds[1,t]=max(u[t])
+            np.save('./Data/trader/mu_Pont_t20.npy',mu)
+            np.save('./Data/trader/value_y_Pont_to_trunc_z_weak.npy')
         elif problem=='trader_weak':
-            np.save('mu_weak_t20.npy',mu)
+            np.save('./Data/trader/mu_weak_t20.npy',mu)
 
 
 
@@ -926,8 +1002,8 @@ if __name__ == '__main__':
         plt.title('$sigma = 0.7$, $rho \in [1,10]$, $c_x = 2, $h_bar=2$, $c_g=0.3$')
         plt.show()
 
-        #plt.savefig('grid_trader_pontryagin_changing_cx.eps')
-        #np.save('grid_trader_pontryagin_rho_larger_x_domain.npy',all_Y_0_values)
+        #plt.savefig('./Data/trader/grid_trader_pontryagin_changing_cx.eps')
+        #np.save('./Data/trader/grid_trader_pontryagin_rho_larger_x_domain.npy',all_Y_0_values)
 
 
 
@@ -988,7 +1064,7 @@ if __name__ == '__main__':
         v=np.zeros((num_t,num_x))
         mu=forward(u,v,mu_0)
 
-        np.save('trader_solution.npy',mu)
+        np.save('./Data/trader/trader_solution.npy',mu)
     elif execution=='true_start': # only for some problems
 
         if periodic_2_pi:
@@ -1012,7 +1088,7 @@ if __name__ == '__main__':
 
 
 
-        #np.save('mu_trader_true_start_t20.npy',mu)
+        #np.save('./Data/trader/mu_trader_true_start_t20.npy',mu)
             
             
     elif execution=='continuation_in_time':
