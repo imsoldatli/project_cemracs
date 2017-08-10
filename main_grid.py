@@ -66,7 +66,14 @@ def b_jet_lag_weak(i,j,mu,u,v):
 
 def f_jet_lag_weak(i,j,mu,u,v):
     value1=1.0/sigma*(omega_0-omega_S)*v[i][j]-1.0/(2*R*sigma**2)*(v[i][j])**2
-    c_bar=np.dot(0.5*(np.sin((x_grid[j]-x_grid)/2.0))**2,mu[i])
+
+#    mu_pad=np.zeros((3*num_x-2))
+#    mu_pad[0:num_x]=mu[i][:]
+#    c_bar_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+#    c_bar=c_bar_2[num_x-1:2*num_x-1][j]
+#    c_bar=np.real(c_bar)
+    #c_bar=np.dot(0.5*(np.sin((x_grid[j]-x_grid)/2.0))**2,mu[i])
+    c_bar=convolution[i][j]
     value2=K*c_bar
     c_sun=0.5*(np.sin((p-x_grid[j])/2.0))**2
     value3=F*c_sun
@@ -74,16 +81,38 @@ def f_jet_lag_weak(i,j,mu,u,v):
 
 def g_jet_lag(x):
     return 0
+    
+def get_h_jet_lag_weak():
+    temp=[0.5*np.sin((i)*delta_x/2.0)**2 for i in range(num_x)]
+    temp=np.asanyarray(temp)
+    temp2=[temp[num_x-i-1] for i in range(num_x)]
+    temp2=np.asanyarray(temp2)
+    h_array=np.concatenate((temp2,temp[1:len(temp)]))
+    return h_array
 
 def b_jet_lag_Pontryagin(i,j,mu,u,v):
     return omega_0-omega_S-1.0/R*u[i][j]
 
 def f_jet_lag_Pontryagin(i,j,mu,u,v):
-    partial_c_bar=np.dot(0.5*np.sin((x_grid[j]-x_grid)/2.0)*np.cos((x_grid[j]-x_grid)/2.0),mu[i])
+#    mu_pad=np.zeros((3*num_x-2))
+#    mu_pad[0:num_x]=mu[i][:]
+#    partial_c_bar_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+#    partial_c_bar=partial_c_bar_2[num_x-1:2*num_x-1][j]
+#    partial_c_bar=np.real(partial_c_bar)
+    #partial_c_bar=np.dot(0.5*np.sin((x_grid[j]-x_grid)/2.0)*np.cos((x_grid[j]-x_grid)/2.0),mu[i])
+    partial_c_bar=convolution[i][j]
     value1=K*partial_c_bar
     partial_c_sun=0.5*np.sin((x_grid[j]-p)/2.0)*np.cos((x_grid[j]-p)/2.0)
     value2=F*partial_c_sun
     return value1+value2
+    
+def get_h_jet_lag_Pontryagin():
+    temp=[0.5*np.sin(i*delta_x/2.0)*np.cos(i*delta_x/2.0) for i in range(num_x)]
+    temp=np.asanyarray(temp)
+    temp2=[-temp[num_x-i-1] for i in range(num_x)]
+    temp2=np.asanyarray(temp2)
+    h_array=np.concatenate((temp2,temp[1:len(temp)]))
+    return h_array
 
 def b_trader_Pontryagin(i,j,mu,u,v):
     return -rho*u[i][j] #rho=1/c_alpha
@@ -134,7 +163,7 @@ def f_flocking_Pontryagin(i,j,mu,u,v):
 
 def g_flocking(x):
     return 0
-    
+
 def b_flocking_weak(i,j,mu,u,v):
     return -v[i][j]/sigma
 
@@ -195,13 +224,13 @@ def pi(x):
     return index
 
 #used to linearly interpolate u(x) using u on x_grid
-def lin_int(x_min,x_max,y_min,y_max,x_get):
-    if x_get>=x_max:
-        return y_max
-    elif x_get<=x_min:
-        return y_min
+def lin_int(x_m,x_M,y_m,y_M,x_get):
+    if x_get>=x_M:
+        return y_M
+    elif x_get<=x_m:
+        return y_m
     else:
-        return y_min+(y_max-y_min)/(x_max-x_min)*(x_get-x_min)
+        return y_m+(y_M-y_m)/(x_M-x_m)*(x_get-x_m)
 
 #use mu_0, u, v, to go forward in mu
 def forward(u,v,mu_0):
@@ -223,6 +252,16 @@ def forward(u,v,mu_0):
 
 #use mu, u_old, v_old to go backwards in u and v
 def backward(mu,u_old,v_old):
+    global convolution
+    if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+        convolution=np.zeros((num_t,num_x))
+        for i in range(num_t):
+            mu_pad=np.zeros((3*num_x-2))
+            mu_pad[0:num_x]=mu[i][:]
+            conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+            conv=conv_2[num_x-1:2*num_x-1]
+            conv=np.real(conv)
+            convolution[i]=conv
     
     u = np.zeros((num_t,num_x))
     v = np.zeros((num_t,num_x))
@@ -230,7 +269,6 @@ def backward(mu,u_old,v_old):
     u[num_t-1,:] = g(x_grid)
     v[num_t-1,:] = v_old[num_t-1,:]
     
-    global linear_int
     linear_int=False
     
     for i in reversed(range(num_t-1)):
@@ -284,7 +322,23 @@ def backward(mu,u_old,v_old):
     return [u,v]
 
 
-# Suppose that x_grid_1 is included in x_grid_2
+def pi_lv(x,x_grid_lv):
+    num_x_lv=len(x_grid_lv)
+    x_min_lv=x_grid_lv[0]
+
+    if periodic_2_pi:
+        x=x%(2*np.pi)
+        index=int(round(((x-x_min_lv)/delta_x)))
+        index=index%num_x_lv
+    else:
+        index=int(round(((x-x_min_lv)/delta_x)))
+        index=min(num_x_lv-1,index)
+        index=max(0,index)
+    return index
+    
+
+# Suppose that x_grid_1 is included in x_grid_2 or 2 included in 1
+# Define the law given by mu_1 on x_grid_2
 def transform_grid(x_grid_1,mu_1,x_grid_2):
     num_x_1=len(x_grid_1)
     num_x_2=len(x_grid_2)
@@ -301,73 +355,69 @@ def transform_grid(x_grid_1,mu_1,x_grid_2):
     return mu_2
 
 
-
-def forward_bar(u,v,num_x_level,mu_0):
-    
-    mu=np.zeros((num_t,num_x_level))
+def forward_lv(u,v,x_grid_lv,mu_0):
+    num_x_lv=len(x_grid_lv)
+    mu=np.zeros((num_t,num_x_lv))
     mu[0,:]=mu_0
     
     for i in range(num_t-1): #t_i
-        for j in range(num_x_level): #x_j
+        for j in range(num_x_lv): #x_j
             
-            low=x_grid[j]+b(i,j,mu,u,v)*delta_t-sigma*math.sqrt(delta_t)
-            low_index=pi(low)
+            low=x_grid_lv[j]+b(i,j,mu,u,v)*delta_t-sigma*math.sqrt(delta_t)
+            low_index=pi_lv(low,x_grid_lv)
             mu[i+1,low_index]+=mu[i,j]*0.5
                         
-            up=x_grid[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
-            up_index=pi(up)
+            up=x_grid_lv[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
+            up_index=pi_lv(up,x_grid_lv)
             mu[i+1,up_index]+=mu[i,j]*0.5
     return mu
 
 
-def backward_bar(mu,u_old,v_old,num_x_level,Y_terminal):
+def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
     
-    u = np.zeros((num_t,num_x_level))
-    v = np.zeros((num_t,num_x_level))
+    num_x_lv=len(x_grid_lv)
+    u=np.zeros((num_t,num_x_lv))
+    v=np.zeros((num_t,num_x_lv))
     
-    u[num_t-1,:] = Y_terminal
-    v[num_t-1,:] = v_old[num_t-1,:]
+    u[num_t-1,:]=Y_terminal
+    v[num_t-1,:]=v_old[num_t-1,:]
     
-    global linear_int
     linear_int=False
     
     for i in reversed(range(num_t-1)):
-        for j in range(num_x_level):
-            x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t)
+        for j in range(num_x_lv):
             
-            x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t)
+            x_down=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t-sigma*np.sqrt(delta_t)
+            j_down=pi(x_down,x_grid_lv)
             
-            j_down = pi(x_down)
-            
-            j_up = pi(x_up)
+            x_up=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t+sigma*np.sqrt(delta_t)
+            j_up=pi(x_up,x_grid_lv)
             
             if i==num_t-2:
-                
-                u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
-                
-                v[i][j] = 1.0/np.sqrt(delta_t) * (g(x_up) - g(x_down))
+                u[i][j] = (Y_terminal[j_down] + Y_terminal[j_up])/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+                v[i][j] = 1.0/np.sqrt(delta_t) * (Y_terminal[j_up] - Y_terminal[j_down])
         
             else:
                 if linear_int:
-                    if x_down>x_grid[j_down]:
-                        if j_down<num_x_level-1:
-                            u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
+                    if x_down>x_grid_lv[j_down]:
+                        if j_down<num_x_lv-1:
+                            u_down= lin_int(x_grid_lv[j_down],x_grid_lv[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
                         else:
                             u_down=u[i+1][j_down]
                     else:
                         if j_down>0:
-                            u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
+                            u_down= lin_int(x_grid_lv[j_down],x_grid_lv[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
                         else:
                             u_down=u[i+1][j_down]
                     
-                    if x_up>x_grid[j_up]:
-                        if j_up<num_x_level-1:
-                            u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
+                    if x_up>x_grid_lv[j_up]:
+                        if j_up<num_x_lv-1:
+                            u_up= lin_int(x_grid_lv[j_up],x_grid_lv[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
                         else:
                             u_up=u[i+1][j_up]
                     else:
                         if j_up>0:
-                            u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+                            u_up= lin_int(x_grid_lv[j_up],x_grid_lv[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
                         else:
                             u_up=u[i+1][j_up]
                 else:
@@ -377,43 +427,48 @@ def backward_bar(mu,u_old,v_old,num_x_level,Y_terminal):
                 
                 u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
                 
-                v[i][j] = 1.0/np.sqrt(delta_t) * (u_up - u_down)
+                v[i][j] = 1.0/np.sqrt(delta_t)*(u_up-u_down)
 
     return [u,v]
 
 def solver_grid(level,mu_0,X_grids):
 #    num_x=len(mu)
-    if level==num_level-1:
-        Y_terminal=g(X_grids[level])
+    if level>=num_level:
+        Y_terminal=g(X_grids[level-1])
         return Y_terminal
     
-    num_x_level=len(X_grids[level])
-    u=np.zeros((num_t,num_x_level))
-    v=np.zeros((num_t,num_x_level))
-    mu=np.zeros((num_t,num_x_level))
+    num_x_lv=len(X_grids[level])
+    u=np.zeros((num_t,num_x_lv))
+    v=np.zeros((num_t,num_x_lv))
+    mu=np.zeros((num_t,num_x_lv))
     mu[0,:]=mu_0
-#    Y_terminal=g(X_grids[level+1])
+    Y_terminal=np.zeros(num_x_lv)
+#    Y_terminal=g(X_grids[level])
     
     for j in range(J):
-        [u,v]=backward_bar(mu,u,v,num_x_level,Y_terminal)
-        mu=forward_bar(u,v,x_level,mu_0)
+        [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
+        mu=forward_lv(u,v,X_grids[level],mu_0)
 
     mu_next=mu[num_t-1,:]
     mu_next=transform_grid(X_grids[level],mu_next,X_grids[level+1])
 
     if level==0:
-        Y_0_values=np.zeros((num_keep))
+        all_Y_0_values=np.zeros((num_keep))
         index=0
         
     for j in range(J):
         Y_terminal=solver_grid(level+1,mu_next,X_grids)
-        Y_terminal=transform_grid(X_grids[level+1],Y_terminal,X_grids[level])
-        [u,v]=backward_bar(mu,u,v,num_x_level,Y_terminal)
-        mu=forward_bar(u,v,x_level,mu_0)
+        if level<num_level-1:
+            Y_terminal=transform_grid(X_grids[level+1],Y_terminal,X_grids[level])
+        [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
+        mu=forward_lv(u,v,X_grids[level],mu_0)
         if level==0 and j>J-num_keep-1:
-            Y_0_values[index]=np.dot(u[0],mu[0])
+            all_Y_0_values[index]=np.dot(u[0,:],mu_0)
             index+=1
-    return Y_0_values
+            
+    if level==0:
+        return [u[0,:],all_Y_0_values]
+    return u[0,:]
 
 
 
@@ -460,6 +515,7 @@ if __name__ == '__main__':
     global c_x
     global h_bar
     global c_g
+    global ftt_h_pad
 
     #set the above variables depending on 'problem'
     if problem =='jetlag_Pontryagin':
@@ -491,6 +547,10 @@ if __name__ == '__main__':
         omega_S=2*np.pi/24
         p=(9.0/12.0)*np.pi
         sigma=0.1
+        h_array=get_h_jet_lag_Pontryagin()
+        h_pad=np.zeros((3*num_x-2))
+        h_pad[0:2*num_x-1]=h_array
+        fft_h_pad=np.fft.fft(h_pad)
     elif problem =='jetlag_weak':
         sigma=0.1
         b=b_jet_lag_weak
@@ -499,12 +559,14 @@ if __name__ == '__main__':
         periodic_2_pi=True
         J=25
         num_keep=5
-        T=24.0*2
-        num_t=int(T)*5+1
+        T=24.0*1
+        #num_t=int(T)*5+1
+        num_t=697
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
-        delta_x=delta_t**2
-        num_x=int((2*np.pi)/(delta_x))+1
+        #delta_x=delta_t**2
+        #num_x=int((2*np.pi)/(delta_x))+1
+        num_x=158
         delta_x=2*np.pi/num_x
         x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
         
@@ -517,7 +579,11 @@ if __name__ == '__main__':
         F=0.01
         omega_0=2*np.pi/24.5
         omega_S=2*np.pi/24
-        p=(3.0/12.0)*np.pi
+        p=(9.0/12.0)*np.pi
+        h_array=get_h_jet_lag_weak()
+        h_pad=np.zeros((3*num_x-2))
+        h_pad[0:2*num_x-1]=h_array
+        fft_h_pad=np.fft.fft(h_pad)
     elif problem=='ex_1':
         b=b_example_1
         f=f_example_1
@@ -709,7 +775,7 @@ if __name__ == '__main__':
         if periodic_2_pi:
             mu_0=np.load('mu_initial_reference_set_158.npy')
             #mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
-            #mu_0=[mu_0[0][6*i] for i in range(num_x)]
+            #mu_0=[mu_0[int(i/6)] for i in range(num_x)]
             #mu_0=mu_0/np.sum(mu_0)
             #mu_0[0]=1
         else:
@@ -913,6 +979,32 @@ if __name__ == '__main__':
 
 
             np.save('mu_trader_true_start_t20.npy',mu)
+            
+            
+    elif execution=='continuation_in_time':
+        global num_level
+        num_level=2
+        x_min_goal=-3
+        x_max_goal=3
+        num_t=11
+        delta_t=T/num_level/(num_t-1)
+        delta_x=delta_t**2
+        num_x=int((x_max_goal-x_min_goal)/delta_x)+1
+        if num_x%2==0:
+            num_x+=1
+        x_center=(x_min_goal+x_max_goal)/2.0
+        x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
+        x_max=x_grid[num_x-1]
+        x_min=x_grid[0]
+        X_grids=[]
+        for i in range(num_level):
+            X_grids.append(x_grid)
+        
+        mu_0=np.zeros((num_x))
+        mu_0[int(num_x/2)]=1.0
+        
+        [u_0,all_Y_values]=solver_grid(0,mu_0,X_grids)
+        Y_0=np.dot(u_0,mu_0)
             
     end_time=time.time()
     print('Time elapsted:',end_time-start_time)
