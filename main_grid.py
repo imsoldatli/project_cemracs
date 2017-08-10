@@ -240,7 +240,6 @@ def lin_int(x_m,x_M,y_m,y_M,x_get):
 
 #use mu_0, u, v, to go forward in mu
 def forward(u,v,mu_0):
-    #ToDo: calculate Y_mean, Z_mean once
     global Y_mean_all
     global Z_mean_all
     if problem=='ex_1' or problem=='trader_Pontryagin':

@@ -240,13 +240,13 @@ def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
                 Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y_old,Z,X_initial_probs)
                 Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
 
-    for i in range(num_t_fine-1):
-        for j in range(num_initial*2**i):
-            X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
-            X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
-            if periodic_2_pi:
-                X[i+1][2*j]=X[i+1][2*j]%(2*np.pi)
-                X[i+1][2*j+1]=X[i+1][2*j+1]%(2*np.pi)
+        for i in range(num_t_fine-1):
+            for j in range(num_initial*2**i):
+                X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
+                X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
+                if periodic_2_pi:
+                    X[i+1][2*j]=X[i+1][2*j]%(2*np.pi)
+                    X[i+1][2*j+1]=X[i+1][2*j+1]%(2*np.pi)
     return [X,Y,Z]
 
 #solver as defined in Chassagneux, Crisan, Delarue
