@@ -377,10 +377,10 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
         for j in range(num_x_lv):
             
             x_down=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t-sigma*np.sqrt(delta_t)
-            j_down=pi(x_down,x_grid_lv)
+            j_down=pi_lv(x_down,x_grid_lv)
             
             x_up=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t+sigma*np.sqrt(delta_t)
-            j_up=pi(x_up,x_grid_lv)
+            j_up=pi_lv(x_up,x_grid_lv)
             
             if i==num_t-2:
                 u[i][j] = (Y_terminal[j_down] + Y_terminal[j_up])/2.0 + delta_t*f(i,j,mu,u_old,v_old)
@@ -423,7 +423,7 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
 def solver_grid(level,mu_0,X_grids):
 #    num_x=len(mu)
     if level>=num_level:
-        Y_terminal=g(X_grids[level-1])
+        Y_terminal=g(X_grids[level])
         return Y_terminal
     
     num_x_lv=len(X_grids[level])
@@ -464,9 +464,11 @@ def solver_grid(level,mu_0,X_grids):
 if __name__ == '__main__':
     start_time=time.time()
     problem='jetlag_Pontryagin'
+#    problem='ex_72'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
     execution='ordinary'
+#    execution='continuation_in_time'
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, solution_trader, true_start
 
@@ -986,15 +988,16 @@ if __name__ == '__main__':
         x_max=x_grid[num_x-1]
         x_min=x_grid[0]
         X_grids=[]
-        for i in range(num_level):
+        for i in range(num_level+1):
             X_grids.append(x_grid)
         
         mu_0=np.zeros((num_x))
         mu_0[int(num_x/2)]=1.0
         
-        [u_0,all_Y_values]=solver_grid(0,mu_0,X_grids)
+        [u_0,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
         Y_0=np.dot(u_0,mu_0)
-            
+        print(Y_0)
+        print(all_Y_0_values)
     end_time=time.time()
     print('Time elapsted:',end_time-start_time)
 
