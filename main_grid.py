@@ -379,8 +379,6 @@ def backward(mu,u_old,v_old):
                     u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
 
                     v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
-
->>>>>>> 3d2a888223b075ae8b9ab021e06b94b32205d036
     return [u,v]
 
 
@@ -418,6 +416,14 @@ def transform_grid(x_grid_1,mu_1,x_grid_2):
 
 
 def forward_lv(u,v,x_grid_lv,mu_0):
+    if problem=='ex_1' or problem=='trader_Pontryagin':
+        Y_mean_all=np.zeros((num_t))
+        for i in range(num_t):
+            Y_mean_all[i]=np.dot(x_grid,u[i])
+    elif problem=='trader_weak':
+        Z_mean_all=np.zeros((num_t))
+        for i in range(num_t):
+            Z_mean_all[i]=np.dot(x_grid,v[i])
     num_x_lv=len(x_grid_lv)
 
     mu=np.zeros((num_t,num_x_lv))
@@ -437,7 +443,20 @@ def forward_lv(u,v,x_grid_lv,mu_0):
 
 
 def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
-    
+    if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+        convolution=np.zeros((num_t,num_x))
+        for i in range(num_t):
+            mu_pad=np.zeros((3*num_x-2))
+            mu_pad[0:num_x]=mu[i][:]
+            conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+            conv=conv_2[num_x-1:2*num_x-1]
+            conv=np.real(conv)
+            convolution[i]=conv
+    elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+        X_mean_all=np.zeros((num_t))
+        for i in range(num_t):
+            X_mean_all[i]=np.dot(x_grid,mu[i])
+            
     num_x_lv=len(x_grid_lv)
     u=np.zeros((num_t,num_x_lv))
     v=np.zeros((num_t,num_x_lv))
@@ -511,18 +530,9 @@ def solver_grid(level,mu_0,X_grids):
 #        Y_terminal=np.zeros(num_x_lv)
     Y_terminal=np.zeros(num_x_lv)
     
-    for j in range(J_1):
-        [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
-        mu=forward_lv(u,v,X_grids[level],mu_0)
-
-    mu_next=mu[num_t-1,:]
-    if level<num_level-1:
-        mu_next=transform_grid(X_grids[level],mu_next,X_grids[level+1])
-
-    if level==0:
-        all_Y_0_values=np.zeros((num_keep))
-        index=0
-        
+    global X_mean_all
+    global Y_mean_all
+    global Z_mean_all
     if problem=='ex_1' or problem=='trader_Pontryagin':
         Y_mean_all=np.zeros((num_t))
         for i in range(num_t):
@@ -544,6 +554,16 @@ def solver_grid(level,mu_0,X_grids):
         X_mean_all=np.zeros((num_t))
         for i in range(num_t):
             X_mean_all[i]=np.dot(x_grid,mu[i])
+    for j in range(J_1):
+        [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
+        mu=forward_lv(u,v,X_grids[level],mu_0)
+    mu_next=mu[num_t-1,:]
+    if level<num_level-1:
+        mu_next=transform_grid(X_grids[level],mu_next,X_grids[level+1])
+
+    if level==0:
+        all_Y_0_values=np.zeros((num_keep))
+        index=0
         
     for j in range(J_2):
         Y_terminal=solver_grid(level+1,mu_next,X_grids)
@@ -568,7 +588,7 @@ if __name__ == '__main__':
 
     global problem
 
-    problem='trader_Pontryagin'
+    problem='ex_73'
 #    problem='ex_72'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
@@ -760,7 +780,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=20
+        num_t=12
         delta_t=(T-0.06)/(num_t-1)
         t_grid=np.linspace(0.06,T,num_t)
         delta_x=delta_t**(2)
@@ -1213,8 +1233,8 @@ if __name__ == '__main__':
         global num_level
         
         num_level=1
-        x_min_goal=-2
-        x_max_goal=4
+        x_min_goal=-1
+        x_max_goal=5
 
         num_t=12
         delta_t=T/num_level/(num_t-1)
