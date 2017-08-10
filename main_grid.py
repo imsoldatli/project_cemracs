@@ -241,11 +241,11 @@ def forward(u,v,mu_0):
     for i in range(num_t-1): #t_i
         for j in range(num_x): #x_j
             
-            low=x_grid[j]+b(i,j,mu,u,v)*delta_t-sigma*math.sqrt(delta_t)
+            low=x_grid[j]+b(i,j,mu,u,v)*delta_t-sigma*sqrt_delta_t
             low_index=pi(low)
             mu[i+1,low_index]+=mu[i,j]*0.5
                         
-            up=x_grid[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
+            up=x_grid[j]+b(i,j,mu,u,v)*delta_t+sigma*sqrt_delta_t
             up_index=pi(up)
             mu[i+1,up_index]+=mu[i,j]*0.5
     return mu
@@ -273,9 +273,9 @@ def backward(mu,u_old,v_old):
     
     for i in reversed(range(num_t-1)):
         for j in range(num_x):
-            x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * np.sqrt(delta_t)
+            x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * sqrt_delta_t
             
-            x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * np.sqrt(delta_t)
+            x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * sqrt_delta_t
             
             j_down = pi(x_down)
             
@@ -285,7 +285,7 @@ def backward(mu,u_old,v_old):
                 
                 u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
                 
-                v[i][j] = 1.0/np.sqrt(delta_t) * (g(x_up) - g(x_down))
+                v[i][j] = 1.0/sqrt_delta_t * (g(x_up) - g(x_down))
         
             else:
                 if linear_int:
@@ -317,7 +317,7 @@ def backward(mu,u_old,v_old):
                 
                 u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
                 
-                v[i][j] = 1.0/np.sqrt(delta_t) * (u_up - u_down)
+                v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
 
     return [u,v]
 
@@ -363,11 +363,11 @@ def forward_lv(u,v,x_grid_lv,mu_0):
     for i in range(num_t-1): #t_i
         for j in range(num_x_lv): #x_j
             
-            low=x_grid_lv[j]+b(i,j,mu,u,v)*delta_t-sigma*math.sqrt(delta_t)
+            low=x_grid_lv[j]+b(i,j,mu,u,v)*delta_t-sigma*sqrt_delta_t
             low_index=pi_lv(low,x_grid_lv)
             mu[i+1,low_index]+=mu[i,j]*0.5
                         
-            up=x_grid_lv[j]+b(i,j,mu,u,v)*delta_t+sigma*math.sqrt(delta_t)
+            up=x_grid_lv[j]+b(i,j,mu,u,v)*delta_t+sigma*sqrt_delta_t
             up_index=pi_lv(up,x_grid_lv)
             mu[i+1,up_index]+=mu[i,j]*0.5
     return mu
@@ -387,15 +387,15 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
     for i in reversed(range(num_t-1)):
         for j in range(num_x_lv):
             
-            x_down=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t-sigma*np.sqrt(delta_t)
+            x_down=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t-sigma*sqrt_delta_t
             j_down=pi(x_down,x_grid_lv)
             
-            x_up=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t+sigma*np.sqrt(delta_t)
+            x_up=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t+sigma*sqrt_delta_t
             j_up=pi(x_up,x_grid_lv)
             
             if i==num_t-2:
                 u[i][j] = (Y_terminal[j_down] + Y_terminal[j_up])/2.0 + delta_t*f(i,j,mu,u_old,v_old)
-                v[i][j] = 1.0/np.sqrt(delta_t) * (Y_terminal[j_up] - Y_terminal[j_down])
+                v[i][j] = 1.0/sqrt_delta_t * (Y_terminal[j_up] - Y_terminal[j_down])
         
             else:
                 if linear_int:
@@ -427,7 +427,7 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
                 
                 u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
                 
-                v[i][j] = 1.0/np.sqrt(delta_t)*(u_up-u_down)
+                v[i][j] = 1.0/sqrt_delta_t*(u_up-u_down)
 
     return [u,v]
 
@@ -495,6 +495,7 @@ if __name__ == '__main__':
     global num_t #number of time points (one more than the number of time steps)
     
     global delta_t
+    global sqrt_delta_t
     global t_grid
     global delta_x
     global x_min #used to set the size of x_grid
@@ -769,7 +770,7 @@ if __name__ == '__main__':
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
-        
+    sqrt_delta_t=np.sqrt(delta_t)
     if execution=='ordinary':
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
