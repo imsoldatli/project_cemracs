@@ -565,13 +565,13 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='trader_weak_truncation'
+    problem='trader_Pontryagin'
 #    problem='ex_72'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='continuation_in_time'
+    execution='ordinary'
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
     #true_start, continuation_in_time
