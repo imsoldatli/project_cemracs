@@ -239,6 +239,36 @@ def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
     global Y_mean_all
     global Z_mean_all
     num_initial=len(X[0])
+    
+    if problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+        X_mean_all=np.zeros((num_t_fine))
+        for i in range(num_t_fine):
+            X_mean=0
+            num_per_initial=len(X[i])/num_initial
+            for k in range(len(X[i])):
+                index=int(math.floor(k/num_per_initial))
+                X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
+            X_mean_all[i]=X_mean
+
+    if problem=='ex_1' or problem=='trader_Pontryagin':
+        Y_mean_all=np.zeros((num_t_fine))
+        for i in range(num_t_fine):
+            Y_mean=0
+            num_per_initial=len(Y[i])/num_initial
+            for k in range(len(Y[i])):
+                index=int(math.floor(k/num_per_initial))
+                Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
+            Y_mean_all[i]=Y_mean
+    elif problem=='trader_weak':
+        Z_mean_all=np.zeros((num_t_fine))
+        for i in range(num_t_fine):
+            Z_mean=0
+            num_per_initial=len(Z[i])/num_initial
+            for k in range(len(Z[i])):
+                index=int(math.floor(k/num_per_initial))
+                Z_mean+=Z[i][k]*X_initial_probs[index]/num_per_initial
+            Z_mean_all[i]=Z_mean
+
     for k in range(J_solver_bar):
         if k>0:
             Y_old=Y
@@ -335,7 +365,7 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     start_time=time.time()
-    problem ='ex_73'
+    problem ='trader_Pontryagin'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
     execution='ordinary'
