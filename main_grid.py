@@ -33,8 +33,8 @@ def b_dummy(i,j,mu,u,v):
     return 0
 
 def b_example_1(i,j,mu,u,v):
-    #Y_mean=np.dot(u[i],mu[i])
-    Y_mean=Y_mean_all[i]
+    Y_mean=np.dot(u[i],mu[i])
+    #Y_mean=Y_mean_all[i]
     return -rho*Y_mean
 
 def f_example_1(i,j,mu,u,v):
@@ -56,8 +56,8 @@ def b_example_73(i,j,mu,u,v):
     return -rho*u[i][j]
 
 def f_example_73(i,j,mu,u,v):
-    #X_mean=np.dot(x_grid,mu[i])
-    X_mean=X_mean_all[i]
+    X_mean=np.dot(x_grid,mu[i])
+    #X_mean=X_mean_all[i]
     return -np.arctan(X_mean)
 
 def g_example_73(x):
@@ -376,6 +376,7 @@ def transform_grid(x_grid_1,mu_1,x_grid_2):
 
 def forward_lv(u,v,x_grid_lv,mu_0):
     num_x_lv=len(x_grid_lv)
+
     mu=np.zeros((num_t,num_x_lv))
     mu[0,:]=mu_0
     
@@ -462,7 +463,10 @@ def solver_grid(level,mu_0,X_grids):
     mu=np.zeros((num_t,num_x_lv))
     mu[0,:]=mu_0
     Y_terminal=np.zeros(num_x_lv)
-#    Y_terminal=g(X_grids[level])
+#    if level==num_level-1:
+#        Y_terminal=g(X_grids[level])
+#    else:
+#        Y_terminal=np.zeros(num_x_lv)
     
     for j in range(J_1):
         [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
@@ -480,8 +484,9 @@ def solver_grid(level,mu_0,X_grids):
         Y_terminal=solver_grid(level+1,mu_next,X_grids)
         if level<num_level-1:
             Y_terminal=transform_grid(X_grids[level+1],Y_terminal,X_grids[level])
-        [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
-        mu=forward_lv(u,v,X_grids[level],mu_0)
+        for j2 in range(J_1):
+            [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
+            mu=forward_lv(u,v,X_grids[level],mu_0)
         if level==0 and j>J_2-num_keep-1:
             all_Y_0_values[index]=np.dot(u[0,:],mu_0)
             index+=1
@@ -496,7 +501,7 @@ if __name__ == '__main__':
     start_time=time.time()
 
     global problem
-    problem='ex_1'
+    problem='ex_73'
 #    problem='ex_72'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
@@ -640,8 +645,8 @@ if __name__ == '__main__':
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
-        x_min=0
-        x_max=4
+        x_min=-2
+        x_max=2
         num_x=int((x_max-x_min)/delta_x)+1
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
@@ -1006,15 +1011,16 @@ if __name__ == '__main__':
             
     elif execution=='continuation_in_time':
         global J_1,J_2
-        J_1=3
-        J_2=10
+        J_1=5
+        J_2=5
         global num_level
-        num_level=2
-        x_min_goal=-2
-        x_max_goal=6
+        num_level=1
+        x_min_goal=-1
+        x_max_goal=5
         num_t=12
         delta_t=T/num_level/(num_t-1)
-        delta_x=(delta_t*num_level)**2
+        #delta_x=(delta_t*num_level)**2
+        delta_x=(delta_t)**2
         num_x=int((x_max_goal-x_min_goal)/delta_x)+1
         if num_x%2==0:
             num_x+=1
