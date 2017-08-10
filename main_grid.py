@@ -495,10 +495,9 @@ def solver_grid(level,mu_0,X_grids):
 if __name__ == '__main__':
     start_time=time.time()
 
-<<<<<<< HEAD
-=======
+
     global problem
->>>>>>> 3b14b852b4e37770a5a2ea22166611cbaa004f52
+
     problem='ex_1'
 #    problem='ex_72'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
