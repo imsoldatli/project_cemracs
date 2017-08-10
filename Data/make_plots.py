@@ -70,14 +70,14 @@ if __name__ == '__main__':
 #    plt.title('Jetlag, PDE Approach, T/2')
 #    plt.savefig('PDE_jetlag_feedback.eps')
     
-#    plt.scatter(x_grid,mu[348]/delta_x)
-#    plt.xlabel('x')
-#    plt.ylabel('$\mu(x)$')
-#    plt.title('Jetlag, Grid Algorithm, Pontryagin Approach, T/2')
-#    plt.savefig('grid_jetlag_Pontryagin.eps')
-    
-    plt.scatter(x_grid,-u[348])
+    plt.scatter(x_grid,mu[348]/delta_x)
     plt.xlabel('x')
-    plt.ylabel('alpha(T/2,x)')
+    plt.ylabel('$\mu(x)$')
     plt.title('Jetlag, Grid Algorithm, Pontryagin Approach, T/2')
-    plt.savefig('grid_jetlag_Pontryagin_feedback.eps')
+    plt.savefig('grid_jetlag_Pontryagin.eps')
+    
+#    plt.scatter(x_grid,-u[348])
+#    plt.xlabel('x')
+#    plt.ylabel('alpha(T/2,x)')
+#    plt.title('Jetlag, Grid Algorithm, Pontryagin Approach, T/2')
+#    plt.savefig('grid_jetlag_Pontryagin_feedback.eps')
