@@ -33,7 +33,8 @@ def b_dummy(i,j,mu,u,v):
     return 0
 
 def b_example_1(i,j,mu,u,v):
-    Y_mean=np.dot(u[i],mu[i])
+    #Y_mean=np.dot(u[i],mu[i])
+    Y_mean=Y_mean_all[i]
     return -rho*Y_mean
 
 def f_example_1(i,j,mu,u,v):
@@ -55,7 +56,8 @@ def b_example_73(i,j,mu,u,v):
     return -rho*u[i][j]
 
 def f_example_73(i,j,mu,u,v):
-    X_mean=np.dot(x_grid,mu[i])
+    #X_mean=np.dot(x_grid,mu[i])
+    X_mean=X_mean_all[i]
     return -np.arctan(X_mean)
 
 def g_example_73(x):
@@ -118,7 +120,8 @@ def b_trader_Pontryagin(i,j,mu,u,v):
     return -rho*u[i][j] #rho=1/c_alpha
 
 def f_trader_Pontryagin(i,j,mu,u,v):
-    Y_mean=np.dot(u[i],mu[i])
+    #Y_mean=np.dot(u[i],mu[i])
+    Y_mean=Y_mean_all[i]
     return c_x*x_grid[j]+h_bar*rho*Y_mean
 
 def g_trader_Pontryagin(x):
@@ -128,7 +131,8 @@ def b_trader_weak(i,j,mu,u,v):
     return -rho*v[i][j]/sigma #rho=1/c_alpha
 
 def f_trader_weak(i,j,mu,u,v):
-    Z_mean=np.dot(v[i],mu[i])
+    #Z_mean=np.dot(v[i],mu[i])
+    Z_mean=Z_mean_all[i]
     return 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
 
 def g_trader_weak(x):
@@ -158,7 +162,8 @@ def b_flocking_Pontryagin(i,j,mu,u,v):
     return -u[i][j]
 
 def f_flocking_Pontryagin(i,j,mu,u,v):
-    X_mean=np.dot(x_grid,mu[i])
+    #X_mean=np.dot(x_grid,mu[i])
+    X_mean=X_mean_all[i]
     return x_grid[j]-X_mean
 
 def g_flocking(x):
@@ -168,7 +173,8 @@ def b_flocking_weak(i,j,mu,u,v):
     return -v[i][j]/sigma
 
 def f_flocking_weak(i,j,mu,u,v):
-    X_mean=np.dot(x_grid,mu[i])
+    #X_mean=np.dot(x_grid,mu[i])
+    X_mean=X_mean_all[i]
     return -1.0/(2*sigma**2)*(v[i][j])**2+0.5*(x_grid[j]-X_mean)**2
 
 #project the value x onto the nearest value in x_grid
@@ -234,6 +240,17 @@ def lin_int(x_m,x_M,y_m,y_M,x_get):
 
 #use mu_0, u, v, to go forward in mu
 def forward(u,v,mu_0):
+    #ToDo: calculate Y_mean, Z_mean once
+    global Y_mean_all
+    global Z_mean_all
+    if problem=='ex_1' or problem=='trader_Pontryagin':
+        Y_mean_all=np.zeros((num_t))
+        for i in range(num_t):
+            Y_mean_all[i]=np.dot(x_grid,u[i])
+    elif problem=='trader_weak':
+        Z_mean_all=np.zeros((num_t))
+        for i in range(num_t):
+            Z_mean_all[i]=np.dot(x_grid,v[i])
     
     mu=np.zeros((num_t,num_x))
     mu[0,:]=mu_0
@@ -253,6 +270,7 @@ def forward(u,v,mu_0):
 #use mu, u_old, v_old to go backwards in u and v
 def backward(mu,u_old,v_old):
     global convolution
+    global X_mean_all
     if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
         convolution=np.zeros((num_t,num_x))
         for i in range(num_t):
@@ -262,6 +280,10 @@ def backward(mu,u_old,v_old):
             conv=conv_2[num_x-1:2*num_x-1]
             conv=np.real(conv)
             convolution[i]=conv
+    elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+        X_mean_all=np.zeros((num_t))
+        for i in range(num_t):
+            X_mean_all[i]=np.dot(x_grid,mu[i])
     
     u = np.zeros((num_t,num_x))
     v = np.zeros((num_t,num_x))
@@ -474,7 +496,7 @@ def solver_grid(level,mu_0,X_grids):
 
 if __name__ == '__main__':
     start_time=time.time()
-    problem='jetlag_Pontryagin'
+    problem='ex_73'
 #    problem='ex_72'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
