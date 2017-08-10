@@ -461,12 +461,8 @@ def solver_grid(level,mu_0,X_grids):
     v=np.zeros((num_t,num_x_lv))
     mu=np.zeros((num_t,num_x_lv))
     mu[0,:]=mu_0
-#    if level==num_level-1:
-#        Y_terminal=g(X_grids[level])
-#    else:
-#        Y_terminal=np.zeros(num_x_lv)
     Y_terminal=np.zeros(num_x_lv)
-
+#    Y_terminal=g(X_grids[level])
     
     for j in range(J_1):
         [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
