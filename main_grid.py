@@ -495,7 +495,7 @@ def solver_grid(level,mu_0,X_grids):
 
 if __name__ == '__main__':
     start_time=time.time()
-    problem='ex_73'
+    problem='jetlag_weak'
 #    problem='ex_72'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
