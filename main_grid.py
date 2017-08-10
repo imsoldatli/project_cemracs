@@ -385,7 +385,7 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
 
 def solver_grid(level,mu_0,X_grids):
 #    num_x=len(mu)
-    if level==num_level:
+    if level>=num_level:
         Y_terminal=g(X_grids[level-1])
         return Y_terminal
     
@@ -405,7 +405,7 @@ def solver_grid(level,mu_0,X_grids):
     mu_next=transform_grid(X_grids[level],mu_next,X_grids[level+1])
 
     if level==0:
-        Y_0_values=np.zeros((num_keep))
+        all_Y_0_values=np.zeros((num_keep))
         index=0
         
     for j in range(J):
@@ -415,8 +415,11 @@ def solver_grid(level,mu_0,X_grids):
         [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
         mu=forward_lv(u,v,X_grids[level],mu_0)
         if level==0 and j>J-num_keep-1:
-            Y_0_values[index]=np.dot(u[0,:],mu_0)
+            all_Y_0_values[index]=np.dot(u[0,:],mu_0)
             index+=1
+            
+    if level==0:
+        return [u[0,:],all_Y_0_values]
     return u[0,:]
 
 
@@ -905,6 +908,31 @@ if __name__ == '__main__':
 
 
             np.save('mu_trader_true_start_t20.npy',mu)
+            
+    elif execution=='continuation_in_time':
+        global num_level
+        num_level=2
+        x_min_goal=-3
+        x_max_goal=3
+        num_t=11
+        delta_t=T/num_level/(num_t-1)
+        delta_x=delta_t**2
+        num_x=int((x_max_goal-x_min_goal)/delta_x)+1
+        if num_x%2==0:
+            num_x+=1
+        x_center=(x_min_goal+x_max_goal)/2.0
+        x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
+        x_max=x_grid[num_x-1]
+        x_min=x_grid[0]
+        X_grids=[]
+        for i in range(num_level):
+            X_grids.append(x_grid)
+        
+        mu_0=np.zeros((num_x))
+        mu_0[int(num_x/2)]=1.0
+        
+        [u_0,all_Y_values]=solver_grid(0,mu_0,X_grids)
+        Y_0=np.dot(u_0,mu_0)
             
     end_time=time.time()
     print('Time elapsted:',end_time-start_time)
