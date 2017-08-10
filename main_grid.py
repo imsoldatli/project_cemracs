@@ -997,7 +997,7 @@ if __name__ == '__main__':
         x_max=x_grid[num_x-1]
         x_min=x_grid[0]
         X_grids=[]
-        for i in range(num_level):
+        for i in range(num_level+1):
             X_grids.append(x_grid)
         
         mu_0=np.zeros((num_x))
