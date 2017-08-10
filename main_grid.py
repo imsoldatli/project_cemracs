@@ -120,8 +120,8 @@ def b_trader_Pontryagin(i,j,mu,u,v):
     return -rho*u[i][j] #rho=1/c_alpha
 
 def f_trader_Pontryagin(i,j,mu,u,v):
-    #Y_mean=np.dot(u[i],mu[i])
-    Y_mean=Y_mean_all[i]
+    Y_mean=np.dot(u[i],mu[i])
+    #Y_mean=Y_mean_all[i]
     return c_x*x_grid[j]+h_bar*rho*Y_mean
 
 def g_trader_Pontryagin(x):
@@ -131,8 +131,8 @@ def b_trader_weak(i,j,mu,u,v):
     return -rho*v[i][j]/sigma #rho=1/c_alpha
 
 def f_trader_weak(i,j,mu,u,v):
-    #Z_mean=np.dot(v[i],mu[i])
-    Z_mean=Z_mean_all[i]
+    Z_mean=np.dot(v[i],mu[i])
+    #Z_mean=Z_mean_all[i]
     return 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
 
 def g_trader_weak(x):
@@ -142,13 +142,13 @@ def b_trader_weak_trunc(i,j,mu,u,v):
     return -rho*v[i][j]/sigma #rho=1/c_alpha
 
 def f_trader_weak_trunc(i,j,mu,u,v):
-    #Z_mean=np.dot(v[i],mu[i])
-    Z_mean=Z_mean_all[i]
-
-    if v[i,j]**2<bounds[0,i]:
+    Z_mean=np.dot(v[i],mu[i])
+    #Z_mean=Z_mean_all[i]
+    value=0
+    if v[i,j]<bounds[0,i]:
         value=0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*bounds[0,i]**2/sigma**2
     elif v[i,j] > bounds[1,i]:
-        v[i,j]= 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*bounds[1,i]**2/sigma**2
+        value= 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*bounds[1,i]**2/sigma**2
     else:
         value=0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
     return(value)
@@ -565,12 +565,11 @@ if __name__ == '__main__':
 
 
     global problem
-
-    problem='trader_Pontryagin'
-
+    problem='trader_weak_truncation'
 #    problem='ex_72'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
+
     global execution
     execution='continuation_in_time'
     # possible values in order of appearance:
@@ -738,7 +737,7 @@ if __name__ == '__main__':
     elif problem=='trader_Pontryagin':
         sigma=0.7
         rho=1
-        c_x=0.7
+        c_x=4
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -771,7 +770,7 @@ if __name__ == '__main__':
     elif problem=='trader_weak':
         sigma=0.7
         rho=1
-        c_x=.7
+        c_x=4
         h_bar=2
         c_g=0.3
         b=b_trader_weak
@@ -793,12 +792,12 @@ if __name__ == '__main__':
     elif problem=='trader_weak_truncation':
         sigma=0.7
         rho=1
-        c_x=.7
+        c_x=2
         h_bar=2
         c_g=0.3
-        b=b_trader_weak
-        f=f_trader_weak
-        g=g_trader_weak
+        b=b_trader_weak_trunc
+        f=f_trader_weak_trunc
+        g=g_trader_weak_trunc
         periodic_2_pi=False
         J=25
         num_keep=5
@@ -947,12 +946,6 @@ if __name__ == '__main__':
 
 
 
-            # for j in range(num_t):
-            #     bounds[0,j]=min(u[t])
-            #     bounds[1,j]=max(u[t])
-
-
-
         if problem=='trader_Pontryagin':
             bounds=np.zeros((2,num_t))
             for t in range(num_t):
@@ -962,6 +955,8 @@ if __name__ == '__main__':
             np.save('./Data/trader/value_y_Pont_to_trunc_z_weak.npy',bounds)
         elif problem=='trader_weak':
             np.save('./Data/trader/mu_weak_t20.npy',mu)
+        elif problem=='trader_weak_truncation':
+            np.save('./Data/trader/mu_weak_trunc_t20.npy',mu)
 
 
 
