@@ -33,8 +33,8 @@ def b_dummy(i,j,mu,u,v):
     return 0
 
 def b_example_1(i,j,mu,u,v):
-    #Y_mean=np.dot(u[i],mu[i])
-    Y_mean=Y_mean_all[i]
+    Y_mean=np.dot(u[i],mu[i])
+    #Y_mean=Y_mean_all[i]
     return -rho*Y_mean
 
 def f_example_1(i,j,mu,u,v):
@@ -56,7 +56,7 @@ def b_example_73(i,j,mu,u,v):
     return -rho*u[i][j]
 
 def f_example_73(i,j,mu,u,v):
-    #X_mean=np.dot(x_grid,mu[i])
+#    X_mean=np.dot(x_grid,mu[i])
     X_mean=X_mean_all[i]
     return -np.arctan(X_mean)
 
@@ -120,8 +120,8 @@ def b_trader_Pontryagin(i,j,mu,u,v):
     return -rho*u[i][j] #rho=1/c_alpha
 
 def f_trader_Pontryagin(i,j,mu,u,v):
-    #Y_mean=np.dot(u[i],mu[i])
-    Y_mean=Y_mean_all[i]
+    Y_mean=np.dot(u[i],mu[i])
+#    Y_mean=Y_mean_all[i]
     return c_x*x_grid[j]+h_bar*rho*Y_mean
 
 def g_trader_Pontryagin(x):
@@ -148,14 +148,14 @@ def f_trader_weak_trunc(i,j,mu,u,v):
 def g_trader_weak_trunc(x):
     return c_g*0.5*x**2
 
-def b_solution_trader(i,j,mu,u,v):
+def b_trader_solution(i,j,mu,u,v):
     x_mean=np.dot(x_grid,mu[i])
     return -rho*(eta[0,i]*x_grid[j]+(eta_bar[0,i]-eta[0,i])*x_mean)
 
-def f_solution_trader(i,j,mu,u,v):
+def f_trader_solution(i,j,mu,u,v):
     return 0
 
-def g_solution_trader(x):
+def g_trader_solution(x):
     return 0
     
 def b_flocking_Pontryagin(i,j,mu,u,v):
@@ -268,6 +268,9 @@ def forward(u,v,mu_0):
 
 #use mu, u_old, v_old to go backwards in u and v
 def backward(mu,u_old,v_old):
+    
+
+    
     global convolution
     global X_mean_all
     if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
@@ -337,7 +340,7 @@ def backward(mu,u_old,v_old):
                 u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
                 
                 v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
-
+            
     return [u,v]
 
 
@@ -376,6 +379,7 @@ def transform_grid(x_grid_1,mu_1,x_grid_2):
 
 def forward_lv(u,v,x_grid_lv,mu_0):
     num_x_lv=len(x_grid_lv)
+
     mu=np.zeros((num_t,num_x_lv))
     mu[0,:]=mu_0
     
@@ -466,7 +470,6 @@ def solver_grid(level,mu_0,X_grids):
 #    else:
 #        Y_terminal=np.zeros(num_x_lv)
     Y_terminal=np.zeros(num_x_lv)
-
     
     for j in range(J_1):
         [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
@@ -484,8 +487,9 @@ def solver_grid(level,mu_0,X_grids):
         Y_terminal=solver_grid(level+1,mu_next,X_grids)
         if level<num_level-1:
             Y_terminal=transform_grid(X_grids[level+1],Y_terminal,X_grids[level])
-        [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
-        mu=forward_lv(u,v,X_grids[level],mu_0)
+        for j2 in range(J_1):
+            [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
+            mu=forward_lv(u,v,X_grids[level],mu_0)
         if level==0 and j>J_2-num_keep-1:
             all_Y_0_values[index]=np.dot(u[0,:],mu_0)
             index+=1
@@ -499,13 +503,15 @@ def solver_grid(level,mu_0,X_grids):
 if __name__ == '__main__':
     start_time=time.time()
 
+
     global problem
-    problem='ex_1'
-#    problem='ex_72'
+    problem='ex_73'
+#    problem='trader_Pontryagin'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
     global execution
     execution='continuation_in_time'
+#    execution = 'ordinary'
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
     #true_start, continuation_in_time
@@ -644,8 +650,8 @@ if __name__ == '__main__':
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
-        x_min=0
-        x_max=4
+        x_min=-2
+        x_max=2
         num_x=int((x_max-x_min)/delta_x)+1
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
@@ -724,15 +730,15 @@ if __name__ == '__main__':
         x_grid=np.linspace(x_min,x_max,num_x)
     # Variable trader
 
-    elif problem=='solution_trader':
+    elif problem=='trader_solution':
         sigma=0.7
         rho=1
         c_x=0.7
         h_bar=2
         c_g=0.3
-        b=b_solution_trader
-        f=f_solution_trader
-        g=g_solution_trader
+        b=b_trader_solution
+        f=f_trader_solution
+        g=g_trader_solution
         periodic_2_pi=False
         J=25
         num_keep=5
@@ -818,7 +824,7 @@ if __name__ == '__main__':
         index2=0
         all_Y_0_values=np.zeros((1,num_keep))
         for j in range(J):
-            [u,v]=backward(mu,u,v)
+            [u,v]=backward(mu,u,v)            
             mu=forward(u,v,mu_0)
             if j>J-num_keep-1:
                 all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
@@ -832,7 +838,12 @@ if __name__ == '__main__':
 
 
         #np.save('bounds_Z_weak.npy',mu)
-        np.save('mu_Pont_t20.npy',mu)
+
+        if problem=='trader_Pontryagin':
+            np.save('mu_Pont_t20.npy',mu)
+        elif problem=='trader_weak':
+            np.save('mu_weak_t20.npy',mu)
+
 
 
 
@@ -974,7 +985,7 @@ if __name__ == '__main__':
             print('rho=',rho)
             print(all_Y_0_values[index])
 
-    elif execution=='solution_trader':
+    elif execution=='trader_solution':
         mu_0=np.zeros((num_x))
         mu_0[int(num_x/2)]=1.0
 
@@ -985,13 +996,14 @@ if __name__ == '__main__':
         v=np.zeros((num_t,num_x))
         mu=forward(u,v,mu_0)
 
-        np.save('solution_trader.npy',mu)
-    elif execution=='true_start': # only for certain problems
+        np.save('trader_solution.npy',mu)
+    elif execution=='true_start': # only for some problems
+
         if periodic_2_pi:
             mu=np.load('mu_reference_set_158.npy')*delta_x
             u=np.load('u_reference_set_158.npy')
         elif problem=='trader_weak' or problem=='trader_Pontryagin':
-            mu=true_solution=np.load('solution_trader.npy')
+            mu=true_solution=np.load('./Data/trader/trader_solution.npy')
         mu_0=mu[0]
         u=np.zeros((num_t,num_x))
         v=np.zeros((num_t,num_x))
@@ -1005,20 +1017,25 @@ if __name__ == '__main__':
                 index2+=1
         print all_Y_0_values[0]
 
+
+
+
         #np.save('mu_trader_true_start_t20.npy',mu)
             
             
     elif execution=='continuation_in_time':
         global J_1,J_2
-        J_1=3
-        J_2=10
+        J_1=5
+        J_2=5
         global num_level
         num_level=2
-        x_min_goal=-2
-        x_max_goal=6
+        x_min_goal=-1
+        x_max_goal=5
         num_t=12
         delta_t=T/num_level/(num_t-1)
-        delta_x=(delta_t*num_level)**2
+        sqrt_delta_t=math.sqrt(delta_t)
+        #delta_x=(delta_t*num_level)**2
+        delta_x=(delta_t)**2
         num_x=int((x_max_goal-x_min_goal)/delta_x)+1
         if num_x%2==0:
             num_x+=1
