@@ -493,17 +493,7 @@ def solver_grid(level,mu_0,X_grids):
 
 if __name__ == '__main__':
     start_time=time.time()
-<<<<<<< HEAD
-    problem='trader_Pontryagin'
-    #possible values in order of appearance: jetlag(_Pontryagin,_weak),
-    #trader(_Pontryagin,_weak,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
-    execution='true_start'
-    # possible values in order of appearance:
-    # ordinary, changing_sigma, changing_rho, adaptive, trader_solution, true_start
 
-
-=======
-    global problem
     problem='ex_1'
 #    problem='ex_72'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
@@ -516,7 +506,6 @@ if __name__ == '__main__':
     
     global linear_int
     linear_int=False
->>>>>>> 9e2fc45d464e8c50ea7adc2bb1fc71412ae2a7f7
 
     global b
     global f
@@ -995,35 +984,14 @@ if __name__ == '__main__':
         v=np.zeros((num_t,num_x))
         mu=forward(u,v,mu_0)
 
-<<<<<<< HEAD
         np.save('trader_solution.npy',mu)
-    elif execution=='true_start': # problem has to be 'trader_Pontryagin'
-=======
-        np.save('solution_trader.npy',mu)
-    elif execution=='true_start': # only for certain problems
->>>>>>> 9e2fc45d464e8c50ea7adc2bb1fc71412ae2a7f7
+    elif execution=='true_start': # only for some problems
+
         if periodic_2_pi:
             mu=np.load('mu_reference_set_158.npy')*delta_x
             u=np.load('u_reference_set_158.npy')
         elif problem=='trader_weak' or problem=='trader_Pontryagin':
-<<<<<<< HEAD
             mu=true_solution=np.load('./Data/trader/trader_solution.npy')
-            mu_0=mu[0]
-            u=np.zeros((num_t,num_x))
-            v=np.zeros((num_t,num_x))
-            index2=0
-            all_Y_0_values=np.zeros((1,num_keep))
-            for j in range(J):
-                [u,v]=backward(mu,u,v)
-                mu=forward(u,v,mu_0)
-                if j>J-num_keep-1:
-                    all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
-                    index2+=1
-            print all_Y_0_values[0]
-
-
-=======
-            mu=true_solution=np.load('solution_trader.npy')
         mu_0=mu[0]
         u=np.zeros((num_t,num_x))
         v=np.zeros((num_t,num_x))
@@ -1036,7 +1004,9 @@ if __name__ == '__main__':
                 all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
                 index2+=1
         print all_Y_0_values[0]
->>>>>>> 9e2fc45d464e8c50ea7adc2bb1fc71412ae2a7f7
+
+
+
 
         #np.save('mu_trader_true_start_t20.npy',mu)
             
