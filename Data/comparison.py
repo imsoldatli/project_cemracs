@@ -6,6 +6,7 @@ from matplotlib import animation
 
 # load solutions
 weak=np.load('./Data/trader/mu_weak_t20.npy')
+weak_trunc=np.load('./Data/trader/mu_weak_trunc_t20.npy')
 Pont=np.load('./Data/trader/mu_Pont_t20.npy')
 true_solution=np.load('./Data/trader/trader_solution.npy')
 true_start=np.load('./Data/trader/mu_trader_true_start_t20.npy')
@@ -148,10 +149,10 @@ print('mean_T',mean_true_solution)
 fig = plt.figure()
 ax1 = plt.axes(xlim=(-1, 3), ylim=(0,.8))
 line, = ax1.plot([], [],'o')
-plotlays, plotcols = [3], ["green","yellow","red"]
-labels=['weak','Pont','true']
+plotlays, plotcols = [3], ["green","yellow","red","blue"]
+labels=['weak','Pont','true','weak trunc']
 lines = []
-for index in range(3):
+for index in range(4):
     lobj = ax1.plot([],[],'o',color=plotcols[index],label=labels[index])[0]
     plt.legend()
     lines.append(lobj)
@@ -165,6 +166,8 @@ def init():
 x1,y1 = [],[]
 x2,y2 = [],[]
 x3,y3= [],[]
+x4,y4= [],[]
+
 
 # fake data
 frame_num = 20
@@ -174,6 +177,7 @@ def animate(i):
     x1,y1 = [],[]
     x2,y2 = [],[]
     x3,y3= [],[]
+    x4,y4= [],[]
 
     x = x_grid
     y = weak[i]
@@ -190,8 +194,13 @@ def animate(i):
     x3.append(x)
     y3.append(y)
 
-    xlist = [x1, x2,x3]
-    ylist = [y1, y2, y3]
+    x = x_grid
+    y = weak_trunc[i]
+    x4.append(x)
+    y4.append(y)
+
+    xlist = [x1, x2, x3, x4]
+    ylist = [y1, y2, y3, y4]
 
     #for index in range(0,1):
     for lnum,line in enumerate(lines):
