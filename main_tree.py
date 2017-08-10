@@ -251,7 +251,7 @@ def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
                 for k in range(len(X[i])):
                     index=int(math.floor(k/num_per_initial))
                     X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
-            X_mean_all[i]=X_mean
+                X_mean_all[i]=X_mean
         
         for n in range(num_t_fine-1):
             i=num_t_fine-2-n
@@ -335,7 +335,7 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     start_time=time.time()
-    problem ='ex_1'
+    problem ='ex_73'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
     execution='ordinary'
