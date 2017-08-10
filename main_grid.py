@@ -379,6 +379,7 @@ def backward(mu,u_old,v_old):
                     u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
 
                     v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
+
     return [u,v]
 
 
@@ -737,7 +738,7 @@ if __name__ == '__main__':
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
         x_min=-2
-        x_max=2
+        x_max=4
         num_x=int((x_max-x_min)/delta_x)+1
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
