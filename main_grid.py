@@ -141,7 +141,7 @@ def f_trader_weak_trunc(i,j,mu,u,v):
     Z_mean=np.dot(v[i],mu[i])
     return 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
 
-def g_trader_weak(x):
+def g_trader_weak_trunc(x):
     return c_g*0.5*x**2
 
 def b_solution_trader(i,j,mu,u,v):
@@ -387,10 +387,10 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
     for i in reversed(range(num_t-1)):
         for j in range(num_x_lv):
             
-            x_down=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t-sigma*np.sqrt(delta_t)
+            x_down=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t-sigma*sqrt_delta_t
             j_down=pi_lv(x_down,x_grid_lv)
             
-            x_up=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t+sigma*np.sqrt(delta_t)
+            x_up=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t+sigma*sqrt_delta_t
             j_up=pi_lv(x_up,x_grid_lv)
 
             if i==num_t-2:
@@ -821,8 +821,8 @@ if __name__ == '__main__':
         # for i in reversed(range(num_t-1)):
         #     for j in range(num_x):
         #
-        #         j_down = pi(x_grid[j] + b(i, j, mu, u, v) * delta_t - sigma * np.sqrt(delta_t))
-        #         j_up = pi(x_grid[j] + b(i, j, mu, u, v) * delta_t + sigma * np.sqrt(delta_t))
+        #         j_down = pi(x_grid[j] + b(i, j, mu, u, v) * delta_t - sigma * sqrt_delta_t
+        #         j_up = pi(x_grid[j] + b(i, j, mu, u, v) * delta_t + sigma * sqrt_delta_t
         #         mu_u[i][j] = mu[i+1][j_down]+mu[i+1][j_up]
         #         mu_v[i][j] = mu[i+1][j_down]+mu[i+1][j_up]
         # test=np.zeros((num_t,num_x))
