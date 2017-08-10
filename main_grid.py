@@ -33,7 +33,8 @@ def b_dummy(i,j,mu,u,v):
     return 0
 
 def b_example_1(i,j,mu,u,v):
-    Y_mean=np.dot(u[i],mu[i])
+    #Y_mean=np.dot(u[i],mu[i])
+    Y_mean=Y_mean_all[i]
     return -rho*Y_mean
 
 def f_example_1(i,j,mu,u,v):
@@ -55,7 +56,8 @@ def b_example_73(i,j,mu,u,v):
     return -rho*u[i][j]
 
 def f_example_73(i,j,mu,u,v):
-    X_mean=np.dot(x_grid,mu[i])
+    #X_mean=np.dot(x_grid,mu[i])
+    X_mean=X_mean_all[i]
     return -np.arctan(X_mean)
 
 def g_example_73(x):
@@ -118,7 +120,8 @@ def b_trader_Pontryagin(i,j,mu,u,v):
     return -rho*u[i][j] #rho=1/c_alpha
 
 def f_trader_Pontryagin(i,j,mu,u,v):
-    Y_mean=np.dot(u[i],mu[i])
+    #Y_mean=np.dot(u[i],mu[i])
+    Y_mean=Y_mean_all[i]
     return c_x*x_grid[j]+h_bar*rho*Y_mean
 
 def g_trader_Pontryagin(x):
@@ -128,7 +131,8 @@ def b_trader_weak(i,j,mu,u,v):
     return -rho*v[i][j]/sigma #rho=1/c_alpha
 
 def f_trader_weak(i,j,mu,u,v):
-    Z_mean=np.dot(v[i],mu[i])
+    #Z_mean=np.dot(v[i],mu[i])
+    Z_mean=Z_mean_all[i]
     return 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
 
 def g_trader_weak(x):
@@ -141,7 +145,7 @@ def f_trader_weak_trunc(i,j,mu,u,v):
     Z_mean=np.dot(v[i],mu[i])
     return 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
 
-def g_trader_weak(x):
+def g_trader_weak_trunc(x):
     return c_g*0.5*x**2
 
 def b_solution_trader(i,j,mu,u,v):
@@ -158,7 +162,8 @@ def b_flocking_Pontryagin(i,j,mu,u,v):
     return -u[i][j]
 
 def f_flocking_Pontryagin(i,j,mu,u,v):
-    X_mean=np.dot(x_grid,mu[i])
+    #X_mean=np.dot(x_grid,mu[i])
+    X_mean=X_mean_all[i]
     return x_grid[j]-X_mean
 
 def g_flocking(x):
@@ -168,7 +173,8 @@ def b_flocking_weak(i,j,mu,u,v):
     return -v[i][j]/sigma
 
 def f_flocking_weak(i,j,mu,u,v):
-    X_mean=np.dot(x_grid,mu[i])
+    #X_mean=np.dot(x_grid,mu[i])
+    X_mean=X_mean_all[i]
     return -1.0/(2*sigma**2)*(v[i][j])**2+0.5*(x_grid[j]-X_mean)**2
 
 #project the value x onto the nearest value in x_grid
@@ -234,6 +240,16 @@ def lin_int(x_m,x_M,y_m,y_M,x_get):
 
 #use mu_0, u, v, to go forward in mu
 def forward(u,v,mu_0):
+    global Y_mean_all
+    global Z_mean_all
+    if problem=='ex_1' or problem=='trader_Pontryagin':
+        Y_mean_all=np.zeros((num_t))
+        for i in range(num_t):
+            Y_mean_all[i]=np.dot(x_grid,u[i])
+    elif problem=='trader_weak':
+        Z_mean_all=np.zeros((num_t))
+        for i in range(num_t):
+            Z_mean_all[i]=np.dot(x_grid,v[i])
     
     mu=np.zeros((num_t,num_x))
     mu[0,:]=mu_0
@@ -253,6 +269,7 @@ def forward(u,v,mu_0):
 #use mu, u_old, v_old to go backwards in u and v
 def backward(mu,u_old,v_old):
     global convolution
+    global X_mean_all
     if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
         convolution=np.zeros((num_t,num_x))
         for i in range(num_t):
@@ -262,14 +279,16 @@ def backward(mu,u_old,v_old):
             conv=conv_2[num_x-1:2*num_x-1]
             conv=np.real(conv)
             convolution[i]=conv
+    elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+        X_mean_all=np.zeros((num_t))
+        for i in range(num_t):
+            X_mean_all[i]=np.dot(x_grid,mu[i])
     
     u = np.zeros((num_t,num_x))
     v = np.zeros((num_t,num_x))
     
     u[num_t-1,:] = g(x_grid)
     v[num_t-1,:] = v_old[num_t-1,:]
-    
-    linear_int=False
     
     for i in reversed(range(num_t-1)):
         for j in range(num_x):
@@ -387,10 +406,10 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
     for i in reversed(range(num_t-1)):
         for j in range(num_x_lv):
             
-            x_down=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t-sigma*np.sqrt(delta_t)
+            x_down=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t-sigma*sqrt_delta_t
             j_down=pi_lv(x_down,x_grid_lv)
             
-            x_up=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t+sigma*np.sqrt(delta_t)
+            x_up=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t+sigma*sqrt_delta_t
             j_up=pi_lv(x_up,x_grid_lv)
 
             if i==num_t-2:
@@ -475,18 +494,20 @@ def solver_grid(level,mu_0,X_grids):
 
 if __name__ == '__main__':
     start_time=time.time()
-#    problem='jetlag_Pontryagin'
-    problem='ex_72'
+
+    global problem
+    problem='ex_1'
+#    problem='ex_72'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
-    execution='ordinary'
-#    execution='continuation_in_time'
+    global execution
+    execution='continuation_in_time'
     # possible values in order of appearance:
-    # ordinary, changing_sigma, changing_rho, adaptive, solution_trader, true_start
-
-    # possible values in order of appearance:
-    # ordinary, changing sigma, changing rho, adaptive,
-    # solution_trader, true_start
+    # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
+    #true_start, continuation_in_time
+    
+    global linear_int
+    linear_int=False
 
     global b
     global f
@@ -822,8 +843,8 @@ if __name__ == '__main__':
         # for i in reversed(range(num_t-1)):
         #     for j in range(num_x):
         #
-        #         j_down = pi(x_grid[j] + b(i, j, mu, u, v) * delta_t - sigma * np.sqrt(delta_t))
-        #         j_up = pi(x_grid[j] + b(i, j, mu, u, v) * delta_t + sigma * np.sqrt(delta_t))
+        #         j_down = pi(x_grid[j] + b(i, j, mu, u, v) * delta_t - sigma * sqrt_delta_t
+        #         j_up = pi(x_grid[j] + b(i, j, mu, u, v) * delta_t + sigma * sqrt_delta_t
         #         mu_u[i][j] = mu[i+1][j_down]+mu[i+1][j_up]
         #         mu_v[i][j] = mu[i+1][j_down]+mu[i+1][j_up]
         # test=np.zeros((num_t,num_x))
@@ -961,28 +982,26 @@ if __name__ == '__main__':
         mu=forward(u,v,mu_0)
 
         np.save('solution_trader.npy',mu)
-    elif execution=='true_start': # problem has to be 'trader_Pontryagin'
+    elif execution=='true_start': # only for certain problems
         if periodic_2_pi:
             mu=np.load('mu_reference_set_158.npy')*delta_x
             u=np.load('u_reference_set_158.npy')
         elif problem=='trader_weak' or problem=='trader_Pontryagin':
             mu=true_solution=np.load('solution_trader.npy')
-            mu_0=mu[0]
-            u=np.zeros((num_t,num_x))
-            v=np.zeros((num_t,num_x))
-            index2=0
-            all_Y_0_values=np.zeros((1,num_keep))
-            for j in range(J):
-                [u,v]=backward(mu,u,v)
-                mu=forward(u,v,mu_0)
-                if j>J-num_keep-1:
-                    all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
-                    index2+=1
-            print all_Y_0_values[0]
+        mu_0=mu[0]
+        u=np.zeros((num_t,num_x))
+        v=np.zeros((num_t,num_x))
+        index2=0
+        all_Y_0_values=np.zeros((1,num_keep))
+        for j in range(J):
+            [u,v]=backward(mu,u,v)
+            mu=forward(u,v,mu_0)
+            if j>J-num_keep-1:
+                all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
+                index2+=1
+        print all_Y_0_values[0]
 
-
-
-            np.save('mu_trader_true_start_t20.npy',mu)
+        #np.save('mu_trader_true_start_t20.npy',mu)
             
             
     elif execution=='continuation_in_time':
