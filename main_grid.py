@@ -380,7 +380,6 @@ def backward(mu,u_old,v_old):
 
                     v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
 
->>>>>>> 3d2a888223b075ae8b9ab021e06b94b32205d036
     return [u,v]
 
 
@@ -568,13 +567,14 @@ if __name__ == '__main__':
 
     global problem
 
-    problem='trader_Pontryagin'
-#    problem='ex_72'
+#    problem='trader_Pontryagin'
+    problem='ex_72'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='ordinary'
+#    execution='ordinary'
+    execution='continuation_in_time'
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
     #true_start, continuation_in_time
@@ -714,7 +714,7 @@ if __name__ == '__main__':
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
         x_min=-2
-        x_max=2
+        x_max=4
         num_x=int((x_max-x_min)/delta_x)+1
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
