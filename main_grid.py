@@ -1168,18 +1168,34 @@ if __name__ == '__main__':
         sqrt_delta_t=math.sqrt(delta_t)
         delta_x=(delta_t*num_level)**2
         #delta_x=delta_t**(2)
-        x_min=-1
-        x_max=5
-        num_x=int((x_max-x_min)/delta_x)+1
-        x_grid=np.linspace(x_min,x_max,num_x)
+#        x_min=-1
+#        x_max=5
+#        num_x=int((x_max-x_min)/delta_x)+1
+#        x_grid=np.linspace(x_min,x_max,num_x)
+#
+#        # x_grid for each level, should be an increasing sequence
+#        X_grids=[]
+#        for i in range(num_level):
+#            X_grids.append(x_grid)
+#        mu_0=np.zeros((num_x))
+#        mu_0[int(num_x/2)]=1.0
 
+        x_0=2
         # x_grid for each level, should be an increasing sequence
         X_grids=[]
+        num_x_vec=np.zeros(num_level)
+        b_m=rho
         for i in range(num_level):
+            T_lv=T/num_level*(i+1)
+            x_min=x_0-b_m*T_lv-2*sigma*math.sqrt(T_lv)
+            x_max=x_0+b_m*T_lv+2*sigma*math.sqrt(T_lv)
+            num_x=int((x_max-x_min)/delta_x)+1
+            num_x_vec[i]=num_x
+            x_grid=np.linspace(x_min,x_max,num_x)
             X_grids.append(x_grid)
-        
-        mu_0=np.zeros((num_x))
-        mu_0[int(num_x/2)]=1.0
+        mu_0=np.zeros(int(num_x_vec[0]))
+        mu_0[int(num_x_vec[0]/2)]=1.0
+
         
         [u_0,mu,u,v,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
         print(all_Y_0_values)
