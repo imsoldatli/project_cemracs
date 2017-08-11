@@ -568,15 +568,16 @@ def solver_grid(level,mu_0,X_grids):
     u=np.zeros((num_t,num_x_lv))
     v=np.zeros((num_t,num_x_lv))
     
-    mu_next=mu[num_t-1,:]
-    if level<num_level-1:
-        mu_next=transform_grid(X_grids[level],mu_next,X_grids[level+1])
+
 
     if level==0:
         all_Y_0_values=np.zeros((num_keep))
         index=0
         
     for j in range(J_2):
+        mu_next=mu[num_t-1,:]
+        if level<num_level-1:
+            mu_next=transform_grid(X_grids[level],mu_next,X_grids[level+1])
         #print('loop in level: ',level)
         #print('j=',j)
         Y_terminal=solver_grid(level+1,mu_next,X_grids)
@@ -602,12 +603,12 @@ if __name__ == '__main__':
 
     global problem
 
-    problem='flocking_Pontryagin'
+    problem='ex_73'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='ordinary'
+    execution='continuation_in_time'
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
     #true_start, continuation_in_time
@@ -947,6 +948,12 @@ if __name__ == '__main__':
         index2=0
         all_Y_0_values=np.zeros((1,num_keep))
         
+        for j in range(1):
+            [u,v]=backward(mu,u,v)
+            mu=forward(u,v,mu_0)
+        u=np.zeros((num_t,num_x))
+        v=np.zeros((num_t,num_x))
+        
         for j in range(J):
             [u,v]=backward(mu,u,v)            
             mu=forward(u,v,mu_0)
@@ -1150,19 +1157,19 @@ if __name__ == '__main__':
             
     elif execution=='continuation_in_time':
         global J_1,J_2
-        J_1=5
-        J_2=5
+        J_1=1
+        J_2=25
         global num_level
         
         num_level=2
 
-        num_t=12
+        num_t=7
         delta_t=T/num_level/(num_t-1)
         sqrt_delta_t=math.sqrt(delta_t)
         delta_x=(delta_t*num_level)**2
         #delta_x=delta_t**(2)
-        x_min=-3
-        x_max=3
+        x_min=-1
+        x_max=5
         num_x=int((x_max-x_min)/delta_x)+1
         x_grid=np.linspace(x_min,x_max,num_x)
 
