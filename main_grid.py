@@ -29,44 +29,44 @@ import time
 
 #Define functions b, f, and g for a variety of problems:
 
-def b_dummy(i,j,mu,u,v):
+def b_dummy(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     return 0
 
-def b_example_1(i,j,mu,u,v):
-    Y_mean=np.dot(u[i],mu[i])
+def b_example_1(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
+    #Y_mean=np.dot(u[i],mu[i])
     #Y_mean=Y_mean_all[i]
     return -rho*Y_mean
 
-def f_example_1(i,j,mu,u,v):
+def f_example_1(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     return a*u[i][j]
 
 def g_example_1(x):
     return x
 
-def b_example_72(i,j,mu,u,v):
+def b_example_72(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     return rho*np.cos(u[i][j])
 
-def f_example_72(i,j,mu,u,v):
+def f_example_72(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     return 0
 
 def g_example_72(x):
     return np.sin(x)
 
-def b_example_73(i,j,mu,u,v):
+def b_example_73(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     return -rho*u[i][j]
 
-def f_example_73(i,j,mu,u,v):
+def f_example_73(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
 #    X_mean=np.dot(x_grid,mu[i])
-    X_mean=X_mean_all[i]
+    #X_mean=X_mean_all[i]
     return -np.arctan(X_mean)
 
 def g_example_73(x):
     return np.arctan(x)
 
-def b_jet_lag_weak(i,j,mu,u,v):
+def b_jet_lag_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     return omega_0-omega_S-1.0/(R*sigma)*v[i][j]
 
-def f_jet_lag_weak(i,j,mu,u,v):
+def f_jet_lag_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     value1=1.0/sigma*(omega_0-omega_S)*v[i][j]-1.0/(2*R*sigma**2)*(v[i][j])**2
 
 #    mu_pad=np.zeros((3*num_x-2))
@@ -75,7 +75,7 @@ def f_jet_lag_weak(i,j,mu,u,v):
 #    c_bar=c_bar_2[num_x-1:2*num_x-1][j]
 #    c_bar=np.real(c_bar)
     #c_bar=np.dot(0.5*(np.sin((x_grid[j]-x_grid)/2.0))**2,mu[i])
-    c_bar=convolution[i][j]
+    c_bar=convolution[j]
     value2=K*c_bar
     c_sun=0.5*(np.sin((p-x_grid[j])/2.0))**2
     value3=F*c_sun
@@ -92,17 +92,17 @@ def get_h_jet_lag_weak():
     h_array=np.concatenate((temp2,temp[1:len(temp)]))
     return h_array
 
-def b_jet_lag_Pontryagin(i,j,mu,u,v):
+def b_jet_lag_Pontryagin(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     return omega_0-omega_S-1.0/R*u[i][j]
 
-def f_jet_lag_Pontryagin(i,j,mu,u,v):
+def f_jet_lag_Pontryagin(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
 #    mu_pad=np.zeros((3*num_x-2))
 #    mu_pad[0:num_x]=mu[i][:]
 #    partial_c_bar_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
 #    partial_c_bar=partial_c_bar_2[num_x-1:2*num_x-1][j]
 #    partial_c_bar=np.real(partial_c_bar)
     #partial_c_bar=np.dot(0.5*np.sin((x_grid[j]-x_grid)/2.0)*np.cos((x_grid[j]-x_grid)/2.0),mu[i])
-    partial_c_bar=convolution[i][j]
+    partial_c_bar=convolution[j]
     value1=K*partial_c_bar
     partial_c_sun=0.5*np.sin((x_grid[j]-p)/2.0)*np.cos((x_grid[j]-p)/2.0)
     value2=F*partial_c_sun
@@ -116,33 +116,33 @@ def get_h_jet_lag_Pontryagin():
     h_array=np.concatenate((temp2,temp[1:len(temp)]))
     return h_array
 
-def b_trader_Pontryagin(i,j,mu,u,v):
+def b_trader_Pontryagin(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     return -rho*u[i][j] #rho=1/c_alpha
 
-def f_trader_Pontryagin(i,j,mu,u,v):
-    Y_mean=np.dot(u[i],mu[i])
+def f_trader_Pontryagin(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
+    #Y_mean=np.dot(u[i],mu[i])
     #Y_mean=Y_mean_all[i]
     return c_x*x_grid[j]+h_bar*rho*Y_mean
 
 def g_trader_Pontryagin(x):
     return c_g *x
 
-def b_trader_weak(i,j,mu,u,v):
+def b_trader_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     return -rho*v[i][j]/sigma #rho=1/c_alpha
 
-def f_trader_weak(i,j,mu,u,v):
-    Z_mean=np.dot(v[i],mu[i])
+def f_trader_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
+    #Z_mean=np.dot(v[i],mu[i])
     #Z_mean=Z_mean_all[i]
     return 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
 
 def g_trader_weak(x):
     return c_g*0.5*x**2
 
-def b_trader_weak_trunc(i,j,mu,u,v):
+def b_trader_weak_trunc(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     return -rho*v[i][j]/sigma #rho=1/c_alpha
 
-def f_trader_weak_trunc(i,j,mu,u,v):
-    Z_mean=np.dot(v[i],mu[i])
+def f_trader_weak_trunc(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
+    #Z_mean=np.dot(v[i],mu[i])
     #Z_mean=Z_mean_all[i]
     value=0
     if v[i,j]<bounds[0,i]:
@@ -166,23 +166,23 @@ def f_trader_solution(i,j,mu,u,v):
 def g_trader_solution(x):
     return 0
     
-def b_flocking_Pontryagin(i,j,mu,u,v):
+def b_flocking_Pontryagin(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     return -u[i][j]
 
-def f_flocking_Pontryagin(i,j,mu,u,v):
+def f_flocking_Pontryagin(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     #X_mean=np.dot(x_grid,mu[i])
-    X_mean=X_mean_all[i]
+    #X_mean=X_mean_all[i]
     return x_grid[j]-X_mean
 
 def g_flocking(x):
     return 0
 
-def b_flocking_weak(i,j,mu,u,v):
+def b_flocking_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     return -v[i][j]/sigma
 
-def f_flocking_weak(i,j,mu,u,v):
+def f_flocking_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     #X_mean=np.dot(x_grid,mu[i])
-    X_mean=X_mean_all[i]
+    #X_mean=X_mean_all[i]
     return -1.0/(2*sigma**2)*(v[i][j])**2+0.5*(x_grid[j]-X_mean)**2
 
 #project the value x onto the nearest value in x_grid
@@ -248,47 +248,40 @@ def lin_int(x_m,x_M,y_m,y_M,x_get):
 
 #use mu_0, u, v, to go forward in mu
 def forward(u,v,mu_0):
-    if problem=='ex_1' or problem=='trader_Pontryagin':
-        Y_mean_all=np.zeros((num_t))
-        for i in range(num_t):
-            Y_mean_all[i]=np.dot(x_grid,u[i])
-    elif problem=='trader_weak':
-        Z_mean_all=np.zeros((num_t))
-        for i in range(num_t):
-            Z_mean_all[i]=np.dot(x_grid,v[i])
-
     mu=np.zeros((num_t,num_x))
     mu[0,:]=mu_0
     
     for i in range(num_t-1): #t_i
+        convolution=0
+        X_mean=0
+        Y_mean=0
+        Z_mean=0
+        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+            convolution=np.zeros((num_x))
+            mu_pad=np.zeros((3*num_x-2))
+            mu_pad[0:num_x]=mu[i][:]
+            conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+            conv=conv_2[num_x-1:2*num_x-1]
+            convolution=np.real(conv)
+        elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+            X_mean=np.dot(x_grid,mu[i])
+        elif problem=='ex_1' or problem=='trader_Pontryagin':
+            Y_mean=np.dot(u[i],mu[i])
+        elif problem=='trader_weak':
+            Z_mean=np.dot(v[i],mu[i])
+
         for j in range(num_x): #x_j
-            
-            low=x_grid[j]+b(i,j,mu,u,v)*delta_t-sigma*sqrt_delta_t
+            low=x_grid[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t-sigma*sqrt_delta_t
             low_index=pi(low)
             mu[i+1,low_index]+=mu[i,j]*0.5
                         
-            up=x_grid[j]+b(i,j,mu,u,v)*delta_t+sigma*sqrt_delta_t
+            up=x_grid[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t+sigma*sqrt_delta_t
             up_index=pi(up)
             mu[i+1,up_index]+=mu[i,j]*0.5
     return mu
 
 #use mu, u_old, v_old to go backwards in u and v
-def backward(mu,u_old,v_old):
-
-    if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
-        convolution=np.zeros((num_t,num_x))
-        for i in range(num_t):
-            mu_pad=np.zeros((3*num_x-2))
-            mu_pad[0:num_x]=mu[i][:]
-            conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
-            conv=conv_2[num_x-1:2*num_x-1]
-            conv=np.real(conv)
-            convolution[i]=conv
-    elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
-        X_mean_all=np.zeros((num_t))
-        for i in range(num_t):
-            X_mean_all[i]=np.dot(x_grid,mu[i])
-    
+def backward(mu,u_old,v_old):    
     u = np.zeros((num_t,num_x))
     v = np.zeros((num_t,num_x))
     
@@ -296,10 +289,27 @@ def backward(mu,u_old,v_old):
     v[num_t-1,:] = v_old[num_t-1,:]
     if problem=='trader_weak_trunc':
         for i in reversed(range(num_t-1)):
+            convolution=0
+            X_mean=0
+            Y_mean=0
+            Z_mean=0
+            if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+                convolution=np.zeros((num_x))
+                mu_pad=np.zeros((3*num_x-2))
+                mu_pad[0:num_x]=mu[i][:]
+                conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+                conv=conv_2[num_x-1:2*num_x-1]
+                convolution=np.real(conv)
+            elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+                X_mean=np.dot(x_grid,mu[i])
+            elif problem=='ex_1' or problem=='trader_Pontryagin':
+                Y_mean=np.dot(u_old[i],mu[i])
+            elif problem=='trader_weak':
+                Z_mean=np.dot(v_old[i],mu[i])
             for j in range(num_x):
-                x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * sqrt_delta_t
+                x_down = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t - sigma * sqrt_delta_t
 
-                x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * sqrt_delta_t
+                x_up = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t + sigma * sqrt_delta_t
 
                 j_down = pi(x_down)
 
@@ -307,7 +317,7 @@ def backward(mu,u_old,v_old):
 
                 if i==num_t-2:
 
-                    u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+                    u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
 
                     v[i][j] = 1.0/sqrt_delta_t * (g(x_up) - g(x_down))
 
@@ -315,15 +325,11 @@ def backward(mu,u_old,v_old):
                         v[i,j]=bounds[0,i]
                     elif v[i,j]>bounds[1,i]:
                         v[i,j]=bounds[1,i]
-
-
                 else:
-
-
                     u_up = u[i+1][j_up]
                     u_down = u[i+1][j_down]
 
-                    u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+                    u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
 
                     v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
                     if v[i,j]<bounds[0,i]:
@@ -333,10 +339,27 @@ def backward(mu,u_old,v_old):
 
     else:
         for i in reversed(range(num_t-1)):
+            convolution=0
+            X_mean=0
+            Y_mean=0
+            Z_mean=0
+            if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+                convolution=np.zeros((num_x))
+                mu_pad=np.zeros((3*num_x-2))
+                mu_pad[0:num_x]=mu[i][:]
+                conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+                conv=conv_2[num_x-1:2*num_x-1]
+                convolution=np.real(conv)
+            elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+                X_mean=np.dot(x_grid,mu[i])
+            elif problem=='ex_1' or problem=='trader_Pontryagin':
+                Y_mean=np.dot(u_old[i],mu[i])
+            elif problem=='trader_weak':
+                Z_mean=np.dot(v_old[i],mu[i])
             for j in range(num_x):
-                x_down = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t - sigma * sqrt_delta_t
+                x_down = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t - sigma * sqrt_delta_t
 
-                x_up = x_grid[j] + b(i, j, mu, u_old, v_old) * delta_t + sigma * sqrt_delta_t
+                x_up = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t + sigma * sqrt_delta_t
 
                 j_down = pi(x_down)
 
@@ -344,7 +367,7 @@ def backward(mu,u_old,v_old):
 
                 if i==num_t-2:
 
-                    u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+                    u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
 
                     v[i][j] = 1.0/sqrt_delta_t * (g(x_up) - g(x_down))
 
@@ -376,7 +399,7 @@ def backward(mu,u_old,v_old):
                         u_up = u[i+1][j_up]
                         u_down = u[i+1][j_down]
 
-                    u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+                    u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
 
                     v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
 
@@ -417,51 +440,42 @@ def transform_grid(x_grid_1,mu_1,x_grid_2):
 
 
 def forward_lv(u,v,x_grid_lv,mu_0):
-    global Y_mean_all
-    global Z_mean_all
-    if problem=='ex_1' or problem=='trader_Pontryagin':
-        Y_mean_all=np.zeros((num_t))
-        for i in range(num_t):
-            Y_mean_all[i]=np.dot(x_grid,u[i])
-    elif problem=='trader_weak':
-        Z_mean_all=np.zeros((num_t))
-        for i in range(num_t):
-            Z_mean_all[i]=np.dot(x_grid,v[i])
     num_x_lv=len(x_grid_lv)
 
     mu=np.zeros((num_t,num_x_lv))
     mu[0,:]=mu_0
     
     for i in range(num_t-1): #t_i
+        convolution=0
+        X_mean=0
+        Y_mean=0
+        Z_mean=0
+        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+            convolution=np.zeros((num_x))
+            mu_pad=np.zeros((3*num_x-2))
+            mu_pad[0:num_x]=mu[i][:]
+            conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+            conv=conv_2[num_x-1:2*num_x-1]
+            convolution=np.real(conv)
+        elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+            X_mean=np.dot(x_grid,mu[i])
+        elif problem=='ex_1' or problem=='trader_Pontryagin':
+            Y_mean=np.dot(u[i],mu[i])
+        elif problem=='trader_weak':
+            Z_mean=np.dot(v[i],mu[i])
         for j in range(num_x_lv): #x_j
             
-            low=x_grid_lv[j]+b(i,j,mu,u,v)*delta_t-sigma*sqrt_delta_t
+            low=x_grid_lv[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t-sigma*sqrt_delta_t
             low_index=pi_lv(low,x_grid_lv)
             mu[i+1,low_index]+=mu[i,j]*0.5
                         
-            up=x_grid_lv[j]+b(i,j,mu,u,v)*delta_t+sigma*sqrt_delta_t
+            up=x_grid_lv[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t+sigma*sqrt_delta_t
             up_index=pi_lv(up,x_grid_lv)
             mu[i+1,up_index]+=mu[i,j]*0.5
     return mu
 
 
-def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
-    global convolution
-    global X_mean_all
-    if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
-        convolution=np.zeros((num_t,num_x))
-        for i in range(num_t):
-            mu_pad=np.zeros((3*num_x-2))
-            mu_pad[0:num_x]=mu[i][:]
-            conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
-            conv=conv_2[num_x-1:2*num_x-1]
-            conv=np.real(conv)
-            convolution[i]=conv
-    elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
-        X_mean_all=np.zeros((num_t))
-        for i in range(num_t):
-            X_mean_all[i]=np.dot(x_grid,mu[i])
-            
+def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):            
     num_x_lv=len(x_grid_lv)
     u=np.zeros((num_t,num_x_lv))
     v=np.zeros((num_t,num_x_lv))
@@ -472,16 +486,33 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
     linear_int=False
     
     for i in reversed(range(num_t-1)):
+        convolution=0
+        X_mean=0
+        Y_mean=0
+        Z_mean=0
+        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+            convolution=np.zeros((num_x))
+            mu_pad=np.zeros((3*num_x-2))
+            mu_pad[0:num_x]=mu[i][:]
+            conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+            conv=conv_2[num_x-1:2*num_x-1]
+            convolution=np.real(conv)
+        elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+            X_mean=np.dot(x_grid,mu[i])
+        elif problem=='ex_1' or problem=='trader_Pontryagin':
+            Y_mean=np.dot(u_old[i],mu[i])
+        elif problem=='trader_weak':
+            Z_mean=np.dot(v_old[i],mu[i])
         for j in range(num_x_lv):
             
-            x_down=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t-sigma*sqrt_delta_t
+            x_down=x_grid_lv[j]+b(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)*delta_t-sigma*sqrt_delta_t
             j_down=pi_lv(x_down,x_grid_lv)
             
-            x_up=x_grid_lv[j]+b(i,j,mu,u_old,v_old)*delta_t+sigma*sqrt_delta_t
+            x_up=x_grid_lv[j]+b(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)*delta_t+sigma*sqrt_delta_t
             j_up=pi_lv(x_up,x_grid_lv)
 
             if i==num_t-2:
-                u[i][j]=(Y_terminal[j_down]+Y_terminal[j_up])/2.0+delta_t*f(i,j,mu,u_old,v_old)
+                u[i][j]=(Y_terminal[j_down]+Y_terminal[j_up])/2.0+delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
                 v[i][j]=1.0/sqrt_delta_t*(Y_terminal[j_up]-Y_terminal[j_down])
         
             else:
@@ -512,7 +543,7 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
                     u_up = u[i+1][j_up]
                     u_down = u[i+1][j_down]
                 
-                u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old)
+                u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
                 
                 v[i][j] = 1.0/sqrt_delta_t*(u_up-u_down)
 
@@ -535,30 +566,6 @@ def solver_grid(level,mu_0,X_grids):
 #        Y_terminal=np.zeros(num_x_lv)
     Y_terminal=np.zeros(num_x_lv)
     
-    global X_mean_all
-    global Y_mean_all
-    global Z_mean_all
-    if problem=='ex_1' or problem=='trader_Pontryagin':
-        Y_mean_all=np.zeros((num_t))
-        for i in range(num_t):
-            Y_mean_all[i]=np.dot(x_grid,u[i])
-    elif problem=='trader_weak':
-        Z_mean_all=np.zeros((num_t))
-        for i in range(num_t):
-            Z_mean_all[i]=np.dot(x_grid,v[i])
-    if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
-        convolution=np.zeros((num_t,num_x))
-        for i in range(num_t):
-            mu_pad=np.zeros((3*num_x-2))
-            mu_pad[0:num_x]=mu[i][:]
-            conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
-            conv=conv_2[num_x-1:2*num_x-1]
-            conv=np.real(conv)
-            convolution[i]=conv
-    elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
-        X_mean_all=np.zeros((num_t))
-        for i in range(num_t):
-            X_mean_all[i]=np.dot(x_grid,mu[i])
     for j in range(J_1):
         [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
         mu=forward_lv(u,v,X_grids[level],mu_0)
@@ -737,8 +744,8 @@ if __name__ == '__main__':
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
-        x_min=-2
-        x_max=4
+        x_min=-3
+        x_max=3
         num_x=int((x_max-x_min)/delta_x)+1
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
@@ -917,10 +924,7 @@ if __name__ == '__main__':
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
     sqrt_delta_t=np.sqrt(delta_t)
-    global convolution
-    global X_mean_all
-    global Y_mean_all
-    global Z_mean_all
+
     if execution=='ordinary':
 
         mu_0=np.zeros((num_x))
@@ -941,28 +945,6 @@ if __name__ == '__main__':
         index2=0
         all_Y_0_values=np.zeros((1,num_keep))
         
-
-        if problem=='ex_1' or problem=='trader_Pontryagin':
-            Y_mean_all=np.zeros((num_t))
-            for i in range(num_t):
-                Y_mean_all[i]=np.dot(x_grid,u[i])
-        elif problem=='trader_weak':
-            Z_mean_all=np.zeros((num_t))
-            for i in range(num_t):
-                Z_mean_all[i]=np.dot(x_grid,v[i])
-        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
-            convolution=np.zeros((num_t,num_x))
-            for i in range(num_t):
-                mu_pad=np.zeros((3*num_x-2))
-                mu_pad[0:num_x]=mu[i][:]
-                conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
-                conv=conv_2[num_x-1:2*num_x-1]
-                conv=np.real(conv)
-                convolution[i]=conv
-        elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
-            X_mean_all=np.zeros((num_t))
-            for i in range(num_t):
-                X_mean_all[i]=np.dot(x_grid,mu[i])
         for j in range(J):
             [u,v]=backward(mu,u,v)            
             mu=forward(u,v,mu_0)
@@ -1029,28 +1011,6 @@ if __name__ == '__main__':
                 mu[k]=mu_0
             u=np.zeros((num_t,num_x))
             v=np.zeros((num_t,num_x))
-                
-            if problem=='ex_1' or problem=='trader_Pontryagin':
-                Y_mean_all=np.zeros((num_t))
-                for i in range(num_t):
-                    Y_mean_all[i]=np.dot(x_grid,u[i])
-            elif problem=='trader_weak':
-                Z_mean_all=np.zeros((num_t))
-                for i in range(num_t):
-                    Z_mean_all[i]=np.dot(x_grid,v[i])
-            if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
-                convolution=np.zeros((num_t,num_x))
-                for i in range(num_t):
-                    mu_pad=np.zeros((3*num_x-2))
-                    mu_pad[0:num_x]=mu[i][:]
-                    conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
-                    conv=conv_2[num_x-1:2*num_x-1]
-                    conv=np.real(conv)
-                    convolution[i]=conv
-            elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
-                X_mean_all=np.zeros((num_t))
-                for i in range(num_t):
-                    X_mean_all[i]=np.dot(x_grid,mu[i])
             
             for j in range(J):
                 [u,v]=backward(mu,u,v)
@@ -1084,28 +1044,6 @@ if __name__ == '__main__':
                 mu[k]=mu_0
             u=np.zeros((num_t,num_x))
             v=np.zeros((num_t,num_x))
-            
-            if problem=='ex_1' or problem=='trader_Pontryagin':
-                Y_mean_all=np.zeros((num_t))
-                for i in range(num_t):
-                    Y_mean_all[i]=np.dot(x_grid,u[i])
-            elif problem=='trader_weak':
-                Z_mean_all=np.zeros((num_t))
-                for i in range(num_t):
-                    Z_mean_all[i]=np.dot(x_grid,v[i])
-            if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
-                convolution=np.zeros((num_t,num_x))
-                for i in range(num_t):
-                    mu_pad=np.zeros((3*num_x-2))
-                    mu_pad[0:num_x]=mu[i][:]
-                    conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
-                    conv=conv_2[num_x-1:2*num_x-1]
-                    conv=np.real(conv)
-                    convolution[i]=conv
-            elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
-                X_mean_all=np.zeros((num_t))
-                for i in range(num_t):
-                    X_mean_all[i]=np.dot(x_grid,mu[i])
             
             for j in range(J):
                 [u,v]=backward(mu,u,v)
@@ -1160,28 +1098,6 @@ if __name__ == '__main__':
                 mu[k]=mu_0
             u=np.zeros((num_t,num_x))
             v=np.zeros((num_t,num_x))
-        
-            if problem=='ex_1' or problem=='trader_Pontryagin':
-                Y_mean_all=np.zeros((num_t))
-                for i in range(num_t):
-                    Y_mean_all[i]=np.dot(x_grid,u[i])
-            elif problem=='trader_weak':
-                Z_mean_all=np.zeros((num_t))
-                for i in range(num_t):
-                    Z_mean_all[i]=np.dot(x_grid,v[i])
-            if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
-                convolution=np.zeros((num_t,num_x))
-                for i in range(num_t):
-                    mu_pad=np.zeros((3*num_x-2))
-                    mu_pad[0:num_x]=mu[i][:]
-                    conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
-                    conv=conv_2[num_x-1:2*num_x-1]
-                    conv=np.real(conv)
-                    convolution[i]=conv
-            elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
-                X_mean_all=np.zeros((num_t))
-                for i in range(num_t):
-                    X_mean_all[i]=np.dot(x_grid,mu[i])
             
             for j in range(J):
                 [u,v]=backward(mu,u,v)
