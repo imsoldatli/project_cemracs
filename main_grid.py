@@ -451,14 +451,14 @@ def forward_lv(u,v,x_grid_lv,mu_0):
         Y_mean=0
         Z_mean=0
         if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
-            convolution=np.zeros((num_x))
-            mu_pad=np.zeros((3*num_x-2))
-            mu_pad[0:num_x]=mu[i][:]
+            convolution=np.zeros((num_x_lv))
+            mu_pad=np.zeros((3*num_x_lv-2))
+            mu_pad[0:num_x_lv]=mu[i][:]
             conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
-            conv=conv_2[num_x-1:2*num_x-1]
+            conv=conv_2[num_x_lv-1:2*num_x_lv-1]
             convolution=np.real(conv)
         elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
-            X_mean=np.dot(x_grid,mu[i])
+            X_mean=np.dot(x_grid_lv,mu[i])
         elif problem=='ex_1' or problem=='trader_Pontryagin':
             Y_mean=np.dot(u[i],mu[i])
         elif problem=='trader_weak':
@@ -489,14 +489,14 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
         Y_mean=0
         Z_mean=0
         if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
-            convolution=np.zeros((num_x))
-            mu_pad=np.zeros((3*num_x-2))
-            mu_pad[0:num_x]=mu[i][:]
+            convolution=np.zeros((num_x_lv))
+            mu_pad=np.zeros((3*num_x_lv-2))
+            mu_pad[0:num_x_lv]=mu[i][:]
             conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
-            conv=conv_2[num_x-1:2*num_x-1]
+            conv=conv_2[num_x_lv-1:2*num_x_lv-1]
             convolution=np.real(conv)
         elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
-            X_mean=np.dot(x_grid,mu[i])
+            X_mean=np.dot(x_grid_lv,mu[i])
         elif problem=='ex_1' or problem=='trader_Pontryagin':
             Y_mean=np.dot(u_old[i],mu[i])
         elif problem=='trader_weak':
