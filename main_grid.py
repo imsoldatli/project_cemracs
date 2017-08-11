@@ -458,7 +458,7 @@ def forward_lv(u,v,x_grid_lv,mu_0):
             conv=conv_2[num_x-1:2*num_x-1]
             convolution=np.real(conv)
         elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
-            X_mean=np.dot(x_grid,mu[i])
+            X_mean=np.dot(x_grid_lv,mu[i])
         elif problem=='ex_1' or problem=='trader_Pontryagin':
             Y_mean=np.dot(u[i],mu[i])
         elif problem=='trader_weak':
@@ -489,14 +489,14 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
         Y_mean=0
         Z_mean=0
         if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
-            convolution=np.zeros((num_x))
-            mu_pad=np.zeros((3*num_x-2))
-            mu_pad[0:num_x]=mu[i][:]
+            convolution=np.zeros((num_x_lv))
+            mu_pad=np.zeros((3*num_x_lv-2))
+            mu_pad[0:num_x_lv]=mu[i][:]
             conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
-            conv=conv_2[num_x-1:2*num_x-1]
+            conv=conv_2[num_x_lv-1:2*num_x_lv-1]
             convolution=np.real(conv)
         elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
-            X_mean=np.dot(x_grid,mu[i])
+            X_mean=np.dot(x_grid_lv,mu[i])
         elif problem=='ex_1' or problem=='trader_Pontryagin':
             Y_mean=np.dot(u_old[i],mu[i])
         elif problem=='trader_weak':
@@ -609,6 +609,7 @@ if __name__ == '__main__':
 
     global execution
     execution='continuation_in_time'
+#    execution='ordinary'
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
     #true_start, continuation_in_time
@@ -1168,18 +1169,26 @@ if __name__ == '__main__':
         sqrt_delta_t=math.sqrt(delta_t)
         delta_x=(delta_t*num_level)**2
         #delta_x=delta_t**(2)
-        x_min=-1
-        x_max=5
-        num_x=int((x_max-x_min)/delta_x)+1
-        x_grid=np.linspace(x_min,x_max,num_x)
+#        x_min=-1
+#        x_max=5        
+#        num_x=int((x_max-x_min)/delta_x)+1
+#        x_grid=np.linspace(x_min,x_max,num_x)
 
+        x_0=2
         # x_grid for each level, should be an increasing sequence
         X_grids=[]
+        num_x_vec=np.zeros(num_level)
+        b_m=rho
         for i in range(num_level):
+            T_lv=T/num_level*(i+1)
+            x_min=x_0-b_m*T_lv-2*sigma*math.sqrt(T_lv)
+            x_max=x_0+b_m*T_lv+2*sigma*math.sqrt(T_lv)
+            num_x=int((x_max-x_min)/delta_x)+1
+            num_x_vec[i]=num_x
+            x_grid=np.linspace(x_min,x_max,num_x)
             X_grids.append(x_grid)
-        
-        mu_0=np.zeros((num_x))
-        mu_0[int(num_x/2)]=1.0
+        mu_0=np.zeros(int(num_x_vec[0]))
+        mu_0[int(num_x_vec[0]/2)]=1.0
         
         [u_0,mu,u,v,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
         print(all_Y_0_values)
