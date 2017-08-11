@@ -27,67 +27,67 @@ import time
 
 #Define functions b, f, and g for a variety of problems:
 
-def b_example_1(i,j,X,Y,Z,X_initial_probs):
+def b_example_1(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
 #    num_initial=len(X[0])
 #    Y_mean=0
 #    num_per_initial=len(Y[i])/num_initial
 #    for k in range(len(Y[i])):
 #        index=int(math.floor(k/num_per_initial))
 #        Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
-    Y_mean=Y_mean_all[i]
+    #Y_mean=Y_mean_all[i]
     return -rho*Y_mean
 
-def f_example_1(i,j,X,Y,Z,X_initial_probs):
+def f_example_1(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
     return a*Y[i][j]
 
 def g_example_1(index,xi_vals,xi_probs):
     x=xi_vals[index]
     return x
 
-def b_example_72(i,j,X,Y,Z,X_initial_probs):
+def b_example_72(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
     return rho*np.cos(Y[i][j])
 
-def f_example_72(i,j,X,Y,Z,X_initial_probs):
+def f_example_72(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
     return 0
 
 def g_example_72(index,xi_vals,xi_probs):
     x=xi_vals[index]
     return np.sin(x)
 
-def b_example_73(i,j,X,Y,Z,X_initial_probs):
+def b_example_73(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
     return -rho*Y[i][j]
 
-def f_example_73(i,j,X,Y,Z,X_initial_probs):
+def f_example_73(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
 #    num_initial=len(X[0])
 #    X_mean=0
 #    num_per_initial=len(X[i])/num_initial
 #    for k in range(len(X[i])):
 #        index=int(math.floor(k/num_per_initial))
 #        X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
-    X_mean=X_mean_all[i]
+    #X_mean=X_mean_all[i]
     return -np.arctan(X_mean)
 
 def g_example_73(index,xi_vals,xi_probs):
     x=xi_vals[index]
     return np.arctan(x)
 
-def b_example_73_E(i,j,X,Y,Z,X_initial_probs):
-    num_initial=len(X[0])
-    Y_mean=0
-    num_per_initial=len(Y[i])/num_initial
-    for k in range(len(Y[i])):
-        index=int(math.floor(k/num_per_initial))
-        Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
+def b_example_73_E(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
+#    num_initial=len(X[0])
+#    Y_mean=0
+#    num_per_initial=len(Y[i])/num_initial
+#    for k in range(len(Y[i])):
+#        index=int(math.floor(k/num_per_initial))
+#        Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
     return -rho*Y_mean
 
 def g_example_73_E(index,xi_vals,xi_probs):
     X_mean=np.dot(xi_vals,xi_probs)
     return np.arctan(X_mean)
 
-def b_jet_lag_weak(i,j,X,Y,Z,X_initial_probs):
+def b_jet_lag_weak(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
     return omega_0-omega_S-1.0/(R*sigma)*Z[i][j]
 
-def f_jet_lag_weak(i,j,X,Y,Z,X_initial_probs):
+def f_jet_lag_weak(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
     value1=1.0/sigma*(omega_0-omega_S)*Z[i][j]-1.0/(2*R*sigma**2)*(Z[i][j])**2
     num_initial=len(X[0])
     num_per_initial=len(X[i])/num_initial
@@ -104,10 +104,10 @@ def f_jet_lag_weak(i,j,X,Y,Z,X_initial_probs):
 def g_jet_lag(index,xi_vals,xi_probs):
     return 0
 
-def b_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+def b_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
     return omega_0-omega_S-1.0/R*Y[i][j]
 
-def f_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+def f_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
     num_initial=len(X[0])
     num_per_initial=len(X[i])/num_initial
     X_probs=np.zeros((len(X[i])))
@@ -120,67 +120,67 @@ def f_jet_lag_Pontryagin(i,j,X,Y,Z,X_initial_probs):
     value2=F*partial_c_sun
     return value1+value2
 
-def b_trader_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+def b_trader_Pontryagin(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
     return -rho*Y[i][j] #rho=1/c_alpha
 
-def f_trader_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+def f_trader_Pontryagin(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
 #    num_initial=len(X[0])
 #    Y_mean=0
 #    num_per_initial=len(Y[i])/num_initial
 #    for k in range(len(Y[i])):
 #        index=int(math.floor(k/num_per_initial))
 #        Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
-    Y_mean=Y_mean_all[i]
+    #Y_mean=Y_mean_all[i]
     return c_x*X[i][j]+h_bar*rho*Y_mean
 
 def g_trader_Pontryagin(index,xi_vals,xi_probs):
     x=xi_vals[index]
     return c_g *x
 
-def b_trader_weak(i,j,X,Y,Z,X_initial_probs):
+def b_trader_weak(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
     return -rho*Z[i][j]/sigma #rho=1/c_alpha
 
-def f_trader_weak(i,j,X,Y,Z,X_initial_probs):
+def f_trader_weak(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
 #    num_initial=len(X[0])
 #    Z_mean=0
 #    num_per_initial=len(Z[i])/num_initial
 #    for k in range(len(Z[i])):
 #        index=int(math.floor(k/num_per_initial))
 #        Z_mean+=Z[i][k]*X_initial_probs[index]/num_per_initial
-    Z_mean=Z_mean_all[i]
+    #Z_mean=Z_mean_all[i]
     return 0.5*c_x*X[i][j]**2+X[i][j]*h_bar*rho*Z_mean/sigma-rho*0.5*Z[i][j]**2/sigma**2
 
 def g_trader_weak(index,xi_vals,xi_probs):
     x=xi_vals[index]
     return c_g*0.5*x**2
     
-def b_flocking_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+def b_flocking_Pontryagin(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
     return -Y[i][j]
 
-def f_flocking_Pontryagin(i,j,X,Y,Z,X_initial_probs):
+def f_flocking_Pontryagin(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
 #    num_initial=len(X[0])
 #    X_mean=0
 #    num_per_initial=len(X[i])/num_initial
 #    for k in range(len(X[i])):
 #        index=int(math.floor(k/num_per_initial))
 #        X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
-    X_mean=X_mean_all[i]
+    #X_mean=X_mean_all[i]
     return X[i][j]-X_mean
 
 def g_flocking(index,xi_vals,xi_probs):
     return 0
     
-def b_flocking_weak(i,j,X,Y,Z,X_initial_probs):
+def b_flocking_weak(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
     return -Z[i][j]/sigma
 
-def f_flocking_weak(i,j,X,Y,Z,X_initial_probs):
+def f_flocking_weak(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
 #    num_initial=len(X[0])
 #    X_mean=0
 #    num_per_initial=len(X[i])/num_initial
 #    for k in range(len(X[i])):
 #        index=int(math.floor(k/num_per_initial))
 #        X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
-    X_mean=X_mean_all[i]
+    #X_mean=X_mean_all[i]
     return -1.0/(2*sigma**2)*(Z[i][j])**2+0.5*(X[i][j]-X_mean)**2
 
 #This function is essentially solver_bar, except it is used for the
@@ -190,7 +190,7 @@ def continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
     
     num_initial=len(X_ini[0])
     Y_0_values=np.zeros((num_keep))
-    index=0
+    index_num_keep=0
     X=X_ini
     Y=Y_ini
     Z=Z_ini
@@ -203,25 +203,57 @@ def continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
         for j in range(num_initial*2**(num_t_fine-1)):
             Y[num_t_fine-1][j]=g(j,X[num_t_fine-1],x_probs)
             
-            for index2 in range(J_solver_bar):
-                for i in reversed(range(num_t_fine-1)):
-                    for j in range(num_initial*2**i):
-                        #temp_Y=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z,X_initial_probs)+delta_t_fine*f(i+1,2*j+1,X,Y,Z,X_initial_probs))/2.0
-                        temp_Y=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y,Z,X_initial_probs)
-                        Y[i][j]=temp_Y
-                        Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
-                for i in range(num_t_fine-1):
-                    for j in range(num_initial*2**i):
-                        X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
-                        X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
+        for index2 in range(J_solver_bar):
+            for i in reversed(range(num_t_fine-1)):
+                X_mean=0
+                Y_mean=0
+                Z_mean=0
+                num_per_initial=len(X[i])/num_initial
+                if problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+                    for k2 in range(len(X[i])):
+                        index=int(math.floor(k2/num_per_initial))
+                        X_mean+=X[i][k2]*X_initial_probs[index]/num_per_initial
+                elif problem=='ex_1' or problem=='trader_Pontryagin':
+                    for k2 in range(len(Y[i])):
+                        index=int(math.floor(k2/num_per_initial))
+                        Y_mean+=Y[i][k2]*X_initial_probs[index]/num_per_initial
+                elif problem=='trader_weak':
+                    for k2 in range(len(Z[i])):
+                        index=int(math.floor(k2/num_per_initial))
+                        Z_mean+=Z[i][k2]*X_initial_probs[index]/num_per_initial
+                for j in range(num_initial*2**i):
+                    #temp_Y=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z,X_initial_probs)+delta_t_fine*f(i+1,2*j+1,X,Y,Z,X_initial_probs))/2.0
+                    temp_Y=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean)
+                    Y[i][j]=temp_Y
+                    Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
+            for i in range(num_t_fine-1):
+                X_mean=0
+                Y_mean=0
+                Z_mean=0
+                num_per_initial=len(X[i])/num_initial
+                if problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+                    for k2 in range(len(X[i])):
+                        index=int(math.floor(k2/num_per_initial))
+                        X_mean+=X[i][k2]*X_initial_probs[index]/num_per_initial
+                elif problem=='ex_1' or problem=='trader_Pontryagin':
+                    for k2 in range(len(Y[i])):
+                        index=int(math.floor(k2/num_per_initial))
+                        Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
+                elif problem=='trader_weak':
+                    for k in range(len(Z[i])):
+                        index=int(math.floor(k2/num_per_initial))
+                        Z_mean+=Z[i][k2]*X_initial_probs[index]/num_per_initial
+                for j in range(num_initial*2**i):
+                    X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean)+sigma*delta_W
+                    X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean)-sigma*delta_W
 
         if k>J-num_keep-1:
-            Y_0_values[index]=Y[0][0]
-            index+=1
+            Y_0_values[index_num_keep]=Y[0][0]
+            index_num_keep+=1
     return [X,Y,Z,Y_0_values]
 
 #solver_bar as defined in Chassagneux, Crisan, Delarue
-def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
+def solver_bar(X,Y_terminal,X_initial_probs,Y_old,Z_old):
     num_initial=len(X[0])
     Y=[]
     Z=[]
@@ -235,84 +267,56 @@ def solver_bar(X,Y_terminal,X_initial_probs,Y_old):
         Y[num_t_fine-1][j]=Y_terminal[j]
     #Y[num_t_fine-1,:]=Y_terminal
 
-    global X_mean_all
-    global Y_mean_all
-    global Z_mean_all
+
     num_initial=len(X[0])
-    
-    if problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
-        X_mean_all=np.zeros((num_t_fine))
-        for i in range(num_t_fine):
-            X_mean=0
-            num_per_initial=len(X[i])/num_initial
-            for k in range(len(X[i])):
-                index=int(math.floor(k/num_per_initial))
-                X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
-            X_mean_all[i]=X_mean
-
-    if problem=='ex_1' or problem=='trader_Pontryagin':
-        Y_mean_all=np.zeros((num_t_fine))
-        for i in range(num_t_fine):
-            Y_mean=0
-            num_per_initial=len(Y[i])/num_initial
-            for k in range(len(Y[i])):
-                index=int(math.floor(k/num_per_initial))
-                Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
-            Y_mean_all[i]=Y_mean
-    elif problem=='trader_weak':
-        Z_mean_all=np.zeros((num_t_fine))
-        for i in range(num_t_fine):
-            Z_mean=0
-            num_per_initial=len(Z[i])/num_initial
-            for k in range(len(Z[i])):
-                index=int(math.floor(k/num_per_initial))
-                Z_mean+=Z[i][k]*X_initial_probs[index]/num_per_initial
-            Z_mean_all[i]=Z_mean
-
     for k in range(J_solver_bar):
         if k>0:
             Y_old=Y
-            
-        if problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
-            X_mean_all=np.zeros((num_t_fine))
-            for i in range(num_t_fine):
-                X_mean=0
-                num_per_initial=len(X[i])/num_initial
-                for k in range(len(X[i])):
-                    index=int(math.floor(k/num_per_initial))
-                    X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
-                X_mean_all[i]=X_mean
+            Z_old=Z
         
         for n in range(num_t_fine-1):
             i=num_t_fine-2-n
+            X_mean=0
+            Y_mean=0
+            Z_mean=0
+            num_per_initial=len(X[i])/num_initial
+            if problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+                for k in range(len(X[i])):
+                    index=int(math.floor(k/num_per_initial))
+                    X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
+            elif problem=='ex_1' or problem=='trader_Pontryagin':
+                for k in range(len(Y[i])):
+                    index=int(math.floor(k/num_per_initial))
+                    Y_mean+=Y_old[i][k]*X_initial_probs[index]/num_per_initial
+            elif problem=='trader_weak':
+                for k in range(len(Z[i])):
+                    index=int(math.floor(k/num_per_initial))
+                    Z_mean+=Z_old[i][k]*X_initial_probs[index]/num_per_initial
             for j in range(num_initial*2**i):
                 #Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1]+delta_t_fine*f(i+1,2*j,X,Y,Z,X_initial_probs)+delta_t_fine*f(i+1,2*j+1,X,Y,Z,X_initial_probs))/2.0
-                Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y_old,Z,X_initial_probs)
+                Y[i][j]=(Y[i+1][2*j]+Y[i+1][2*j+1])/2.0+delta_t_fine*f(i,j,X,Y_old,Z_old,X_initial_probs,X_mean,Y_mean,Z_mean)
                 Z[i][j]=delta_W/delta_t_fine*(Y[i+1][2*j]-Y[i+1][2*j+1])/2.0
 
-        if problem=='ex_1' or problem=='trader_Pontryagin':
-            Y_mean_all=np.zeros((num_t_fine))
-            for i in range(num_t_fine):
-                Y_mean=0
-                num_per_initial=len(Y[i])/num_initial
+        for i in range(num_t_fine-1):
+            X_mean=0
+            Y_mean=0
+            Z_mean=0
+            num_per_initial=len(X[i])/num_initial
+            if problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+                for k in range(len(X[i])):
+                    index=int(math.floor(k/num_per_initial))
+                    X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
+            elif problem=='ex_1' or problem=='trader_Pontryagin':
                 for k in range(len(Y[i])):
                     index=int(math.floor(k/num_per_initial))
                     Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
-                Y_mean_all[i]=Y_mean
-        elif problem=='trader_weak':
-            Z_mean_all=np.zeros((num_t_fine))
-            for i in range(num_t_fine):
-                Z_mean=0
-                num_per_initial=len(Z[i])/num_initial
+            elif problem=='trader_weak':
                 for k in range(len(Z[i])):
                     index=int(math.floor(k/num_per_initial))
                     Z_mean+=Z[i][k]*X_initial_probs[index]/num_per_initial
-                Z_mean_all[i]=Z_mean
-
-        for i in range(num_t_fine-1):
             for j in range(num_initial*2**i):
-                X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)+sigma*delta_W
-                X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs)-sigma*delta_W
+                X[i+1][2*j]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean)+sigma*delta_W
+                X[i+1][2*j+1]=X[i][j]+delta_t_fine*b(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean)-sigma*delta_W
                 if periodic_2_pi:
                     X[i+1][2*j]=X[i+1][2*j]%(2*np.pi)
                     X[i+1][2*j+1]=X[i+1][2*j+1]%(2*np.pi)
@@ -341,10 +345,13 @@ def solver(level,xi_vals,xi_probs):
     Y_terminal=np.zeros(num_initial*(2**(num_t_fine-1)))
     num_initial=len(X[0])
     Y=[]
+    Z=[]
     for i in range(num_t_fine):
         row2=np.zeros((num_initial*2**i))
         Y.append(row2)
-    X=(solver_bar(X,Y_terminal,xi_probs,Y))[0]
+        row3=np.zeros((num_initial*2**i))
+        Z.append(row3)
+    X=(solver_bar(X,Y_terminal,xi_probs,Y,Z))[0]
     
     if level==0:
         Y_0_values=np.zeros((num_keep))
@@ -353,7 +360,7 @@ def solver(level,xi_vals,xi_probs):
     for j in range(J):
         X_terminal=X[num_t_fine-1]
         Y_terminal=solver(level+1,X_terminal,X_terminal_probs)
-        [X,Y,Z]=solver_bar(X,Y_terminal,xi_probs,Y)
+        [X,Y,Z]=solver_bar(X,Y_terminal,xi_probs,Y,Z)
         if level==0 and j>J-num_keep-1:
             Y_0_values[index]=Y[0]
             index+=1
@@ -368,7 +375,7 @@ if __name__ == '__main__':
     problem ='ex_73'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
-    execution='ordinary'
+    execution='continuation_sigma'
     # possible values in order of appearance:
     # ordinary, changing_rho, changing_sigma, continuation_rho, continuation_sigma
     global b
@@ -472,7 +479,7 @@ if __name__ == '__main__':
         x_0=[0.0]
         x_0_probs=[1.0]
         sigma=1.0
-        rho=3.5
+        rho=2.0
     elif problem=='ex_73':
         b=b_example_73
         f=f_example_73
@@ -608,8 +615,8 @@ if __name__ == '__main__':
         delta_rho=0.1
         rho_min=1.0
         rho_max=3.0
-        num_rho=int((sigma_max-sigma_min)/delta_sigma)+1
-        rho_values=np.linspace(sigma_min,sigma_max,num_sigma)
+        num_rho=int((rho_max-rho_min)/delta_rho)+1
+        rho_values=np.linspace(rho_min,rho_max,num_rho)
         all_Y_0_values=np.zeros((num_rho,num_keep))
         
         X=[]
