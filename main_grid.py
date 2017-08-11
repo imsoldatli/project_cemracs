@@ -586,9 +586,6 @@ def solver_grid(level,mu_0,X_grids):
         for j2 in range(J_1):
             [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
             mu=forward_lv(u,v,X_grids[level],mu_0)
-            print('level: ',level)
-            print(mu[0][0:5])
-            print(Y_terminal[0:5])
         if level==0 and j>J_2-num_keep-1:
             all_Y_0_values[index]=np.dot(u[0],mu_0)
             index+=1
@@ -605,12 +602,12 @@ if __name__ == '__main__':
 
     global problem
 
-    problem='ex_72'
+    problem='flocking_Pontryagin'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='continuation_in_time'
+    execution='ordinary'
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
     #true_start, continuation_in_time
@@ -900,8 +897,8 @@ if __name__ == '__main__':
         periodic_2_pi=False
         J=25
         num_keep=5
-        T=10
-        num_t=10*20
+        T=1
+        num_t=20
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
