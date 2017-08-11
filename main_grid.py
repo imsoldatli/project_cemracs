@@ -475,15 +475,13 @@ def forward_lv(u,v,x_grid_lv,mu_0):
     return mu
 
 
-def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):            
+def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):     
     num_x_lv=len(x_grid_lv)
     u=np.zeros((num_t,num_x_lv))
     v=np.zeros((num_t,num_x_lv))
     
     u[num_t-1,:]=Y_terminal
     v[num_t-1,:]=v_old[num_t-1,:]
-    
-    linear_int=False
     
     for i in reversed(range(num_t-1)):
         convolution=0
@@ -511,47 +509,44 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
             x_up=x_grid_lv[j]+b(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)*delta_t+sigma*sqrt_delta_t
             j_up=pi_lv(x_up,x_grid_lv)
 
-            if i==num_t-2:
-                u[i][j]=(Y_terminal[j_down]+Y_terminal[j_up])/2.0+delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
-                v[i][j]=1.0/sqrt_delta_t*(Y_terminal[j_up]-Y_terminal[j_down])
-        
-            else:
-                if linear_int:
-                    if x_down>x_grid_lv[j_down]:
-                        if j_down<num_x_lv-1:
-                            u_down= lin_int(x_grid_lv[j_down],x_grid_lv[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
-                        else:
-                            u_down=u[i+1][j_down]
+            if linear_int:
+                if x_down>x_grid_lv[j_down]:
+                    if j_down<num_x_lv-1:
+                        u_down= lin_int(x_grid_lv[j_down],x_grid_lv[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
                     else:
-                        if j_down>0:
-                            u_down= lin_int(x_grid_lv[j_down],x_grid_lv[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
-                        else:
-                            u_down=u[i+1][j_down]
-                    
-                    if x_up>x_grid_lv[j_up]:
-                        if j_up<num_x_lv-1:
-                            u_up= lin_int(x_grid_lv[j_up],x_grid_lv[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
-                        else:
-                            u_up=u[i+1][j_up]
-                    else:
-                        if j_up>0:
-                            u_up= lin_int(x_grid_lv[j_up],x_grid_lv[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
-                        else:
-                            u_up=u[i+1][j_up]
+                        u_down=u[i+1][j_down]
                 else:
+                    if j_down>0:
+                        u_down= lin_int(x_grid_lv[j_down],x_grid_lv[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
+                    else:
+                        u_down=u[i+1][j_down]
                 
-                    u_up = u[i+1][j_up]
-                    u_down = u[i+1][j_down]
-                
-                u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
-                
-                v[i][j] = 1.0/sqrt_delta_t*(u_up-u_down)
+                if x_up>x_grid_lv[j_up]:
+                    if j_up<num_x_lv-1:
+                        u_up= lin_int(x_grid_lv[j_up],x_grid_lv[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
+                    else:
+                        u_up=u[i+1][j_up]
+                else:
+                    if j_up>0:
+                        u_up= lin_int(x_grid_lv[j_up],x_grid_lv[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+                    else:
+                        u_up=u[i+1][j_up]
+            else:
+            
+                u_up = u[i+1][j_up]
+                u_down = u[i+1][j_down]
+            
+            u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+            
+            v[i][j] = 1.0/sqrt_delta_t*(u_up-u_down)
 
     return [u,v]
 
 def solver_grid(level,mu_0,X_grids):
+    #print('level: ',level)
 #    num_x=len(mu)
-    if level>=num_level:
+    if level==num_level:
+        #print('break')
         Y_terminal=g(X_grids[level-1])
         return Y_terminal
     
@@ -559,7 +554,8 @@ def solver_grid(level,mu_0,X_grids):
     u=np.zeros((num_t,num_x_lv))
     v=np.zeros((num_t,num_x_lv))
     mu=np.zeros((num_t,num_x_lv))
-    mu[0,:]=mu_0
+    for k in range(num_t):
+        mu[k]=mu_0
 #    if level==num_level-1:
 #        Y_terminal=g(X_grids[level])
 #    else:
@@ -569,6 +565,9 @@ def solver_grid(level,mu_0,X_grids):
     for j in range(J_1):
         [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
         mu=forward_lv(u,v,X_grids[level],mu_0)
+    u=np.zeros((num_t,num_x_lv))
+    v=np.zeros((num_t,num_x_lv))
+    
     mu_next=mu[num_t-1,:]
     if level<num_level-1:
         mu_next=transform_grid(X_grids[level],mu_next,X_grids[level+1])
@@ -578,18 +577,21 @@ def solver_grid(level,mu_0,X_grids):
         index=0
         
     for j in range(J_2):
+        #print('loop in level: ',level)
+        #print('j=',j)
         Y_terminal=solver_grid(level+1,mu_next,X_grids)
+        #print('back in level: ',level)
         if level<num_level-1:
             Y_terminal=transform_grid(X_grids[level+1],Y_terminal,X_grids[level])
         for j2 in range(J_1):
             [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
             mu=forward_lv(u,v,X_grids[level],mu_0)
         if level==0 and j>J_2-num_keep-1:
-            all_Y_0_values[index]=np.dot(u[0,:],mu_0)
+            all_Y_0_values[index]=np.dot(u[0],mu_0)
             index+=1
             
     if level==0:
-        return [u[0,:],all_Y_0_values]
+        return [u[0,:],mu,u,v,all_Y_0_values]
     return u[0,:]
 
 
@@ -764,7 +766,7 @@ if __name__ == '__main__':
         delta_x=delta_t**(2)
         x_min=-1
         x_max=5
-        num_x=int((x_max-x_min)/delta_x+1)
+        num_x=int((x_max-x_min)/delta_x)+1
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
         rho=1
@@ -1020,7 +1022,7 @@ if __name__ == '__main__':
                     index2+=1
         print all_Y_0_values[index]
     
-    elif execution=='changing rho':
+    elif execution=='changing_rho':
         num_rho=15
         rho_values=np.linspace(2.5,5,num_rho)
 
@@ -1160,14 +1162,12 @@ if __name__ == '__main__':
         delta_t=T/num_level/(num_t-1)
         sqrt_delta_t=math.sqrt(delta_t)
         #delta_x=(delta_t*num_level)**2
-        delta_x=(delta_t)**2
-        num_x=int((x_max_goal-x_min_goal)/delta_x)+1
-        if num_x%2==0:
-            num_x+=1
-        x_center=(x_min_goal+x_max_goal)/2.0
-        x_grid=np.linspace(x_center-(num_x-1)/2*delta_x,x_center+(num_x-1)/2*delta_x,num_x)
-        x_max=x_grid[num_x-1]
-        x_min=x_grid[0]
+        delta_x=delta_t**(2)
+        x_min=-1
+        x_max=5
+        num_x=int((x_max-x_min)/delta_x)+1
+        x_grid=np.linspace(x_min,x_max,num_x)
+
         # x_grid for each level, should be an increasing sequence
         X_grids=[]
         for i in range(num_level):
@@ -1176,9 +1176,7 @@ if __name__ == '__main__':
         mu_0=np.zeros((num_x))
         mu_0[int(num_x/2)]=1.0
         
-        [u_0,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
-        Y_0=np.dot(u_0,mu_0)
-        print(Y_0)
+        [u_0,mu,u,v,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
         print(all_Y_0_values)
     end_time=time.time()
     print('Time elapsted:',end_time-start_time)
