@@ -67,7 +67,7 @@ def b_jet_lag_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     return omega_0-omega_S-1.0/(R*sigma)*v[i][j]
 
 def f_jet_lag_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
-    value1=1.0/sigma*(omega_0-omega_S)*v[i][j]-1.0/(2*R*sigma**2)*(v[i][j])**2
+    value1=R/(2*sigma**2)*(v[i][j])**2
 
 #    mu_pad=np.zeros((3*num_x-2))
 #    mu_pad[0:num_x]=mu[i][:]
@@ -569,11 +569,6 @@ def solver_grid(level,mu_0,X_grids):
         mu=forward_lv(u,v,X_grids[level],mu_0)
     u=np.zeros((num_t,num_x_lv))
     v=np.zeros((num_t,num_x_lv))
-    
-    if level==num_level-1:
-        Y_terminal=g(X_grids[level])
-    else:
-        Y_terminal=np.zeros(num_x_lv)
 
     if level==0:
         all_Y_0_values=np.zeros((num_keep))
@@ -612,12 +607,12 @@ if __name__ == '__main__':
 
     global problem
 
-    problem='ex_1'
+    problem='jetlag_weak'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='continuation_in_time'
+    execution='ordinary'
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
     #true_start, continuation_in_time
@@ -749,7 +744,7 @@ if __name__ == '__main__':
         f=f_example_72
         g=g_example_72
         periodic_2_pi=False
-        J=10
+        J=25
         num_keep=5
         T=1
         num_t=12
@@ -1172,7 +1167,7 @@ if __name__ == '__main__':
         J_2=25
         global num_level
         
-        num_level=2
+        num_level=1
 
         num_t=12
         delta_t=T/num_level/(num_t-1)
