@@ -612,12 +612,14 @@ if __name__ == '__main__':
 
     global problem
 
-    problem='ex_1'
+    problem='ex_73'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='continuation_in_time'
+#    execution='continuation_in_time'
+    execution='ordinary'
+
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
     #true_start, continuation_in_time
@@ -770,7 +772,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=12
+        num_t=13
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -1172,12 +1174,12 @@ if __name__ == '__main__':
         J_2=25
         global num_level
         
-        num_level=2
+        num_level=1
 
-        num_t=12
+        num_t=13
         delta_t=T/num_level/(num_t-1)
         sqrt_delta_t=math.sqrt(delta_t)
-        delta_x=(delta_t*num_level)**2
+        delta_x=(delta_t)**2
         #delta_x=delta_t**(2)
         x_min=-1
         x_max=5
