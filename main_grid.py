@@ -556,11 +556,13 @@ def solver_grid(level,mu_0,X_grids):
     mu=np.zeros((num_t,num_x_lv))
     for k in range(num_t):
         mu[k]=mu_0
-#    if level==num_level-1:
-#        Y_terminal=g(X_grids[level])
-#    else:
-#        Y_terminal=np.zeros(num_x_lv)
-    Y_terminal=np.zeros(num_x_lv)
+    if level==num_level-1:
+        Y_terminal=g(X_grids[level])
+    else:
+        Y_terminal=np.zeros(num_x_lv)
+
+
+    #Y_terminal=np.zeros(num_x_lv)
     
     for j in range(J_1):
         [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
@@ -568,11 +570,16 @@ def solver_grid(level,mu_0,X_grids):
     u=np.zeros((num_t,num_x_lv))
     v=np.zeros((num_t,num_x_lv))
     
-
+    if level==num_level-1:
+        Y_terminal=g(X_grids[level])
+    else:
+        Y_terminal=np.zeros(num_x_lv)
 
     if level==0:
         all_Y_0_values=np.zeros((num_keep))
         index=0
+    
+    thing1=mu
         
     for j in range(J_2):
         mu_next=mu[num_t-1,:]
@@ -580,7 +587,9 @@ def solver_grid(level,mu_0,X_grids):
             mu_next=transform_grid(X_grids[level],mu_next,X_grids[level+1])
         #print('loop in level: ',level)
         #print('j=',j)
+        #print(g(mu_next))
         Y_terminal=solver_grid(level+1,mu_next,X_grids)
+        #print(Y_terminal)
         #print('back in level: ',level)
         if level<num_level-1:
             Y_terminal=transform_grid(X_grids[level+1],Y_terminal,X_grids[level])
@@ -592,7 +601,7 @@ def solver_grid(level,mu_0,X_grids):
             index+=1
             
     if level==0:
-        return [u[0,:],mu,u,v,all_Y_0_values]
+        return [u[0,:],mu,u,v,all_Y_0_values,thing1]
     return u[0,:]
 
 
@@ -603,7 +612,7 @@ if __name__ == '__main__':
 
     global problem
 
-    problem='ex_73'
+    problem='ex_1'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
@@ -954,6 +963,9 @@ if __name__ == '__main__':
         u=np.zeros((num_t,num_x))
         v=np.zeros((num_t,num_x))
         
+        thing2=mu
+        
+        
         for j in range(J):
             [u,v]=backward(mu,u,v)            
             mu=forward(u,v,mu_0)
@@ -1161,43 +1173,45 @@ if __name__ == '__main__':
         J_2=25
         global num_level
         
-        num_level=2
+        num_level=1
 
-        num_t=7
+        num_t=12
         delta_t=T/num_level/(num_t-1)
         sqrt_delta_t=math.sqrt(delta_t)
         delta_x=(delta_t*num_level)**2
         #delta_x=delta_t**(2)
-#        x_min=-1
-#        x_max=5
-#        num_x=int((x_max-x_min)/delta_x)+1
-#        x_grid=np.linspace(x_min,x_max,num_x)
-#
-#        # x_grid for each level, should be an increasing sequence
-#        X_grids=[]
-#        for i in range(num_level):
-#            X_grids.append(x_grid)
-#        mu_0=np.zeros((num_x))
-#        mu_0[int(num_x/2)]=1.0
+        x_min=-1
+        x_max=5
+        num_x=int((x_max-x_min)/delta_x)+1
+        x_grid=np.linspace(x_min,x_max,num_x)
 
-        x_0=2
         # x_grid for each level, should be an increasing sequence
         X_grids=[]
-        num_x_vec=np.zeros(num_level)
-        b_m=rho
         for i in range(num_level):
-            T_lv=T/num_level*(i+1)
-            x_min=x_0-b_m*T_lv-2*sigma*math.sqrt(T_lv)
-            x_max=x_0+b_m*T_lv+2*sigma*math.sqrt(T_lv)
-            num_x=int((x_max-x_min)/delta_x)+1
-            num_x_vec[i]=num_x
-            x_grid=np.linspace(x_min,x_max,num_x)
             X_grids.append(x_grid)
-        mu_0=np.zeros(int(num_x_vec[0]))
-        mu_0[int(num_x_vec[0]/2)]=1.0
+        mu_0=np.zeros((num_x))
+        mu_0[int(num_x/2)]=1.0
+
+              
+
+#        x_0=2
+#        # x_grid for each level, should be an increasing sequence
+#        X_grids=[]
+#        num_x_vec=np.zeros(num_level)
+#        b_m=rho
+#        for i in range(num_level):
+#            T_lv=T/num_level*(i+1)
+#            x_min=x_0-b_m*T_lv-3*sigma*math.sqrt(T_lv)
+#            x_max=x_0+b_m*T_lv+3*sigma*math.sqrt(T_lv)
+#            num_x=int((x_max-x_min)/delta_x)+1
+#            num_x_vec[i]=num_x
+#            x_grid=np.linspace(x_min,x_max,num_x)
+#            X_grids.append(x_grid)
+#        mu_0=np.zeros(int(num_x_vec[0]))
+#        mu_0[int(num_x_vec[0]/2)]=1.0
 
         
-        [u_0,mu,u,v,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
+        [u_0,mu,u,v,all_Y_0_values,thing1]=solver_grid(0,mu_0,X_grids)
         print(all_Y_0_values)
     end_time=time.time()
     print('Time elapsted:',end_time-start_time)
