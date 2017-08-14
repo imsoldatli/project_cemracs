@@ -328,9 +328,9 @@ def backward(mu,u_old,v_old):
                 else:
                     u_up = u[i+1][j_up]
                     u_down = u[i+1][j_down]
-
+    
                     u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
-
+    
                     v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
                     if v[i,j]<bounds[0,i]:
                         v[i,j]=bounds[0,i]
@@ -365,43 +365,43 @@ def backward(mu,u_old,v_old):
 
                 j_up = pi(x_up)
 
-                if i==num_t-2:
-
-                    u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
-
-                    v[i][j] = 1.0/sqrt_delta_t * (g(x_up) - g(x_down))
-
-                else:
-                    if linear_int:
-                        if x_down>x_grid[j_down]:
-                            if j_down<num_x-1:
-                                u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
-                            else:
-                                u_down=u[i+1][j_down]
+#                if i==num_t-2:
+#
+#                    u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+#
+#                    v[i][j] = 1.0/sqrt_delta_t * (g(x_up) - g(x_down))
+#
+#                else:
+                if linear_int:
+                    if x_down>x_grid[j_down]:
+                        if j_down<num_x-1:
+                            u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
                         else:
-                            if j_down>0:
-                                u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
-                            else:
-                                u_down=u[i+1][j_down]
-
-                        if x_up>x_grid[j_up]:
-                            if j_up<num_x-1:
-                                u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
-                            else:
-                                u_up=u[i+1][j_up]
-                        else:
-                            if j_up>0:
-                                u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
-                            else:
-                                u_up=u[i+1][j_up]
+                            u_down=u[i+1][j_down]
                     else:
+                        if j_down>0:
+                            u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
+                        else:
+                            u_down=u[i+1][j_down]
 
-                        u_up = u[i+1][j_up]
-                        u_down = u[i+1][j_down]
+                    if x_up>x_grid[j_up]:
+                        if j_up<num_x-1:
+                            u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
+                        else:
+                            u_up=u[i+1][j_up]
+                    else:
+                        if j_up>0:
+                            u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+                        else:
+                            u_up=u[i+1][j_up]
+                else:
 
-                    u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+                    u_up = u[i+1][j_up]
+                    u_down = u[i+1][j_down]
 
-                    v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
+                u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+
+                v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
 
     return [u,v]
 
@@ -579,7 +579,6 @@ def solver_grid(level,mu_0,X_grids):
         all_Y_0_values=np.zeros((num_keep))
         index=0
     
-    thing1=mu
         
     for j in range(J_2):
         mu_next=mu[num_t-1,:]
@@ -596,6 +595,7 @@ def solver_grid(level,mu_0,X_grids):
         for j2 in range(J_1):
             [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
             mu=forward_lv(u,v,X_grids[level],mu_0)
+        thing1=u
         if level==0 and j>J_2-num_keep-1:
             all_Y_0_values[index]=np.dot(u[0],mu_0)
             index+=1
@@ -963,12 +963,11 @@ if __name__ == '__main__':
         u=np.zeros((num_t,num_x))
         v=np.zeros((num_t,num_x))
         
-        thing2=mu
-        
         
         for j in range(J):
             [u,v]=backward(mu,u,v)            
             mu=forward(u,v,mu_0)
+            thing2=u
             if j>J-num_keep-1:
                 all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
                 index2+=1
@@ -1173,7 +1172,7 @@ if __name__ == '__main__':
         J_2=25
         global num_level
         
-        num_level=1
+        num_level=2
 
         num_t=12
         delta_t=T/num_level/(num_t-1)
