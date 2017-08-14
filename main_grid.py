@@ -663,7 +663,7 @@ if __name__ == '__main__':
         num_keep=5
         T=24.0*1
         #num_t=int(T)*5+1
-        num_t=697
+        num_t=50
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         #delta_x=delta_t**2
@@ -697,7 +697,7 @@ if __name__ == '__main__':
         num_keep=5
         T=24.0*1
         #num_t=int(T)*5+1
-        num_t=697
+        num_t=50
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         #delta_x=delta_t**2
@@ -1167,13 +1167,13 @@ if __name__ == '__main__':
         J_2=25
         global num_level
         
-        num_level=1
+        num_level=2
 
-        num_t=12
+        num_t=7
         delta_t=T/num_level/(num_t-1)
         sqrt_delta_t=math.sqrt(delta_t)
-        delta_x=(delta_t*num_level)**2
-        #delta_x=delta_t**(2)
+        #delta_x=(delta_t*num_level)**2
+        delta_x=delta_t**(2)
         x_min=-1
         x_max=5
         num_x=int((x_max-x_min)/delta_x)+1
