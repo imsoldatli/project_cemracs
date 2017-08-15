@@ -133,7 +133,7 @@ def b_trader_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
 def f_trader_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     #Z_mean=np.dot(v[i],mu[i])
     #Z_mean=Z_mean_all[i]
-    return 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
+    return 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma+rho*0.5*v[i][j]**2/sigma**2
 
 def g_trader_weak(x):
     return c_g*0.5*x**2
@@ -612,12 +612,12 @@ if __name__ == '__main__':
 
     global problem
 
-    problem='ex_1'
+    problem='trader_weak'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='continuation_in_time'
+    execution='ordinary'
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
     #true_start, continuation_in_time
@@ -782,8 +782,8 @@ if __name__ == '__main__':
         rho=1
     elif problem=='trader_Pontryagin':
         sigma=0.7
-        rho=1
-        c_x=4
+        rho=0.3
+        c_x=2
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -803,7 +803,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=12
+        num_t=20
         delta_t=(T-0.06)/(num_t-1)
         t_grid=np.linspace(0.06,T,num_t)
         delta_x=delta_t**(2)
@@ -815,8 +815,8 @@ if __name__ == '__main__':
 # convergence for rho=0.1
     elif problem=='trader_weak':
         sigma=0.7
-        rho=1
-        c_x=4
+        rho=0.3
+        c_x=2
         h_bar=2
         c_g=0.3
         b=b_trader_weak
@@ -1075,11 +1075,11 @@ if __name__ == '__main__':
             print all_Y_0_values[index]
 
             plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index],'o')
-        plt.title('$sigma = 0.7$, $rho \in [1,10]$, $c_x = 2, $h_bar=2$, $c_g=0.3$')
+        plt.title('sigma = 0.7, rho \in [3.5,5], c_x = 2, h_{bar}=2, c_g=0.3')
         plt.show()
 
-        #plt.savefig('./Data/trader/grid_trader_pontryagin_changing_cx.eps')
-        #np.save('./Data/trader/grid_trader_pontryagin_rho_larger_x_domain.npy',all_Y_0_values)
+        plt.savefig('./Data/trader/grid_trader_pontryagin_changing_rho.eps')
+        np.save('./Data/trader/grid_trader_pontryagin_rho_changing_rho.npy',all_Y_0_values)
 
 
 
