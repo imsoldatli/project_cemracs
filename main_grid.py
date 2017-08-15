@@ -624,23 +624,14 @@ if __name__ == '__main__':
 
 
     global problem
-
-<<<<<<< HEAD
-    problem='trader_weak'
-=======
-    problem='jetlag_weak_trunc'
->>>>>>> 0e5860e9598409a94f4789eb7d089e9d46c5219c
+    problem='jetlag_Pontryagin'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-<<<<<<< HEAD
-    execution='ordinary'
-=======
 #    execution='continuation_in_time'
     execution='ordinary'
 
->>>>>>> 0e5860e9598409a94f4789eb7d089e9d46c5219c
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
     #true_start, continuation_in_time
@@ -691,13 +682,17 @@ if __name__ == '__main__':
         num_keep=5
         T=24.0*1
         #num_t=int(T)*5+1
-        num_t=50
-        delta_t=T/(num_t-1)
-        t_grid=np.linspace(0,T,num_t)
+#        num_t=50
+#        delta_t=T/(num_t-1)
+#        t_grid=np.linspace(0,T,num_t)
         #delta_x=delta_t**2
         #num_x=int((2*np.pi)/(delta_x))+1
         num_x=158
         delta_x=2*np.pi/num_x
+        partial_b_max=0.03
+        delta_t=(T*delta_x/(2*math.sqrt(2*partial_b_max*math.exp(4*partial_b_max*T))))**(2.0/3)
+        num_t=int(T/delta_t)+1
+        delta_t=T/(num_t-1)
         x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
         
         x_min=x_grid[0]
