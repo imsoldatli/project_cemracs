@@ -80,6 +80,24 @@ def f_jet_lag_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     c_sun=0.5*(np.sin((p-x_grid[j])/2.0))**2
     value3=F*c_sun
     return value1+value2+value3
+    
+def f_jet_lag_weak_trunc(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
+    temp=v[i][j]
+    temp=max(temp,bounds[0,i])
+    temp=min(temp,bounds[1,i])
+    value1=R/(2*sigma**2)*(temp)**2
+
+#    mu_pad=np.zeros((3*num_x-2))
+#    mu_pad[0:num_x]=mu[i][:]
+#    c_bar_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+#    c_bar=c_bar_2[num_x-1:2*num_x-1][j]
+#    c_bar=np.real(c_bar)
+    #c_bar=np.dot(0.5*(np.sin((x_grid[j]-x_grid)/2.0))**2,mu[i])
+    c_bar=convolution[j]
+    value2=K*c_bar
+    c_sun=0.5*(np.sin((p-x_grid[j])/2.0))**2
+    value3=F*c_sun
+    return value1+value2+value3
 
 def g_jet_lag(x):
     return 0
@@ -256,7 +274,7 @@ def forward(u,v,mu_0):
         X_mean=0
         Y_mean=0
         Z_mean=0
-        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin' or problem=='jetlag_weak_trunc':
             convolution=np.zeros((num_x))
             mu_pad=np.zeros((3*num_x-2))
             mu_pad[0:num_x]=mu[i][:]
@@ -287,13 +305,13 @@ def backward(mu,u_old,v_old):
     
     u[num_t-1,:] = g(x_grid)
     v[num_t-1,:] = v_old[num_t-1,:]
-    if problem=='trader_weak_trunc':
+    if problem=='trader_weak_trunc' or problem=='jetlag_weak_trunc':
         for i in reversed(range(num_t-1)):
             convolution=0
             X_mean=0
             Y_mean=0
             Z_mean=0
-            if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+            if problem=='jetlag_weak' or problem=='jetlag_Pontryagin' or problem=='jetlag_weak_trunc':
                 convolution=np.zeros((num_x))
                 mu_pad=np.zeros((3*num_x-2))
                 mu_pad[0:num_x]=mu[i][:]
@@ -343,7 +361,7 @@ def backward(mu,u_old,v_old):
             X_mean=0
             Y_mean=0
             Z_mean=0
-            if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+            if problem=='jetlag_weak' or problem=='jetlag_Pontryagin' or problem=='jetlag_weak_trunc':
                 convolution=np.zeros((num_x))
                 mu_pad=np.zeros((3*num_x-2))
                 mu_pad[0:num_x]=mu[i][:]
@@ -450,7 +468,7 @@ def forward_lv(u,v,x_grid_lv,mu_0):
         X_mean=0
         Y_mean=0
         Z_mean=0
-        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin' or problem=='jetlag_weak_trunc':
             convolution=np.zeros((num_x_lv))
             mu_pad=np.zeros((3*num_x_lv-2))
             mu_pad[0:num_x_lv]=mu[i][:]
@@ -488,7 +506,7 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
         X_mean=0
         Y_mean=0
         Z_mean=0
-        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin' or problem=='jetlag_weak_trunc':
             convolution=np.zeros((num_x_lv))
             mu_pad=np.zeros((3*num_x_lv-2))
             mu_pad[0:num_x_lv]=mu[i][:]
@@ -607,7 +625,7 @@ if __name__ == '__main__':
 
     global problem
 
-    problem='jetlag_weak'
+    problem='jetlag_weak_trunc'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
@@ -722,6 +740,44 @@ if __name__ == '__main__':
         h_pad=np.zeros((3*num_x-2))
         h_pad[0:2*num_x-1]=h_array
         fft_h_pad=np.fft.fft(h_pad)
+    elif problem =='jetlag_weak_trunc':
+        sigma=0.1
+        b=b_jet_lag_weak
+        f=f_jet_lag_weak_trunc
+        g=g_jet_lag
+        periodic_2_pi=True
+        J=25
+        num_keep=5
+        T=24.0*1
+        #num_t=int(T)*5+1
+        num_t=50
+        delta_t=T/(num_t-1)
+        t_grid=np.linspace(0,T,num_t)
+        #delta_x=delta_t**2
+        #num_x=int((2*np.pi)/(delta_x))+1
+        num_x=158
+        delta_x=2*np.pi/num_x
+        x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
+        
+        x_min=x_grid[0]
+        x_max=x_grid[num_x-1]
+        
+        # Varible Jet Lag
+        R=1
+        K=0.01
+        F=0.01
+        omega_0=2*np.pi/24.5
+        omega_S=2*np.pi/24
+        p=(9.0/12.0)*np.pi
+        h_array=get_h_jet_lag_weak()
+        h_pad=np.zeros((3*num_x-2))
+        h_pad[0:2*num_x-1]=h_array
+        fft_h_pad=np.fft.fft(h_pad)
+        global bounds
+        bounds=np.zeros((2,num_t))
+        for i in range(num_t):
+            bounds[0,i]=-0.3*sigma
+            bounds[1,i]=0.3*sigma
     elif problem=='ex_1':
         b=b_example_1
         f=f_example_1
