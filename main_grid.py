@@ -628,6 +628,7 @@ if __name__ == '__main__':
     problem='trader_Pontryagin'
 
 
+
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
@@ -685,17 +686,14 @@ if __name__ == '__main__':
         num_keep=5
         T=24.0*1
         #num_t=int(T)*5+1
-#        num_t=50
-#        delta_t=T/(num_t-1)
+        num_t=50
+        delta_t=T/(num_t-1)
 #        t_grid=np.linspace(0,T,num_t)
         #delta_x=delta_t**2
         #num_x=int((2*np.pi)/(delta_x))+1
         num_x=158
         delta_x=2*np.pi/num_x
         partial_b_max=0.03
-        delta_t=(T*delta_x/(2*math.sqrt(2*partial_b_max*math.exp(4*partial_b_max*T))))**(2.0/3)
-        num_t=int(T/delta_t)+1
-        delta_t=T/(num_t-1)
         x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
         
         x_min=x_grid[0]
@@ -752,7 +750,7 @@ if __name__ == '__main__':
         f=f_jet_lag_weak_trunc
         g=g_jet_lag
         periodic_2_pi=True
-        J=25
+        J=50
         num_keep=5
         T=24.0*1
         #num_t=int(T)*5+1
