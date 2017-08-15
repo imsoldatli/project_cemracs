@@ -25,7 +25,7 @@ import math
 import matplotlib.pyplot as plt
 import scipy
 import time
-
+import scipy.stats
 
 #Define functions b, f, and g for a variety of problems:
 
@@ -174,11 +174,11 @@ def f_trader_weak_trunc(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
 def g_trader_weak_trunc(x):
     return c_g*0.5*x**2
 
-def b_trader_solution(i,j,mu,u,v):
+def b_trader_solution(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     x_mean=np.dot(x_grid,mu[i])
     return -rho*(eta[0,i]*x_grid[j]+(eta_bar[0,i]-eta[0,i])*x_mean)
 
-def f_trader_solution(i,j,mu,u,v):
+def f_trader_solution(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     return 0
 
 def g_trader_solution(x):
@@ -281,11 +281,11 @@ def forward(u,v,mu_0):
             conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
             conv=conv_2[num_x-1:2*num_x-1]
             convolution=np.real(conv)
-        elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+        elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak' or problem=='trader_solution':
             X_mean=np.dot(x_grid,mu[i])
         elif problem=='ex_1' or problem=='trader_Pontryagin':
             Y_mean=np.dot(u[i],mu[i])
-        elif problem=='trader_weak':
+        elif problem=='trader_weak' or problem=='trader_weak_truncation':
             Z_mean=np.dot(v[i],mu[i])
 
         for j in range(num_x): #x_j
@@ -625,22 +625,14 @@ if __name__ == '__main__':
 
     global problem
 
-<<<<<<< HEAD
-    problem='trader_weak'
-=======
-    problem='jetlag_weak_trunc'
->>>>>>> 0e5860e9598409a94f4789eb7d089e9d46c5219c
+    problem='trader_solution'
+
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-<<<<<<< HEAD
-    execution='ordinary'
-=======
-#    execution='continuation_in_time'
-    execution='ordinary'
+    execution='trader_solution'
 
->>>>>>> 0e5860e9598409a94f4789eb7d089e9d46c5219c
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
     #true_start, continuation_in_time
@@ -898,7 +890,7 @@ if __name__ == '__main__':
 
     elif problem=='trader_weak_truncation':
         sigma=0.7
-        rho=1
+        rho=0.3
         c_x=2
         h_bar=2
         c_g=0.3
@@ -924,8 +916,8 @@ if __name__ == '__main__':
 
     elif problem=='trader_solution':
         sigma=0.7
-        rho=1
-        c_x=0.7
+        rho=1.5
+        c_x=2
         h_bar=2
         c_g=0.3
         b=b_trader_solution
@@ -1190,15 +1182,23 @@ if __name__ == '__main__':
             print(all_Y_0_values[index])
 
     elif execution=='trader_solution':
-        mu_0=np.zeros((num_x))
-        mu_0[int(num_x/2)]=1.0
-
         mu=np.zeros((num_t,num_x))
-        for k in range(num_t):
-            mu[k]=mu_0
-        u=np.zeros((num_t,num_x))
-        v=np.zeros((num_t,num_x))
-        mu=forward(u,v,mu_0)
+        for t in range(num_t):
+            mean_mu=eta[0,t]*rho-(1-eta[0,t]*rho)*np.exp(-eta[0,t]*rho*t)
+            variance_mu=sigma**2*(1-np.exp(-2*eta[0,t]*rho*t))/(2*eta[0,t]*rho)
+            mu[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid)
+            print(mean_mu,variance_mu)
+
+        # mu_0[int(num_x/2)]=1.0
+        #
+        # mu=np.zeros((num_t,num_x))
+        # for k in range(num_t):
+        #     mu[k]=mu_0
+        # u=np.zeros((num_t,num_x))
+        # v=np.zeros((num_t,num_x))
+        # mu=forward(u,v,mu_0)
+
+
 
         np.save('./Data/trader/trader_solution.npy',mu)
     elif execution=='true_start': # only for some problems
@@ -1224,7 +1224,7 @@ if __name__ == '__main__':
 
 
 
-        #np.save('./Data/trader/mu_trader_true_start_t20.npy',mu)
+        np.save('./Data/trader/mu_trader_true_start_t20.npy',mu)
             
             
     elif execution=='continuation_in_time':
