@@ -67,7 +67,25 @@ def b_jet_lag_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     return omega_0-omega_S-1.0/(R*sigma)*v[i][j]
 
 def f_jet_lag_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
-    value1=1.0/sigma*(omega_0-omega_S)*v[i][j]-1.0/(2*R*sigma**2)*(v[i][j])**2
+    value1=R/(2*sigma**2)*(v[i][j])**2
+
+#    mu_pad=np.zeros((3*num_x-2))
+#    mu_pad[0:num_x]=mu[i][:]
+#    c_bar_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
+#    c_bar=c_bar_2[num_x-1:2*num_x-1][j]
+#    c_bar=np.real(c_bar)
+    #c_bar=np.dot(0.5*(np.sin((x_grid[j]-x_grid)/2.0))**2,mu[i])
+    c_bar=convolution[j]
+    value2=K*c_bar
+    c_sun=0.5*(np.sin((p-x_grid[j])/2.0))**2
+    value3=F*c_sun
+    return value1+value2+value3
+    
+def f_jet_lag_weak_trunc(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
+    temp=v[i][j]
+    temp=max(temp,bounds[0,i])
+    temp=min(temp,bounds[1,i])
+    value1=R/(2*sigma**2)*(temp)**2
 
 #    mu_pad=np.zeros((3*num_x-2))
 #    mu_pad[0:num_x]=mu[i][:]
@@ -256,7 +274,7 @@ def forward(u,v,mu_0):
         X_mean=0
         Y_mean=0
         Z_mean=0
-        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin' or problem=='jetlag_weak_trunc':
             convolution=np.zeros((num_x))
             mu_pad=np.zeros((3*num_x-2))
             mu_pad[0:num_x]=mu[i][:]
@@ -287,13 +305,13 @@ def backward(mu,u_old,v_old):
     
     u[num_t-1,:] = g(x_grid)
     v[num_t-1,:] = v_old[num_t-1,:]
-    if problem=='trader_weak_trunc':
+    if problem=='trader_weak_trunc' or problem=='jetlag_weak_trunc':
         for i in reversed(range(num_t-1)):
             convolution=0
             X_mean=0
             Y_mean=0
             Z_mean=0
-            if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+            if problem=='jetlag_weak' or problem=='jetlag_Pontryagin' or problem=='jetlag_weak_trunc':
                 convolution=np.zeros((num_x))
                 mu_pad=np.zeros((3*num_x-2))
                 mu_pad[0:num_x]=mu[i][:]
@@ -328,9 +346,9 @@ def backward(mu,u_old,v_old):
                 else:
                     u_up = u[i+1][j_up]
                     u_down = u[i+1][j_down]
-
+    
                     u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
-
+    
                     v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
                     if v[i,j]<bounds[0,i]:
                         v[i,j]=bounds[0,i]
@@ -343,7 +361,7 @@ def backward(mu,u_old,v_old):
             X_mean=0
             Y_mean=0
             Z_mean=0
-            if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+            if problem=='jetlag_weak' or problem=='jetlag_Pontryagin' or problem=='jetlag_weak_trunc':
                 convolution=np.zeros((num_x))
                 mu_pad=np.zeros((3*num_x-2))
                 mu_pad[0:num_x]=mu[i][:]
@@ -365,43 +383,43 @@ def backward(mu,u_old,v_old):
 
                 j_up = pi(x_up)
 
-                if i==num_t-2:
-
-                    u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
-
-                    v[i][j] = 1.0/sqrt_delta_t * (g(x_up) - g(x_down))
-
-                else:
-                    if linear_int:
-                        if x_down>x_grid[j_down]:
-                            if j_down<num_x-1:
-                                u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
-                            else:
-                                u_down=u[i+1][j_down]
+#                if i==num_t-2:
+#
+#                    u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+#
+#                    v[i][j] = 1.0/sqrt_delta_t * (g(x_up) - g(x_down))
+#
+#                else:
+                if linear_int:
+                    if x_down>x_grid[j_down]:
+                        if j_down<num_x-1:
+                            u_down= lin_int(x_grid[j_down],x_grid[j_down+1],u[i+1][j_down],u[i+1][j_down+1],x_down)
                         else:
-                            if j_down>0:
-                                u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
-                            else:
-                                u_down=u[i+1][j_down]
-
-                        if x_up>x_grid[j_up]:
-                            if j_up<num_x-1:
-                                u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
-                            else:
-                                u_up=u[i+1][j_up]
-                        else:
-                            if j_up>0:
-                                u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
-                            else:
-                                u_up=u[i+1][j_up]
+                            u_down=u[i+1][j_down]
                     else:
+                        if j_down>0:
+                            u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
+                        else:
+                            u_down=u[i+1][j_down]
 
-                        u_up = u[i+1][j_up]
-                        u_down = u[i+1][j_down]
+                    if x_up>x_grid[j_up]:
+                        if j_up<num_x-1:
+                            u_up= lin_int(x_grid[j_up],x_grid[j_up+1],u[i+1][j_up],u[i+1][j_up+1],x_up)
+                        else:
+                            u_up=u[i+1][j_up]
+                    else:
+                        if j_up>0:
+                            u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+                        else:
+                            u_up=u[i+1][j_up]
+                else:
 
-                    u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+                    u_up = u[i+1][j_up]
+                    u_down = u[i+1][j_down]
 
-                    v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
+                u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+
+                v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
 
     return [u,v]
 
@@ -450,7 +468,7 @@ def forward_lv(u,v,x_grid_lv,mu_0):
         X_mean=0
         Y_mean=0
         Z_mean=0
-        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin' or problem=='jetlag_weak_trunc':
             convolution=np.zeros((num_x_lv))
             mu_pad=np.zeros((3*num_x_lv-2))
             mu_pad[0:num_x_lv]=mu[i][:]
@@ -488,7 +506,7 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
         X_mean=0
         Y_mean=0
         Z_mean=0
-        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin':
+        if problem=='jetlag_weak' or problem=='jetlag_Pontryagin' or problem=='jetlag_weak_trunc':
             convolution=np.zeros((num_x_lv))
             mu_pad=np.zeros((3*num_x_lv-2))
             mu_pad[0:num_x_lv]=mu[i][:]
@@ -569,17 +587,11 @@ def solver_grid(level,mu_0,X_grids):
         mu=forward_lv(u,v,X_grids[level],mu_0)
     u=np.zeros((num_t,num_x_lv))
     v=np.zeros((num_t,num_x_lv))
-    
-    if level==num_level-1:
-        Y_terminal=g(X_grids[level])
-    else:
-        Y_terminal=np.zeros(num_x_lv)
 
     if level==0:
         all_Y_0_values=np.zeros((num_keep))
         index=0
     
-    thing1=mu
         
     for j in range(J_2):
         mu_next=mu[num_t-1,:]
@@ -596,6 +608,7 @@ def solver_grid(level,mu_0,X_grids):
         for j2 in range(J_1):
             [u,v]=backward_lv(mu,u,v,X_grids[level],Y_terminal)
             mu=forward_lv(u,v,X_grids[level],mu_0)
+        thing1=u
         if level==0 and j>J_2-num_keep-1:
             all_Y_0_values[index]=np.dot(u[0],mu_0)
             index+=1
@@ -612,12 +625,22 @@ if __name__ == '__main__':
 
     global problem
 
+<<<<<<< HEAD
     problem='trader_weak'
+=======
+    problem='jetlag_weak_trunc'
+>>>>>>> 0e5860e9598409a94f4789eb7d089e9d46c5219c
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
+<<<<<<< HEAD
     execution='ordinary'
+=======
+#    execution='continuation_in_time'
+    execution='ordinary'
+
+>>>>>>> 0e5860e9598409a94f4789eb7d089e9d46c5219c
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
     #true_start, continuation_in_time
@@ -668,7 +691,7 @@ if __name__ == '__main__':
         num_keep=5
         T=24.0*1
         #num_t=int(T)*5+1
-        num_t=697
+        num_t=50
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         #delta_x=delta_t**2
@@ -702,7 +725,7 @@ if __name__ == '__main__':
         num_keep=5
         T=24.0*1
         #num_t=int(T)*5+1
-        num_t=697
+        num_t=50
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         #delta_x=delta_t**2
@@ -725,6 +748,44 @@ if __name__ == '__main__':
         h_pad=np.zeros((3*num_x-2))
         h_pad[0:2*num_x-1]=h_array
         fft_h_pad=np.fft.fft(h_pad)
+    elif problem =='jetlag_weak_trunc':
+        sigma=0.1
+        b=b_jet_lag_weak
+        f=f_jet_lag_weak_trunc
+        g=g_jet_lag
+        periodic_2_pi=True
+        J=25
+        num_keep=5
+        T=24.0*1
+        #num_t=int(T)*5+1
+        num_t=50
+        delta_t=T/(num_t-1)
+        t_grid=np.linspace(0,T,num_t)
+        #delta_x=delta_t**2
+        #num_x=int((2*np.pi)/(delta_x))+1
+        num_x=158
+        delta_x=2*np.pi/num_x
+        x_grid=np.linspace(0,2*np.pi-delta_x,num_x)
+        
+        x_min=x_grid[0]
+        x_max=x_grid[num_x-1]
+        
+        # Varible Jet Lag
+        R=1
+        K=0.01
+        F=0.01
+        omega_0=2*np.pi/24.5
+        omega_S=2*np.pi/24
+        p=(9.0/12.0)*np.pi
+        h_array=get_h_jet_lag_weak()
+        h_pad=np.zeros((3*num_x-2))
+        h_pad[0:2*num_x-1]=h_array
+        fft_h_pad=np.fft.fft(h_pad)
+        global bounds
+        bounds=np.zeros((2,num_t))
+        for i in range(num_t):
+            bounds[0,i]=-0.3*sigma
+            bounds[1,i]=0.3*sigma
     elif problem=='ex_1':
         b=b_example_1
         f=f_example_1
@@ -749,7 +810,7 @@ if __name__ == '__main__':
         f=f_example_72
         g=g_example_72
         periodic_2_pi=False
-        J=10
+        J=25
         num_keep=5
         T=1
         num_t=12
@@ -770,7 +831,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=12
+        num_t=13
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -963,12 +1024,11 @@ if __name__ == '__main__':
         u=np.zeros((num_t,num_x))
         v=np.zeros((num_t,num_x))
         
-        thing2=mu
-        
         
         for j in range(J):
             [u,v]=backward(mu,u,v)            
             mu=forward(u,v,mu_0)
+            thing2=u
             if j>J-num_keep-1:
                 all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
                 index2+=1
@@ -1173,13 +1233,14 @@ if __name__ == '__main__':
         J_2=25
         global num_level
         
-        num_level=1
+        num_level=2
 
-        num_t=12
+        num_t=7
         delta_t=T/num_level/(num_t-1)
         sqrt_delta_t=math.sqrt(delta_t)
-        delta_x=(delta_t*num_level)**2
-        #delta_x=delta_t**(2)
+        #delta_x=(delta_t*num_level)**2
+        delta_x=delta_t**(2)
+        
         x_min=-1
         x_max=5
         num_x=int((x_max-x_min)/delta_x)+1
