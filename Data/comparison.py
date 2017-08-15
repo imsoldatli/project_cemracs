@@ -3,12 +3,14 @@ __author__ = 'angiuli'
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
+import math
 
 # load solutions
 weak=np.load('./Data/trader/mu_weak_t20.npy')
 weak_trunc=np.load('./Data/trader/mu_weak_trunc_t20.npy')
 Pont=np.load('./Data/trader/mu_Pont_t20.npy')
 true_solution=np.load('./Data/trader/trader_solution.npy')
+true_solution_hist=np.load('./Data/trader/trader_solution_hist.npy')
 true_start=np.load('./Data/trader/mu_trader_true_start_t20.npy')
 
 # intialize counters of matching points between the solutions
@@ -146,6 +148,28 @@ print('mean_T',mean_true_solution)
 #writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
 
 # animation: plot all the solutions evolving in time
+num_bins=int(num_x/15)
+print('num_x',num_x)
+num_x_hist=int(num_x/num_bins)
+delta_x_hist=np.abs(x_max-x_min)/num_x_hist
+x_grid_hist=np.linspace(x_min,x_max,num_x_hist)
+mu_weak_hist=np.zeros((num_t,num_x_hist))
+mu_weak_trunc_hist=np.zeros((num_t,num_x_hist))
+mu_Pont_hist=np.zeros((num_t,num_x_hist))
+mu_T_hist=np.zeros((num_t,num_x_hist))
+
+for t in range(num_t):
+    for i in range(num_x/num_bins):
+        mu_weak_hist[t,i]=np.sum(weak[t,num_bins*i:num_bins*(i+1)])
+        mu_weak_trunc_hist[t,i]=np.sum(weak_trunc[t,num_bins*i:num_bins*(i+1)])
+        mu_Pont_hist[t,i]=np.sum(Pont[t,num_bins*i:num_bins*(i+1)])
+        mu_T_hist[t,i]=np.sum(true_solution[t,num_bins*i:num_bins*(i+1)])
+
+# print('sum mu_w_hist',np.sum(mu_weak_hist[num_t-1]))
+# print('sum mu_w_trunc_hist',np.sum(mu_weak_trunc_hist[num_t-1]))
+# print('sum mu_P_hist',np.sum(mu_Pont_hist[num_t-1]))
+# print('sum mu_T_hist',np.sum(mu_T_hist[num_t-1]))
+
 fig = plt.figure()
 ax1 = plt.axes(xlim=(-1, 3), ylim=(0,.8))
 line, = ax1.plot([], [],'o')
@@ -153,7 +177,9 @@ plotlays, plotcols = [3], ["green","yellow","red","blue"]
 labels=['weak','Pont','true','weak trunc']
 lines = []
 for index in range(4):
-    lobj = ax1.plot([],[],'o',color=plotcols[index],label=labels[index])[0]
+    #lobj = ax1.plot([],[],'o',color=plotcols[index],label=labels[index])[0]
+    lobj = ax1.plot([],[],color=plotcols[index],label=labels[index])[0]
+
     plt.legend()
     lines.append(lobj)
 
@@ -179,23 +205,23 @@ def animate(i):
     x3,y3= [],[]
     x4,y4= [],[]
 
-    x = x_grid
-    y = weak[i]
+    x = x_grid_hist
+    y = mu_weak_hist[i]
     x1.append(x)
     y1.append(y)
 
-    x = x_grid
-    y = Pont[i]
+    x = x_grid_hist
+    y = mu_Pont_hist[i]
     x2.append(x)
     y2.append(y)
 
-    x = x_grid
-    y = true_solution[i]
+    x = x_grid_hist
+    y = mu_T_hist[i]
     x3.append(x)
     y3.append(y)
 
-    x = x_grid
-    y = weak_trunc[i]
+    x = x_grid_hist
+    y = mu_weak_trunc_hist[i]
     x4.append(x)
     y4.append(y)
 
@@ -215,7 +241,7 @@ anim = animation.FuncAnimation(fig, animate, init_func=init,
 
 plt.show()
 
-anim.save('comparison_mu_trader.mp4')
+#anim.save('comparison_mu_trader.mp4')
 
 def firstindex(list,target):
     nl=len(list)
@@ -243,7 +269,34 @@ def Wd(mu_1,grid_1,mu_2,grid_2,Nint,p=2):
         i1=firstindex(CDF_1,u_vec[i])
         i2=firstindex(CDF_2,u_vec[i])
         dW=du*pow(math.fabs(grid_1[i1]-grid_2[i2]),p)
-        print(dW)
+        #print(dW)
         W+=dW
-    W=pow(W,1/p)
+    W=pow(W,1.0/p)
     return W
+
+if __name__=='__main__':
+    wdist_weak_Pont=Wd(weak[num_t-1],x_grid,Pont[num_t-1],x_grid,10**4)
+    print('wdist_weak_Pont',wdist_weak_Pont)
+    wdist_true_weak=Wd(weak[num_t-1],x_grid,true_solution[num_t-1],x_grid,10**4)
+    print('wdist_true_weak',wdist_true_weak)
+    wdist_true_Pont=Wd(true_solution[num_t-1],x_grid,Pont[num_t-1],x_grid,10**4)
+    print('wdist_true_Pont',wdist_true_Pont)
+    wdist_true_start_true_solut=Wd(true_solution[num_t-1],x_grid,true_start[num_t-1],x_grid,10**4)
+    print('wdist_true_start_true_solut',wdist_true_start_true_solut)
+    wdist_true_start_Pont=Wd(true_start[num_t-1],x_grid,Pont[num_t-1],x_grid,10**4)
+    print('wdist_true_start_Pont',wdist_true_start_Pont)
+    wdist_weak_trunc_true=Wd(weak_trunc[num_t-1],x_grid,true_solution[num_t-1],x_grid,10**4)
+    print('wdist_weak_trunc_true',wdist_weak_trunc_true)
+
+    wdist_weak_Pont_hist=Wd(mu_weak_hist[num_t-1],x_grid_hist,mu_Pont_hist[num_t-1],x_grid_hist,10**4)
+    print('wdist_weak_Pont_hist',wdist_weak_Pont_hist)
+    wdist_true_weak_hist=Wd(mu_weak_hist[num_t-1],x_grid_hist,mu_T_hist[num_t-1],x_grid_hist,10**4)
+    print('wdist_true_weak_hist',wdist_true_weak_hist)
+    wdist_true_Pont_hist=Wd(mu_T_hist[num_t-1],x_grid_hist,mu_Pont_hist[num_t-1],x_grid_hist,10**4)
+    print('wdist_true_Pont_hist',wdist_true_Pont_hist)
+    # wdist_true_start_true_solut_hist=Wd(true_solution[num_t-1],x_grid,true_start[num_t-1],x_grid,10**4)
+    # print('wdist_true_start_true_solut',wdist_true_start_true_solut)
+    # wdist_true_start_Pont=Wd(true_start[num_t-1],x_grid,Pont[num_t-1],x_grid,10**4)
+    # print('wdist_true_start_Pont',wdist_true_start_Pont)
+    wdist_weak_trunc_true_hist=Wd(mu_weak_trunc_hist[num_t-1],x_grid_hist,mu_T_hist[num_t-1],x_grid_hist,10**4)
+    print('wdist_weak_trunc_true_hist',wdist_weak_trunc_true_hist)

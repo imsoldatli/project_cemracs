@@ -625,14 +625,14 @@ if __name__ == '__main__':
 
     global problem
 
-    problem='trader_solution'
+    problem='trader_Pontryagin'
 
 
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='trader_solution'
+    execution='true_start'
 
 
     # possible values in order of appearance:
@@ -922,7 +922,7 @@ if __name__ == '__main__':
 
     elif problem=='trader_solution':
         sigma=0.7
-        rho=1.5
+        rho=0.3
         c_x=2
         h_bar=2
         c_g=0.3
@@ -955,8 +955,10 @@ if __name__ == '__main__':
         ratio=np.sqrt(c_x*rho)
         ratio2=ratio/rho
         for t in range(num_t):
-            eta_bar[0,t]=-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down)/(((delta_down*np.exp(delta_delta*(T-t))-delta_up))-c_g*B*(np.exp(delta_delta*(T-t))-1))
-            eta[0,t]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/(ratio2-c_g+(ratio2+c_g)*np.exp(2*ratio*(T-t)))
+            den_bar=(delta_down*np.exp(delta_delta*(T-t))-delta_up)-c_g*B*(np.exp(delta_delta*(T-t))-1)
+            eta_bar[0,t]=-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down)/den_bar
+            den=(ratio2-c_g+(ratio2+c_g)*np.exp(2*ratio*(T-t)))
+            eta[0,t]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/den
 
 
     elif problem=='flocking_Pontryagin':
@@ -1188,12 +1190,42 @@ if __name__ == '__main__':
             print(all_Y_0_values[index])
 
     elif execution=='trader_solution':
+
         mu=np.zeros((num_t,num_x))
-        for t in range(num_t):
-            mean_mu=eta[0,t]*rho-(1-eta[0,t]*rho)*np.exp(-eta[0,t]*rho*t)
-            variance_mu=sigma**2*(1-np.exp(-2*eta[0,t]*rho*t))/(2*eta[0,t]*rho)
-            mu[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid)
+
+        for t in range(1,num_t):
+            integral=np.sum(eta_bar[0,0:t])*delta_t
+            mean_mu=np.exp(-rho*integral)
+            variance_mu=0
+            for s in range(0,t):
+                variance_mu=variance_mu+delta_t*np.exp(-2*rho*np.sum(eta[0,s:t])*delta_t)
+            variance_mu=sigma**2*variance_mu
             print(mean_mu,variance_mu)
+
+            mu[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid)*delta_x
+        mu[0,int(num_x/2)]=1
+
+        num_bins=5
+        num_x_hist=int(num_x/num_bins)
+        delta_x_hist=np.abs(x_max-x_min)/num_x_hist
+        x_grid_hist=np.linspace(x_min,x_max,num_x_hist)
+        mu_hist=np.zeros((num_t,num_x_hist))
+
+
+        for t in range(1,num_t):
+            integral=np.sum(eta_bar[0,0:t])*delta_t
+            mean_mu=np.exp(-rho*integral)
+            variance_mu=0
+            for s in range(0,t):
+                variance_mu=variance_mu+delta_t*np.exp(-2*rho*np.sum(eta[0,s:t])*delta_t)
+            variance_mu=sigma**2*variance_mu
+            print(mean_mu,variance_mu)
+
+            mu_hist[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid_hist)*delta_x_hist
+        mu_hist[0,int(num_x_hist/2)]=1
+
+
+
 
         # mu_0[int(num_x/2)]=1.0
         #
@@ -1207,6 +1239,7 @@ if __name__ == '__main__':
 
 
         np.save('./Data/trader/trader_solution.npy',mu)
+        np.save('./Data/trader/trader_solution_hist.npy',mu_hist)
     elif execution=='true_start': # only for some problems
 
         if periodic_2_pi:
