@@ -623,7 +623,7 @@ if __name__ == '__main__':
 
     global execution
 
-    execution='true_start'
+    execution='ordinary'
 
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, trader_solution,
@@ -846,7 +846,7 @@ if __name__ == '__main__':
         f=f_trader_Pontryagin
         g=g_trader_Pontryagin
         periodic_2_pi=False
-        J=1
+        J=25
         num_keep=5
         T=1
         num_t=20
