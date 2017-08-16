@@ -167,6 +167,7 @@ def f_trader_weak_trunc(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
         value=0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*bounds[0,i]**2/sigma**2
     elif v[i,j] > bounds[1,i]:
         value= 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*bounds[1,i]**2/sigma**2
+
     else:
         value=0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
     return(value)
@@ -311,19 +312,8 @@ def backward(mu,u_old,v_old):
             X_mean=0
             Y_mean=0
             Z_mean=0
-            if problem=='jetlag_weak' or problem=='jetlag_Pontryagin' or problem=='jetlag_weak_trunc':
-                convolution=np.zeros((num_x))
-                mu_pad=np.zeros((3*num_x-2))
-                mu_pad[0:num_x]=mu[i][:]
-                conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
-                conv=conv_2[num_x-1:2*num_x-1]
-                convolution=np.real(conv)
-            elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
-                X_mean=np.dot(x_grid,mu[i])
-            elif problem=='ex_1' or problem=='trader_Pontryagin':
-                Y_mean=np.dot(u_old[i],mu[i])
-            elif problem=='trader_weak':
-                Z_mean=np.dot(v_old[i],mu[i])
+
+            Z_mean=np.dot(v_old[i],mu[i])
             for j in range(num_x):
                 x_down = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t - sigma * sqrt_delta_t
 
@@ -632,7 +622,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='true_start'
+    execution='changing_bounds'
 
 
     # possible values in order of appearance:
@@ -838,8 +828,8 @@ if __name__ == '__main__':
         rho=1
     elif problem=='trader_Pontryagin':
         sigma=0.7
-        rho=0.3
-        c_x=2
+        rho=3
+        c_x=3
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -871,8 +861,8 @@ if __name__ == '__main__':
 # convergence for rho=0.1
     elif problem=='trader_weak':
         sigma=0.7
-        rho=0.3
-        c_x=2
+        rho=3
+        c_x=3
         h_bar=2
         c_g=0.3
         b=b_trader_weak
@@ -891,10 +881,10 @@ if __name__ == '__main__':
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
 
-    elif problem=='trader_weak_trunc':
+    elif problem=='trader_weak_trunc': #if rho is big enough, otherwise it gives the same results as trader_weak
         sigma=0.7
-        rho=0.3
-        c_x=2
+        rho=4.5
+        c_x=4
         h_bar=2
         c_g=0.3
         b=b_trader_weak_trunc
@@ -1073,7 +1063,46 @@ if __name__ == '__main__':
 #            np.save('./Data/trader/mu_weak_trunc_t20.npy',mu)
 #            np.save('./Data/trader/z_weak_trunc_t20.npy',v)
 
+    if execution=='changing_bounds':
+            step=np.linspace(0.1,1,10)
+            initial_bounds=bounds
+            for k in range(len(step)):
+            #for k in range(1,2):
+                bounds=np.multiply(initial_bounds,step[k])
+                #bounds=np.multiply(bounds,k)
+                mu_0=np.zeros((num_x))
 
+                mu_0[int(num_x/2)]=1.0
+
+                mu=np.zeros((num_t,num_x))
+                for k in range(num_t):
+                    mu[k]=mu_0
+                u=np.zeros((num_t,num_x))
+                v=np.zeros((num_t,num_x))
+                index2=0
+                all_Y_0_values=np.zeros((1,num_keep))
+
+                for j in range(1):
+                    [u,v]=backward(mu,u,v)
+                    mu=forward(u,v,mu_0)
+                u=np.zeros((num_t,num_x))
+                v=np.zeros((num_t,num_x))
+
+
+                for j in range(J):
+                    [u,v]=backward(mu,u,v)
+                    mu=forward(u,v,mu_0)
+                    thing2=u
+                    if j>J-num_keep-1:
+                        all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
+                        index2+=1
+                print all_Y_0_values[0]
+
+
+
+
+
+                #np.save('./Data/trader/mu_weak_trunc_t20.npy',mu)
 
 
         ############## evaluating mu_u, mu_v
