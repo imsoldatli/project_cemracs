@@ -625,8 +625,6 @@ if __name__ == '__main__':
 
     execution='true_start'
 
-
-
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, trader_solution,
     #true_start, continuation_in_time
@@ -848,7 +846,7 @@ if __name__ == '__main__':
         f=f_trader_Pontryagin
         g=g_trader_Pontryagin
         periodic_2_pi=False
-        J=25
+        J=1
         num_keep=5
         T=1
         num_t=20
@@ -1354,6 +1352,8 @@ if __name__ == '__main__':
             u=np.load('u_reference_set_158.npy')
         elif problem=='trader_weak' or problem=='trader_Pontryagin':
             mu=true_solution=np.load('./Data/trader/trader_solution.npy')
+            print('made it here')
+            mu_true_start=mu
         mu_0=mu[0]
         u=np.zeros((num_t,num_x))
         v=np.zeros((num_t,num_x))
@@ -1370,7 +1370,7 @@ if __name__ == '__main__':
 
 
 
-        np.save('./Data/trader/mu_trader_true_start_t20.npy',mu)
+        #np.save('./Data/trader/mu_trader_true_start_t20.npy',mu)
             
             
     elif execution=='continuation_in_time':
