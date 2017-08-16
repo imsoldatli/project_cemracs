@@ -181,7 +181,7 @@ def f_flocking_weak(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
 #        index=int(math.floor(k/num_per_initial))
 #        X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
     #X_mean=X_mean_all[i]
-    return -1.0/(2*sigma**2)*(Z[i][j])**2+0.5*rho*(X[i][j]-X_mean)**2
+    return 1.0/(2*sigma**2)*(Z[i][j])**2+0.5*rho*(X[i][j]-X_mean)**2
 
 #This function is essentially solver_bar, except it is used for the
 #continuation to initialize with the previous solution. It is written to be

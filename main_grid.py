@@ -201,7 +201,7 @@ def b_flocking_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
 def f_flocking_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     #X_mean=np.dot(x_grid,mu[i])
     #X_mean=X_mean_all[i]
-    return -1.0/(2*sigma**2)*(v[i][j])**2+0.5*rho*(x_grid[j]-X_mean)**2
+    return 1.0/(2*sigma**2)*(v[i][j])**2+0.5*rho*(x_grid[j]-X_mean)**2
 
 #project the value x onto the nearest value in x_grid
 def pi_old(x):
