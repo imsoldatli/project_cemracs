@@ -312,19 +312,8 @@ def backward(mu,u_old,v_old):
             X_mean=0
             Y_mean=0
             Z_mean=0
-            if problem=='jetlag_weak' or problem=='jetlag_Pontryagin' or problem=='jetlag_weak_trunc':
-                convolution=np.zeros((num_x))
-                mu_pad=np.zeros((3*num_x-2))
-                mu_pad[0:num_x]=mu[i][:]
-                conv_2=np.fft.ifft(np.fft.fft(mu_pad)*fft_h_pad)
-                conv=conv_2[num_x-1:2*num_x-1]
-                convolution=np.real(conv)
-            elif problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
-                X_mean=np.dot(x_grid,mu[i])
-            elif problem=='ex_1' or problem=='trader_Pontryagin':
-                Y_mean=np.dot(u_old[i],mu[i])
-            elif problem=='trader_weak' or problem=='trader_weak_trunc':
-                Z_mean=np.dot(v_old[i],mu[i])
+
+            Z_mean=np.dot(v_old[i],mu[i])
             for j in range(num_x):
                 x_down = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t - sigma * sqrt_delta_t
 
@@ -1110,7 +1099,7 @@ if __name__ == '__main__':
                         all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
                         index2+=1
                 print all_Y_0_values[0]
-            
+
 
 
 
