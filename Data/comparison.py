@@ -13,6 +13,8 @@ true_solution=np.load('./Data/trader/trader_solution.npy')
 true_solution_hist=np.load('./Data/trader/trader_solution_hist.npy')
 true_start=np.load('./Data/trader/mu_trader_true_start_t20.npy')
 
+y_rho_Pont=np.load('./Data/trader/y*rho_trader_Pont_t20.npy')
+z_weak_trunc=np.load('./Data/trader/z_weak_trunc_t20.npy')
 # intialize counters of matching points between the solutions
 
 compare_weak_pont=0 #compare weak vs pontryagin
@@ -300,3 +302,11 @@ if __name__=='__main__':
     # print('wdist_true_start_Pont',wdist_true_start_Pont)
     wdist_weak_trunc_true_hist=Wd(mu_weak_trunc_hist[num_t-1],x_grid_hist,mu_T_hist[num_t-1],x_grid_hist,10**4)
     print('wdist_weak_trunc_true_hist',wdist_weak_trunc_true_hist)
+
+
+max_diff_y_rho_Pont_z_weak_trunc=[]
+for t in range(num_t):
+    max_diff_y_rho_Pont_z_weak_trunc.append(np.max(abs(y_rho_Pont[t]-z_weak_trunc[t])))
+print('max_diff_y_rho_Pont_z_weak_trunc',max_diff_y_rho_Pont_z_weak_trunc)
+print('max_diff_y_rho_Pont_z_weak_trunc',max_diff_y_rho_Pont_z_weak_trunc)
+

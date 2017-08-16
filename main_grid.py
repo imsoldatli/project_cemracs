@@ -285,7 +285,7 @@ def forward(u,v,mu_0):
             X_mean=np.dot(x_grid,mu[i])
         elif problem=='ex_1' or problem=='trader_Pontryagin':
             Y_mean=np.dot(u[i],mu[i])
-        elif problem=='trader_weak' or problem=='trader_weak_truncation':
+        elif problem=='trader_weak' or problem=='trader_weak_trunc':
             Z_mean=np.dot(v[i],mu[i])
 
         for j in range(num_x): #x_j
@@ -624,20 +624,19 @@ if __name__ == '__main__':
 
 
     global problem
-
-    problem='flocking_weak'
+    problem='trader_weak_trunc'
 
 
 
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
-    #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
+    #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
     execution='ordinary'
 
 
     # possible values in order of appearance:
-    # ordinary, changing_sigma, changing_rho, adaptive, solution_trader,
+    # ordinary, changing_sigma, changing_rho, adaptive, trader_solution,
     #true_start, continuation_in_time
     
     global linear_int
@@ -892,7 +891,7 @@ if __name__ == '__main__':
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
 
-    elif problem=='trader_weak_truncation':
+    elif problem=='trader_weak_trunc':
         sigma=0.7
         rho=0.3
         c_x=2
@@ -1065,12 +1064,12 @@ if __name__ == '__main__':
                 bounds[1,t]=max(u[t])
             np.save('./Data/trader/mu_Pont_t20.npy',mu)
             np.save('./Data/trader/value_y_Pont_to_trunc_z_weak.npy',bounds)
+            np.save('./Data/trader/y*rho_trader_Pont_t20',np.multiply(-rho,u))
         elif problem=='trader_weak':
             np.save('./Data/trader/mu_weak_t20.npy',mu)
-        elif problem=='trader_weak_truncation':
+        elif problem=='trader_weak_trunc':
             np.save('./Data/trader/mu_weak_trunc_t20.npy',mu)
-            
-        
+            np.save('./Data/trader/z_weak_trunc_t20.npy',v)
 
 
 
