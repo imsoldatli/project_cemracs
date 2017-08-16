@@ -165,7 +165,7 @@ def f_flocking_Pontryagin(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
 #        index=int(math.floor(k/num_per_initial))
 #        X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
     #X_mean=X_mean_all[i]
-    return X[i][j]-X_mean
+    return rho*(X[i][j]-X_mean)
 
 def g_flocking(index,xi_vals,xi_probs):
     return 0
@@ -181,7 +181,7 @@ def f_flocking_weak(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
 #        index=int(math.floor(k/num_per_initial))
 #        X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
     #X_mean=X_mean_all[i]
-    return -1.0/(2*sigma**2)*(Z[i][j])**2+0.5*(X[i][j]-X_mean)**2
+    return 1.0/(2*sigma**2)*(Z[i][j])**2+0.5*rho*(X[i][j]-X_mean)**2
 
 #This function is essentially solver_bar, except it is used for the
 #continuation to initialize with the previous solution. It is written to be
@@ -372,7 +372,7 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     start_time=time.time()
-    problem ='ex_1'
+    problem ='flocking_Pontryagin'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
     execution='ordinary'
@@ -546,10 +546,11 @@ if __name__ == '__main__':
         J_solver_bar=10
         num_keep=5
         T=1.0
-        num_intervals_total=6
+        num_intervals_total=8
         num_intervals_coarse=1
         x_0=[0.0]
         x_0_probs=[1.0]
+        rho=1.0
     elif problem=='flocking_weak':
         sigma=1.0
         b=b_flocking_weak
@@ -560,10 +561,11 @@ if __name__ == '__main__':
         J_solver_bar=10
         num_keep=5
         T=1.0
-        num_intervals_total=6
+        num_intervals_total=8
         num_intervals_coarse=1
         x_0=[0.0]
         x_0_probs=[1.0]
+        rho=1.0
     
     #use num_intervals_total, and num_intervals_coarse to calculate:
     global num_t_coarse #number of time points at the coarse discretization

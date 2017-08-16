@@ -191,7 +191,7 @@ def b_flocking_Pontryagin(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
 def f_flocking_Pontryagin(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     #X_mean=np.dot(x_grid,mu[i])
     #X_mean=X_mean_all[i]
-    return x_grid[j]-X_mean
+    return rho*(x_grid[j]-X_mean)
 
 def g_flocking(x):
     return 0
@@ -202,7 +202,7 @@ def b_flocking_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
 def f_flocking_weak(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     #X_mean=np.dot(x_grid,mu[i])
     #X_mean=X_mean_all[i]
-    return -1.0/(2*sigma**2)*(v[i][j])**2+0.5*(x_grid[j]-X_mean)**2
+    return 1.0/(2*sigma**2)*(v[i][j])**2+0.5*rho*(x_grid[j]-X_mean)**2
 
 #project the value x onto the nearest value in x_grid
 def pi_old(x):
@@ -614,9 +614,7 @@ if __name__ == '__main__':
 
 
     global problem
-
-    problem='trader_weak_trunc'
-
+    problem='trader_solution'
 
 
 
@@ -948,7 +946,7 @@ if __name__ == '__main__':
         for k in range(num_t):
             t=t_grid[k]
             den_bar=(delta_down*np.exp(delta_delta*(T-t))-delta_up)-c_g*B*(np.exp(delta_delta*(T-t))-1)
-            eta_bar[0,k]=-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down)/den_bar
+            eta_bar[0,k]=(-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down))/den_bar
             den=(ratio2-c_g+(ratio2+c_g)*np.exp(2*ratio*(T-t)))
             eta[0,k]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/den
 
@@ -961,7 +959,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=20
+        num_t=40
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -980,7 +978,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=20
+        num_t=40
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -994,14 +992,16 @@ if __name__ == '__main__':
         periodic_2_pi=False
         J=25
         num_keep=5
-        T=10
-        num_t=100
+        T=1
+        num_t=400
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
-        x_min=-5
-        x_max=5
+        x_min=-3
+        x_max=3
         num_x=int((x_max-x_min)/delta_x+1)
+        num_x=9127
+        delta_x=(x_max-x_min)/(num_x-1)
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1.0
         rho=1.0
@@ -1051,19 +1051,19 @@ if __name__ == '__main__':
 
 
 
-        if problem=='trader_Pontryagin':
-            bounds=np.zeros((2,num_t))
-            for t in range(num_t):
-                bounds[0,t]=min(u[t])
-                bounds[1,t]=max(u[t])
-            np.save('./Data/trader/mu_Pont_t20.npy',mu)
-            np.save('./Data/trader/value_y_Pont_to_trunc_z_weak.npy',bounds)
-            np.save('./Data/trader/y*rho_trader_Pont_t20',np.multiply(-rho,u))
-        elif problem=='trader_weak':
-            np.save('./Data/trader/mu_weak_t20.npy',mu)
-        elif problem=='trader_weak_trunc':
-            np.save('./Data/trader/mu_weak_trunc_t20.npy',mu)
-            np.save('./Data/trader/z_weak_trunc_t20.npy',v)
+#        if problem=='trader_Pontryagin':
+#            bounds=np.zeros((2,num_t))
+#            for t in range(num_t):
+#                bounds[0,t]=min(u[t])
+#                bounds[1,t]=max(u[t])
+#            np.save('./Data/trader/mu_Pont_t20.npy',mu)
+#            np.save('./Data/trader/value_y_Pont_to_trunc_z_weak.npy',bounds)
+#            np.save('./Data/trader/y*rho_trader_Pont_t20',np.multiply(-rho,u))
+#        elif problem=='trader_weak':
+#            np.save('./Data/trader/mu_weak_t20.npy',mu)
+#        elif problem=='trader_weak_trunc':
+#            np.save('./Data/trader/mu_weak_trunc_t20.npy',mu)
+#            np.save('./Data/trader/z_weak_trunc_t20.npy',v)
 
     if execution=='changing_bounds':
             step=np.linspace(0.1,1,10)
@@ -1308,7 +1308,7 @@ if __name__ == '__main__':
             for s in range(0,t):
                 variance_mu=variance_mu+delta_t*np.exp(-2*np.sum(eta[s:t])*delta_t)
             variance_mu=sigma**2*variance_mu
-            print(mean_mu,variance_mu)
+            #print(mean_mu,variance_mu)
 
             mu[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid)
             mu[t]=mu[t]/np.sum(mu[t])
@@ -1327,14 +1327,17 @@ if __name__ == '__main__':
             for s in range(0,t):
                 variance_mu=variance_mu+delta_t*np.exp(-2*np.sum(eta[s:t])*delta_t)
             variance_mu=sigma**2*variance_mu
-            print(mean_mu,variance_mu)
+            #print(mean_mu,variance_mu)
 
             mu_hist[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid_hist)
             mu_hist[t]=mu_hist[t]/np.sum(mu_hist[t])
         mu_hist[0,int(num_x_hist/2)]=1
+                
+        mu=[mu[10*i] for i in range(40)]
+        mu_hist=[mu_hist[10*i] for i in range(40)]
 
-        np.save('./Data/flocking/true_solution.npy',mu)
-        np.save('./Data/flocking/true_solution_hist.npy',mu_hist)
+        #np.save('./Data/flocking/true_solution_num_t_40_more_accurate.npy',mu)
+        #np.save('./Data/flocking/true_solution_hist_num_t_40_more_accurate.npy',mu_hist)
         
     elif execution=='true_start': # only for some problems
 
