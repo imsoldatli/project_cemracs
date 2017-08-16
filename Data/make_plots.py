@@ -102,8 +102,8 @@ if __name__ == '__main__':
 #    plt.title('Flocking, Grid Algorithm, Weak Approach, T/2')
 #    plt.savefig('flocking_weak_grid_10_bins.eps')
 
-#    plt.scatter(x_grid_hist,mu_true_hist[20])
-#    plt.xlabel('x')
-#    plt.ylabel('$\mu(x)$')
-#    plt.title('Flocking, True Solution, T/2')
-#    plt.savefig('flocking_true_solution_10_bins.eps')
+    plt.scatter(x_grid_hist,mu_true_hist[20])
+    plt.xlabel('x')
+    plt.ylabel('$\mu(x)$')
+    plt.title('Flocking, True Solution, T/2')
+    plt.savefig('flocking_true_solution_10_bins_more_accurate.eps')
