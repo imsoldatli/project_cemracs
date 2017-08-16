@@ -625,7 +625,7 @@ if __name__ == '__main__':
 
     global problem
 
-    problem='flocking_solution'
+    problem='flocking_weak'
 
 
 
@@ -633,7 +633,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_truncation), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='flocking_solution'
+    execution='ordinary'
 
 
     # possible values in order of appearance:
@@ -1001,13 +1001,13 @@ if __name__ == '__main__':
         periodic_2_pi=False
         J=25
         num_keep=5
-        T=10
-        num_t=100
+        T=1
+        num_t=20
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
-        x_min=-5
-        x_max=5
+        x_min=-3
+        x_max=3
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1.0
@@ -1069,6 +1069,8 @@ if __name__ == '__main__':
             np.save('./Data/trader/mu_weak_t20.npy',mu)
         elif problem=='trader_weak_truncation':
             np.save('./Data/trader/mu_weak_trunc_t20.npy',mu)
+            
+        
 
 
 
