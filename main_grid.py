@@ -629,11 +629,14 @@ if __name__ == '__main__':
 
 
 
+
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
+
     execution='ordinary'
+
 
 
     # possible values in order of appearance:
@@ -952,11 +955,12 @@ if __name__ == '__main__':
         eta=np.zeros((1,num_t))
         ratio=np.sqrt(c_x*rho)
         ratio2=ratio/rho
-        for t in range(num_t):
+        for k in range(num_t):
+            t=t_grid[k]
             den_bar=(delta_down*np.exp(delta_delta*(T-t))-delta_up)-c_g*B*(np.exp(delta_delta*(T-t))-1)
-            eta_bar[0,t]=-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down)/den_bar
+            eta_bar[0,k]=-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down)/den_bar
             den=(ratio2-c_g+(ratio2+c_g)*np.exp(2*ratio*(T-t)))
-            eta[0,t]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/den
+            eta[0,k]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/den
 
 
     elif problem=='flocking_Pontryagin':
@@ -975,7 +979,8 @@ if __name__ == '__main__':
         x_max=3
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
-        sigma=1
+        sigma=1.0
+        rho=1.0
         
     elif problem=='flocking_weak':
         b=b_flocking_weak
@@ -993,7 +998,29 @@ if __name__ == '__main__':
         x_max=3
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
-        sigma=1
+        sigma=1.0
+        rho=1.0
+    elif problem=='flocking_solution':
+        periodic_2_pi=False
+        J=25
+        num_keep=5
+        T=10
+        num_t=100
+        delta_t=T/(num_t-1)
+        t_grid=np.linspace(0,T,num_t)
+        delta_x=delta_t**(2)
+        x_min=-5
+        x_max=5
+        num_x=int((x_max-x_min)/delta_x+1)
+        x_grid=np.linspace(x_min,x_max,num_x)
+        sigma=1.0
+        rho=1.0
+
+        eta=np.zeros((num_t))
+        for k in range(num_t):
+            t=t_grid[k]
+            eta[k]=rho*(np.exp(2*rho*(T-t))-1)/(np.exp(2*rho*(T-t))+1)
+        
     sqrt_delta_t=np.sqrt(delta_t)
 
     if execution=='ordinary':
@@ -1202,7 +1229,8 @@ if __name__ == '__main__':
             variance_mu=sigma**2*variance_mu
             print(mean_mu,variance_mu)
 
-            mu[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid)*delta_x
+            mu[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid)
+            mu[t]=mu[t]/np.sum(mu[t])
         mu[0,int(num_x/2)]=1
 
         num_bins=5
@@ -1221,7 +1249,8 @@ if __name__ == '__main__':
             variance_mu=sigma**2*variance_mu
             print(mean_mu,variance_mu)
 
-            mu_hist[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid_hist)*delta_x_hist
+            mu_hist[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid_hist)
+            mu_hist[t]=mu_hist[t]/np.sum(mu_hist[t])
         mu_hist[0,int(num_x_hist/2)]=1
 
 
@@ -1238,8 +1267,46 @@ if __name__ == '__main__':
 
 
 
-        np.save('./Data/trader/trader_solution.npy',mu)
-        np.save('./Data/trader/trader_solution_hist.npy',mu_hist)
+        #np.save('./Data/trader/trader_solution.npy',mu)
+        #np.save('./Data/trader/trader_solution_hist.npy',mu_hist)
+        
+    elif execution=='flocking_solution':
+        mu=np.zeros((num_t,num_x))
+
+        for t in range(1,num_t):
+            mean_mu=0
+            variance_mu=0
+            for s in range(0,t):
+                variance_mu=variance_mu+delta_t*np.exp(-2*np.sum(eta[s:t])*delta_t)
+            variance_mu=sigma**2*variance_mu
+            print(mean_mu,variance_mu)
+
+            mu[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid)
+            mu[t]=mu[t]/np.sum(mu[t])
+        mu[0,int(num_x/2)]=1
+
+        num_bins=5
+        num_x_hist=int(num_x/num_bins)
+        delta_x_hist=np.abs(x_max-x_min)/num_x_hist
+        x_grid_hist=np.linspace(x_min,x_max,num_x_hist)
+        mu_hist=np.zeros((num_t,num_x_hist))
+
+
+        for t in range(1,num_t):
+            mean_mu=0
+            variance_mu=0
+            for s in range(0,t):
+                variance_mu=variance_mu+delta_t*np.exp(-2*np.sum(eta[s:t])*delta_t)
+            variance_mu=sigma**2*variance_mu
+            print(mean_mu,variance_mu)
+
+            mu_hist[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid_hist)
+            mu_hist[t]=mu_hist[t]/np.sum(mu_hist[t])
+        mu_hist[0,int(num_x_hist/2)]=1
+
+        np.save('./Data/flocking/true_solution.npy',mu)
+        np.save('./Data/flocking/true_solution_hist.npy',mu_hist)
+        
     elif execution=='true_start': # only for some problems
 
         if periodic_2_pi:
