@@ -624,7 +624,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='trader_solution'
+    problem='trader_Pontryagin'
 
 
 
@@ -632,7 +632,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='trader_solution'
+    execution='true_start'
 
 
     # possible values in order of appearance:
@@ -856,7 +856,7 @@ if __name__ == '__main__':
         f=f_trader_Pontryagin
         g=g_trader_Pontryagin
         periodic_2_pi=False
-        J=25
+        J=1
         num_keep=5
         T=1
         num_t=20
@@ -1265,8 +1265,8 @@ if __name__ == '__main__':
 
 
 
-        #np.save('./Data/trader/trader_solution.npy',mu)
-        #np.save('./Data/trader/trader_solution_hist.npy',mu_hist)
+        np.save('./Data/trader/trader_solution.npy',mu)
+        np.save('./Data/trader/trader_solution_hist.npy',mu_hist)
         
     elif execution=='flocking_solution':
         mu=np.zeros((num_t,num_x))
@@ -1315,6 +1315,8 @@ if __name__ == '__main__':
             u=np.load('u_reference_set_158.npy')
         elif problem=='trader_weak' or problem=='trader_Pontryagin':
             mu=true_solution=np.load('./Data/trader/trader_solution.npy')
+            print('made it here')
+            mu_true_start=mu
         mu_0=mu[0]
         u=np.zeros((num_t,num_x))
         v=np.zeros((num_t,num_x))
@@ -1331,7 +1333,7 @@ if __name__ == '__main__':
 
 
 
-        np.save('./Data/trader/mu_trader_true_start_t20.npy',mu)
+        #np.save('./Data/trader/mu_trader_true_start_t20.npy',mu)
             
             
     elif execution=='continuation_in_time':
