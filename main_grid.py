@@ -624,7 +624,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='trader_weak_trunc'
+    problem='flocking_solution'
 
 
 
@@ -632,7 +632,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='ordinary'
+    execution='flocking_solution'
 
 
     # possible values in order of appearance:
@@ -967,7 +967,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=20
+        num_t=40
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -986,7 +986,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=20
+        num_t=40
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -1001,7 +1001,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=20
+        num_t=40
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -1300,8 +1300,8 @@ if __name__ == '__main__':
             mu_hist[t]=mu_hist[t]/np.sum(mu_hist[t])
         mu_hist[0,int(num_x_hist/2)]=1
 
-        np.save('./Data/flocking/true_solution.npy',mu)
-        np.save('./Data/flocking/true_solution_hist.npy',mu_hist)
+        np.save('./Data/flocking/true_solution_num_t_40.npy',mu)
+        np.save('./Data/flocking/true_solution_hist_num_t_40.npy',mu_hist)
         
     elif execution=='true_start': # only for some problems
 
