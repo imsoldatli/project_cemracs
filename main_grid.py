@@ -624,7 +624,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='trader_Pontryagin'
+    problem='trader_solution'
 
 
 
@@ -632,7 +632,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='ordinary'
+    execution='trader_solution'
 
 
     # possible values in order of appearance:
@@ -859,7 +859,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=40
+        num_t=20
         delta_t=(T-0.06)/(num_t-1)
         t_grid=np.linspace(0.06,T,num_t)
         delta_x=delta_t**(2)
@@ -954,7 +954,7 @@ if __name__ == '__main__':
         for k in range(num_t):
             t=t_grid[k]
             den_bar=(delta_down*np.exp(delta_delta*(T-t))-delta_up)-c_g*B*(np.exp(delta_delta*(T-t))-1)
-            eta_bar[0,k]=-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down)/den_bar
+            eta_bar[0,k]=(-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down))/den_bar
             den=(ratio2-c_g+(ratio2+c_g)*np.exp(2*ratio*(T-t)))
             eta[0,k]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/den
 
