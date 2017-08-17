@@ -11,16 +11,16 @@ weak_trunc=np.load('./Data/trader/mu_weak_trunc_t20.npy')
 Pont=np.load('./Data/trader/mu_Pont_t20.npy')
 true_solution=np.load('./Data/trader/trader_solution.npy')
 true_solution_hist=np.load('./Data/trader/trader_solution_hist.npy')
-true_start=np.load('./Data/trader/mu_trader_true_start_t20.npy')
+#true_start=np.load('./Data/trader/mu_trader_true_start_t20.npy')
 
-y_rho_Pont=np.load('./Data/trader/y*rho_trader_Pont_t20.npy')
+y_rho_Pont=np.load('./Data/trader/y*sigma_trader_Pont_t20.npy')
 z_weak_trunc=np.load('./Data/trader/z_weak_trunc_t20.npy')
 # intialize counters of matching points between the solutions
 
 compare_weak_pont=0 #compare weak vs pontryagin
 compare_weak_true=0 #compare weak vs true solution
 compare_pont_true=0 #compare pont vs true solution
-compare_true_start_solution=0 #compare true vs pontryagin started from the true solution
+#compare_true_start_solution=0 #compare true vs pontryagin started from the true solution
 compare_shift=0
 
 # construct x_grid (it will be necessary for the animation and to calculate the mean)
@@ -43,8 +43,8 @@ col=len(weak[0])
 max_diff_weak_Pont=[] # Weak solution vs Pontryagin solution
 max_diff_true_weak=[] # true solution vs Weak solution
 max_diff_true_Pont=[] # true solution vs Pontryagin solution
-max_diff_true_start_true_solut=[] # Pontryagin solution started in the true solution vs true solution
-max_diff_true_start_Pont=[] # Pontryagin solution started in the true solution  vs Pontryagin solution
+#max_diff_true_start_true_solut=[] # Pontryagin solution started in the true solution vs true solution
+#max_diff_true_start_Pont=[] # Pontryagin solution started in the true solution  vs Pontryagin solution
 
 # clean the solutions by all values behind a threshold and save the index of the remaining values
 threshold=10**(-3)
@@ -70,8 +70,8 @@ for i in range(row):
     max_diff_weak_Pont.append(np.max(abs(weak[i]-Pont[i])))
     max_diff_true_weak.append(np.max(abs(weak[i]-true_solution[i])))
     max_diff_true_Pont.append(np.max(abs(true_solution[i]-Pont[i])))
-    max_diff_true_start_true_solut.append(np.max(abs(true_solution[i]-true_start[i])))
-    max_diff_true_start_Pont.append(np.max(abs(Pont[i]-true_start[i])))
+    #max_diff_true_start_true_solut.append(np.max(abs(true_solution[i]-true_start[i])))
+    #max_diff_true_start_Pont.append(np.max(abs(Pont[i]-true_start[i])))
 
     # cleaning the solutions & counting matching points
     row_iw=[]
@@ -118,9 +118,9 @@ print('max diff: true vs Pont',max_diff_true_Pont)
 #plt.plot(t_grid,max_diff_true_Pont,'o',label='true vs Pont')
 print('max diff: true vs weak',max_diff_true_weak)
 #plt.plot(t_grid,max_diff_true_weak,'o',label='true vs weak')
-print('max diff: true start vs true solution',max_diff_true_start_true_solut)
+#print('max diff: true start vs true solution',max_diff_true_start_true_solut)
 #plt.plot(t_grid,max_diff_true_start_true_solut,'o',label='Pont start by true vs true solution')
-print('max diff: true start vs Pont',max_diff_true_start_Pont)
+#print('max diff: true start vs Pont',max_diff_true_start_Pont)
 #plt.plot(t_grid,max_diff_true_start_Pont,'o',label='Pont start by true vs Pont')
 plt.xlabel('time grid')
 plt.ylabel('max difference')
@@ -283,10 +283,10 @@ if __name__=='__main__':
     print('wdist_true_weak',wdist_true_weak)
     wdist_true_Pont=Wd(true_solution[num_t-1],x_grid,Pont[num_t-1],x_grid,10**4)
     print('wdist_true_Pont',wdist_true_Pont)
-    wdist_true_start_true_solut=Wd(true_solution[num_t-1],x_grid,true_start[num_t-1],x_grid,10**4)
-    print('wdist_true_start_true_solut',wdist_true_start_true_solut)
-    wdist_true_start_Pont=Wd(true_start[num_t-1],x_grid,Pont[num_t-1],x_grid,10**4)
-    print('wdist_true_start_Pont',wdist_true_start_Pont)
+    #wdist_true_start_true_solut=Wd(true_solution[num_t-1],x_grid,true_start[num_t-1],x_grid,10**4)
+    #print('wdist_true_start_true_solut',wdist_true_start_true_solut)
+    #wdist_true_start_Pont=Wd(true_start[num_t-1],x_grid,Pont[num_t-1],x_grid,10**4)
+    #print('wdist_true_start_Pont',wdist_true_start_Pont)
     wdist_weak_trunc_true=Wd(weak_trunc[num_t-1],x_grid,true_solution[num_t-1],x_grid,10**4)
     print('wdist_weak_trunc_true',wdist_weak_trunc_true)
 

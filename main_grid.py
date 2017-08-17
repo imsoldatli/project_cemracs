@@ -26,6 +26,7 @@ import matplotlib.pyplot as plt
 import scipy
 import time
 import scipy.stats
+import os
 
 #Define functions b, f, and g for a variety of problems:
 
@@ -604,7 +605,7 @@ def solver_grid(level,mu_0,X_grids):
             index+=1
             
     if level==0:
-        return [u[0,:],mu,u,v,all_Y_0_values,thing1]
+        return [u[0,:],mu,u,v,all_Y_0_values]
     return u[0,:]
 
 
@@ -623,7 +624,7 @@ if __name__ == '__main__':
 
     global execution
 
-    execution='ordinary'
+    execution='continuation_in_time'
 
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, trader_solution,
@@ -828,8 +829,8 @@ if __name__ == '__main__':
         rho=1
     elif problem=='trader_Pontryagin':
         sigma=0.7
-        rho=0.3
-        c_x=2
+        rho=1.5
+        c_x=10
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -1060,7 +1061,7 @@ if __name__ == '__main__':
                 bounds[1,t]=sigma*max(u[t])
             np.save('./Data/trader/mu_Pont_t20.npy',mu)
             np.save('./Data/trader/value_y_Pont_to_trunc_z_weak.npy',bounds)
-            np.save('./Data/trader/y*rho_trader_Pont_t20',np.multiply(-rho,u))
+            np.save('./Data/trader/y*sigma_trader_Pont_t20',np.multiply(sigma,u))
         elif problem=='trader_weak':
             np.save('./Data/trader/mu_weak_t20.npy',mu)
         elif problem=='trader_weak_trunc':
@@ -1164,8 +1165,8 @@ if __name__ == '__main__':
         print all_Y_0_values[index]
     
     elif execution=='changing_rho':
-        num_rho=15
-        rho_values=np.linspace(2.5,5,num_rho)
+        num_rho=10
+        rho_values=np.linspace(3,12,num_rho)
 
         all_Y_0_values=np.zeros((num_rho,num_keep))
         value_x=num_keep*[1]
@@ -1173,7 +1174,7 @@ if __name__ == '__main__':
         for index in range(num_rho):
             index2=0
             #rho=rho_values[index]
-            rho=rho_values[index]
+            c_x=rho_values[index]
             
             
             mu_0=np.zeros((num_x))
@@ -1197,11 +1198,11 @@ if __name__ == '__main__':
             print all_Y_0_values[index]
 
             plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index],'o')
-        plt.title('sigma = 0.7, rho \in [3.5,5], c_x = 2, h_{bar}=2, c_g=0.3')
+        plt.title('sigma = 0.7, rho = 1.5, $c_x /in [3,12]$, h_{bar}=2, c_g=0.3')
         plt.show()
 
-        plt.savefig('./Data/trader/grid_trader_pontryagin_changing_rho.eps')
-        np.save('./Data/trader/grid_trader_pontryagin_rho_changing_rho.npy',all_Y_0_values)
+        #plt.savefig('./Data/trader/grid_trader_pontryagin_changing_rho.eps')
+        #np.save('./Data/trader/grid_trader_pontryagin_rho_changing_rho.npy',all_Y_0_values)
 
 
 
@@ -1352,8 +1353,6 @@ if __name__ == '__main__':
             u=np.load('u_reference_set_158.npy')
         elif problem=='trader_weak' or problem=='trader_Pontryagin':
             mu=true_solution=np.load('./Data/trader/trader_solution.npy')
-            print('made it here')
-            mu_true_start=mu
         mu_0=mu[0]
         u=np.zeros((num_t,num_x))
         v=np.zeros((num_t,num_x))
@@ -1379,16 +1378,15 @@ if __name__ == '__main__':
         J_2=25
         global num_level
         
-        num_level=2
+        num_level=3
 
-        num_t=7
+        num_t=5
         delta_t=T/num_level/(num_t-1)
         sqrt_delta_t=math.sqrt(delta_t)
         #delta_x=(delta_t*num_level)**2
         delta_x=delta_t**(2)
         
-        x_min=-1
-        x_max=5
+
         num_x=int((x_max-x_min)/delta_x)+1
         x_grid=np.linspace(x_min,x_max,num_x)
 
@@ -1396,10 +1394,10 @@ if __name__ == '__main__':
         X_grids=[]
         for i in range(num_level):
             X_grids.append(x_grid)
-        mu_0=np.zeros((num_x))
-        mu_0[int(num_x/2)]=1.0
 
-              
+
+
+##### Uncomment the following if you want an adaptive grid for X
 
 #        x_0=2
 #        # x_grid for each level, should be an increasing sequence
@@ -1417,8 +1415,45 @@ if __name__ == '__main__':
 #        mu_0=np.zeros(int(num_x_vec[0]))
 #        mu_0[int(num_x_vec[0]/2)]=1.0
 
-        
-        [u_0,mu,u,v,all_Y_0_values,thing1]=solver_grid(0,mu_0,X_grids)
-        print(all_Y_0_values)
-    end_time=time.time()
-    print('Time elapsted:',end_time-start_time)
+
+##### Uncomment the following if you want lunch the code for a single value of rho
+        # mu_0=np.zeros((num_x))
+        # mu_0[int(num_x/2)]=1.0
+        #
+        # [u_0,mu,u,v,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
+        # print(all_Y_0_values)
+        # end_time=time.time()
+        # print('Time elapsted:',end_time-start_time)
+        # os.system('say "bibidi bobidi bu"')
+
+
+##### Uncomment the following if you want lunch the code for several values of rho
+
+        num_rho=11
+        rho_values=np.linspace(1,12,num_rho)
+
+        value_x=num_keep*[1]
+        plot_cx = plt.figure()
+        for index in range(num_rho):
+             #rho=rho_values[index]
+             c_x=rho_values[index]
+
+
+             mu_0=np.zeros((num_x))
+             mu_0[int(num_x/2)]=1.0
+
+             [u_0,mu,u,v,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
+
+
+             print all_Y_0_values
+
+             plot_cx=plt.plot(np.multiply(c_x,value_x),all_Y_0_values,'o')
+        plt.title('Continuation in time : sigma = 0.7, rho = 1.5, $c_x /in [3,12]$, h_{bar}=2, c_g=0.3')
+        plt.show()
+
+
+
+        end_time=time.time()
+
+        print('Time elapsted:',end_time-start_time)
+        os.system('say "your program has finished"')
