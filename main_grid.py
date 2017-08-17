@@ -615,7 +615,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='trader_weak'
+    problem='trader_Pontryagin'
 
 
 
@@ -624,12 +624,12 @@ if __name__ == '__main__':
 
     global execution
 
-    execution='ordinary'
+    execution='changing_delta_t'
 
 
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, trader_solution,
-    #true_start, continuation_in_time
+    #true_start, changing_delta_t, continuation_in_time,
     
     global linear_int
     linear_int=False
@@ -851,7 +851,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=20
+        num_t=50
         delta_t=(T-0.06)/(num_t-1)
         t_grid=np.linspace(0.06,T,num_t)
         delta_x=delta_t**(2)
@@ -1371,7 +1371,77 @@ if __name__ == '__main__':
 
 
         #np.save('./Data/trader/mu_trader_true_start_t20.npy',mu)
-            
+    if execution=='changing_delta_t':
+        value_num_t=np.linspace(5,50,10)
+        for n in range(len(value_num_t)):
+
+            num_t=int(value_num_t[n])
+            print('num_t=',num_t)
+
+            delta_t=(T-0.06)/(num_t-1)
+            t_grid=np.linspace(0.06,T,num_t)
+            delta_x=delta_t**(2)
+            x_min=-2
+            x_max=4
+            num_x=int((x_max-x_min)/delta_x+1)
+            x_grid=np.linspace(x_min,x_max,num_x)
+
+            mu_0=np.zeros((num_x))
+            if periodic_2_pi:
+                mu_0=np.load('mu_initial_reference_set_158.npy')
+                #mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
+                #mu_0=[mu_0[int(i/6)] for i in range(num_x)]
+                #mu_0=mu_0/np.sum(mu_0)
+                #mu_0[0]=1
+            else:
+                mu_0[int(num_x/2)]=1.0
+
+            mu=np.zeros((num_t,num_x))
+            for k in range(num_t):
+                mu[k]=mu_0
+            u=np.zeros((num_t,num_x))
+            v=np.zeros((num_t,num_x))
+            index2=0
+            all_Y_0_values=np.zeros((len(value_num_t),num_keep))
+            all_Z_0_values=np.zeros((len(value_num_t),num_keep))
+
+
+            for j in range(1):
+                [u,v]=backward(mu,u,v)
+                mu=forward(u,v,mu_0)
+            u=np.zeros((num_t,num_x))
+            v=np.zeros((num_t,num_x))
+
+
+            for j in range(J):
+                [u,v]=backward(mu,u,v)
+                mu=forward(u,v,mu_0)
+                thing2=u
+                if j>J-num_keep-1:
+                    all_Y_0_values[n][index2]=np.dot(u[0],mu[0])
+                    all_Z_0_values[n][index2]=np.dot(v[0],mu[0])
+                    index2+=1
+            print all_Y_0_values[n]
+            print all_Z_0_values[n]
+
+
+
+            # if problem=='trader_Pontryagin':
+            #     bounds=np.zeros((2,num_t))
+            #     for t in range(num_t):
+            #         bounds[0,t]=sigma*min(u[t])
+            #         bounds[1,t]=sigma*max(u[t])
+            if num_t==10 or num_t==30 or num_t==50:
+                np.save('./Data/trader/mu_Pont_t'+str(num_t)+'.npy',mu)
+            #     np.save('./Data/trader/value_y_Pont_to_trunc_z_weak.npy',bounds)
+            #     np.save('./Data/trader/y*sigma_trader_Pont_t20',np.multiply(sigma,u))
+            # elif problem=='trader_weak':
+            #     np.save('./Data/trader/mu_weak_t20.npy',mu)
+            #     np.save('./Data/trader/z_weak_t20.npy',v)
+            # elif problem=='trader_weak_trunc':
+            #     np.save('./Data/trader/mu_weak_trunc_t20.npy',mu)
+            #     np.save('./Data/trader/z_weak_trunc_t20.npy',v)
+
             
     elif execution=='continuation_in_time':
         global J_1,J_2
@@ -1454,7 +1524,7 @@ if __name__ == '__main__':
 
 
 
-        end_time=time.time()
+    end_time=time.time()
 
-        print('Time elapsted:',end_time-start_time)
-        os.system('say "your program has finished"')
+    print('Time elapsted:',end_time-start_time)
+    os.system('say "your program has finished"')
