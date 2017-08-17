@@ -614,7 +614,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='flocking_solution'
+    problem='jetlag_Pontryagin'
 
 
 
@@ -622,7 +622,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='flocking_solution'
+    execution='ordinary'
 
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, trader_solution,
