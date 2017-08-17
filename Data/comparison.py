@@ -14,6 +14,7 @@ true_solution_hist=np.load('./Data/trader/trader_solution_hist.npy')
 #true_start=np.load('./Data/trader/mu_trader_true_start_t20.npy')
 
 y_rho_Pont=np.load('./Data/trader/y*sigma_trader_Pont_t20.npy')
+z_weak=np.load('./Data/trader/z_weak_t20.npy')
 z_weak_trunc=np.load('./Data/trader/z_weak_trunc_t20.npy')
 # intialize counters of matching points between the solutions
 
@@ -305,8 +306,15 @@ if __name__=='__main__':
 
 
 max_diff_y_rho_Pont_z_weak_trunc=[]
+result_w=np.zeros(num_t)
+result_wt=np.zeros(num_t)
 for t in range(num_t):
-    max_diff_y_rho_Pont_z_weak_trunc.append(np.max(abs(y_rho_Pont[t]-z_weak_trunc[t])))
-print('max_diff_y_rho_Pont_z_weak_trunc',max_diff_y_rho_Pont_z_weak_trunc)
-print('max_diff_y_rho_Pont_z_weak_trunc',max_diff_y_rho_Pont_z_weak_trunc)
+    square_P_w=np.power(y_rho_Pont[t]-z_weak[t],2)
+    result_w[t]=np.dot(square_P_w,true_solution[t])
+
+    square_P_wt=np.power(y_rho_Pont[t]-z_weak_trunc[t],2)
+    result_wt[t]=np.dot(square_P_wt,true_solution[t])
+    print('2norm_y_sigma_Pont_z_weak',result_w)
+    print('max_diff_y_sigma_Pont_z_weak_trunc',result_wt)
+
 

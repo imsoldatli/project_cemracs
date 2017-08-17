@@ -615,7 +615,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='jetlag_Pontryagin'
+    problem='trader_weak'
 
 
 
@@ -624,7 +624,7 @@ if __name__ == '__main__':
 
     global execution
 
-    execution='continuation_in_time'
+    execution='ordinary'
 
 
     # possible values in order of appearance:
@@ -830,8 +830,8 @@ if __name__ == '__main__':
         rho=1
     elif problem=='trader_Pontryagin':
         sigma=0.7
-        rho=1.5
-        c_x=10
+        rho=0.3
+        c_x=2
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -1065,6 +1065,7 @@ if __name__ == '__main__':
             np.save('./Data/trader/y*sigma_trader_Pont_t20',np.multiply(sigma,u))
         elif problem=='trader_weak':
             np.save('./Data/trader/mu_weak_t20.npy',mu)
+            np.save('./Data/trader/z_weak_t20.npy',v)
         elif problem=='trader_weak_trunc':
             np.save('./Data/trader/mu_weak_trunc_t20.npy',mu)
             np.save('./Data/trader/z_weak_trunc_t20.npy',v)
@@ -1301,7 +1302,6 @@ if __name__ == '__main__':
         # u=np.zeros((num_t,num_x))
         # v=np.zeros((num_t,num_x))
         # mu=forward(u,v,mu_0)
-
 
 
         np.save('./Data/trader/trader_solution.npy',mu)
