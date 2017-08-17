@@ -624,7 +624,6 @@ if __name__ == '__main__':
     global execution
     execution='flocking_solution'
 
-
     # possible values in order of appearance:
     # ordinary, changing_sigma, changing_rho, adaptive, trader_solution,
     #true_start, continuation_in_time
@@ -828,8 +827,8 @@ if __name__ == '__main__':
         rho=1
     elif problem=='trader_Pontryagin':
         sigma=0.7
-        rho=3
-        c_x=3
+        rho=0.3
+        c_x=2
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -861,8 +860,8 @@ if __name__ == '__main__':
 # convergence for rho=0.1
     elif problem=='trader_weak':
         sigma=0.7
-        rho=3
-        c_x=3
+        rho=0.3
+        c_x=2
         h_bar=2
         c_g=0.3
         b=b_trader_weak
@@ -883,8 +882,8 @@ if __name__ == '__main__':
 
     elif problem=='trader_weak_trunc': #if rho is big enough, otherwise it gives the same results as trader_weak
         sigma=0.7
-        rho=4.5
-        c_x=4
+        rho=0.3
+        c_x=2
         h_bar=2
         c_g=0.3
         b=b_trader_weak_trunc
@@ -1030,6 +1029,8 @@ if __name__ == '__main__':
         v=np.zeros((num_t,num_x))
         index2=0
         all_Y_0_values=np.zeros((1,num_keep))
+        all_Z_0_values=np.zeros((1,num_keep))
+
         
         for j in range(1):
             [u,v]=backward(mu,u,v)
@@ -1044,27 +1045,29 @@ if __name__ == '__main__':
             thing2=u
             if j>J-num_keep-1:
                 all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
+                all_Z_0_values[0][index2]=np.dot(v[0],mu[0])
                 index2+=1
         print all_Y_0_values[0]
+        print all_Z_0_values[0]
 
 
 
-#        if problem=='trader_Pontryagin':
-#            bounds=np.zeros((2,num_t))
-#            for t in range(num_t):
-#                bounds[0,t]=min(u[t])
-#                bounds[1,t]=max(u[t])
-#            np.save('./Data/trader/mu_Pont_t20.npy',mu)
-#            np.save('./Data/trader/value_y_Pont_to_trunc_z_weak.npy',bounds)
-#            np.save('./Data/trader/y*rho_trader_Pont_t20',np.multiply(-rho,u))
-#        elif problem=='trader_weak':
-#            np.save('./Data/trader/mu_weak_t20.npy',mu)
-#        elif problem=='trader_weak_trunc':
-#            np.save('./Data/trader/mu_weak_trunc_t20.npy',mu)
-#            np.save('./Data/trader/z_weak_trunc_t20.npy',v)
+        if problem=='trader_Pontryagin':
+            bounds=np.zeros((2,num_t))
+            for t in range(num_t):
+                bounds[0,t]=sigma*min(u[t])
+                bounds[1,t]=sigma*max(u[t])
+            np.save('./Data/trader/mu_Pont_t20.npy',mu)
+            np.save('./Data/trader/value_y_Pont_to_trunc_z_weak.npy',bounds)
+            np.save('./Data/trader/y*rho_trader_Pont_t20',np.multiply(-rho,u))
+        elif problem=='trader_weak':
+            np.save('./Data/trader/mu_weak_t20.npy',mu)
+        elif problem=='trader_weak_trunc':
+            np.save('./Data/trader/mu_weak_trunc_t20.npy',mu)
+            np.save('./Data/trader/z_weak_trunc_t20.npy',v)
 
     if execution=='changing_bounds':
-            step=np.linspace(0.1,1,10)
+            step=np.linspace(1,10,15)
             initial_bounds=bounds
             for k in range(len(step)):
             #for k in range(1,2):
@@ -1081,6 +1084,7 @@ if __name__ == '__main__':
                 v=np.zeros((num_t,num_x))
                 index2=0
                 all_Y_0_values=np.zeros((1,num_keep))
+                all_Z_0_values=np.zeros((1,num_keep))
 
                 for j in range(1):
                     [u,v]=backward(mu,u,v)
@@ -1095,8 +1099,11 @@ if __name__ == '__main__':
                     thing2=u
                     if j>J-num_keep-1:
                         all_Y_0_values[0][index2]=np.dot(u[0],mu[0])
+                        all_Z_0_values[0][index2]=np.dot(v[0],mu[0])
                         index2+=1
-                print all_Y_0_values[0]
+                print ('Y_0',all_Y_0_values[0])
+                print ('Z_0',all_Z_0_values[0])
+
 
 
 
