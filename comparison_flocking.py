@@ -46,9 +46,13 @@ def Wd(mu_1,grid_1,mu_2,grid_2,Nint,p=2):
     return W
     
 if __name__ == '__main__':
-    mu_Pontryagin=np.load('./Data/flocking/mu_Pontryagin_num_t_40.npy')
-    mu_weak=np.load('./Data/flocking/mu_weak_num_t_40.npy')
-    mu_true=np.load('./Data/flocking/true_solution_num_t_40_more_accurate.npy')
+#    mu_Pontryagin=np.load('./Data/flocking/mu_Pontryagin_num_t_40.npy')
+#    mu_weak=np.load('./Data/flocking/mu_weak_num_t_40.npy')
+#    mu_true=np.load('./Data/flocking/true_solution_num_t_40.npy')
+    
+    mu_Pontryagin=np.load('./Data/flocking/mu_Pontryagin_num_t_60.npy')
+    mu_weak=np.load('./Data/flocking/mu_weak_num_t_60.npy')
+    mu_true=np.load('./Data/flocking/true_solution_num_t_60.npy')
 
     mu_Pontryagin_end=mu_Pontryagin[len(mu_Pontryagin)-1]
     mu_weak_end=mu_weak[len(mu_weak)-1]
@@ -68,7 +72,7 @@ if __name__ == '__main__':
     
     print(d1,d2,d3)
     
-    num_bins=int(num_x/10)
+    num_bins=int(num_x/30)
     num_x_hist=int(num_x/num_bins)
     delta_x_hist=np.abs(x_max-x_min)/num_x_hist
     x_grid_hist=np.linspace(x_min,x_max,num_x_hist)
