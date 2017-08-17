@@ -48,7 +48,7 @@ def Wd(mu_1,grid_1,mu_2,grid_2,Nint,p=2):
 if __name__ == '__main__':
     mu_Pontryagin=np.load('./Data/flocking/mu_Pontryagin_num_t_40.npy')
     mu_weak=np.load('./Data/flocking/mu_weak_num_t_40.npy')
-    mu_true=np.load('./Data/flocking/true_solution_num_t_40_more_accurate.npy')
+    mu_true=np.load('./Data/flocking/true_solution_num_t_40.npy')
 
     mu_Pontryagin_end=mu_Pontryagin[len(mu_Pontryagin)-1]
     mu_weak_end=mu_weak[len(mu_weak)-1]

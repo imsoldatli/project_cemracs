@@ -614,7 +614,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='trader_Pontryagin'
+    problem='flocking_solution'
 
 
 
@@ -622,7 +622,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='changing_bounds'
+    execution='flocking_solution'
 
 
     # possible values in order of appearance:
@@ -991,7 +991,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=400
+        num_t=40
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -1007,7 +1007,7 @@ if __name__ == '__main__':
         eta=np.zeros((num_t))
         for k in range(num_t):
             t=t_grid[k]
-            eta[k]=rho*(np.exp(2*rho*(T-t))-1)/(np.exp(2*rho*(T-t))+1)
+            eta[k]=np.sqrt(rho)*(np.exp(2*np.sqrt(rho)*(T-t))-1)/(np.exp(2*np.sqrt(rho)*(T-t))+1)
         
     sqrt_delta_t=np.sqrt(delta_t)
 
@@ -1331,11 +1331,11 @@ if __name__ == '__main__':
             mu_hist[t]=mu_hist[t]/np.sum(mu_hist[t])
         mu_hist[0,int(num_x_hist/2)]=1
                 
-        mu=[mu[10*i] for i in range(40)]
-        mu_hist=[mu_hist[10*i] for i in range(40)]
+        #mu=[mu[10*i] for i in range(40)]
+        #mu_hist=[mu_hist[10*i] for i in range(40)]
 
-        #np.save('./Data/flocking/true_solution_num_t_40_more_accurate.npy',mu)
-        #np.save('./Data/flocking/true_solution_hist_num_t_40_more_accurate.npy',mu_hist)
+        np.save('./Data/flocking/true_solution_num_t_40.npy',mu)
+        np.save('./Data/flocking/true_solution_hist_num_t_40.npy',mu_hist)
         
     elif execution=='true_start': # only for some problems
 
