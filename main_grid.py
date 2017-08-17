@@ -956,7 +956,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=40
+        num_t=60
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -975,7 +975,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=40
+        num_t=60
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -990,14 +990,14 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=40
+        num_t=60
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
         x_min=-3
         x_max=3
         num_x=int((x_max-x_min)/delta_x+1)
-        num_x=9127
+        #num_x=9127
         delta_x=(x_max-x_min)/(num_x-1)
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1.0
@@ -1341,8 +1341,8 @@ if __name__ == '__main__':
         #mu=[mu[10*i] for i in range(40)]
         #mu_hist=[mu_hist[10*i] for i in range(40)]
 
-        np.save('./Data/flocking/true_solution_num_t_40.npy',mu)
-        np.save('./Data/flocking/true_solution_hist_num_t_40.npy',mu_hist)
+        np.save('./Data/flocking/true_solution_num_t_60.npy',mu)
+        np.save('./Data/flocking/true_solution_hist_num_t_60.npy',mu_hist)
         
     elif execution=='true_start': # only for some problems
 

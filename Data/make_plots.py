@@ -90,23 +90,23 @@ if __name__ == '__main__':
 #    plt.savefig('grid_jetlag_Weak_larger_delta_t_truncation.eps')
     
     
-#    plt.scatter(x_grid_hist,mu_Pontryagin_hist[20])
-#    plt.xlabel('x')
-#    plt.ylabel('$\mu(x)$')
-#    plt.title('Flocking, Grid Algorithm, Pontryagin Approach, T/2')
-#    plt.savefig('flocking_Pontryagin_grid_10_bins.eps')
+    plt.scatter(x_grid_hist,mu_Pontryagin_hist[30])
+    plt.xlabel('x')
+    plt.ylabel('$\mu(x)$')
+    plt.title('Flocking, Grid Algorithm, Pontryagin Approach, T/2')
+    plt.savefig('flocking_Pontryagin_grid_10_bins_num_t_60.eps')
 
-#    plt.scatter(x_grid_hist,mu_weak_hist[20])
+#    plt.scatter(x_grid_hist,mu_weak_hist[30])
 #    plt.xlabel('x')
 #    plt.ylabel('$\mu(x)$')
 #    plt.title('Flocking, Grid Algorithm, Weak Approach, T/2')
-#    plt.savefig('flocking_weak_grid_10_bins.eps')
+#    plt.savefig('flocking_weak_grid_10_bins_num_t_60.eps')
 
-    plt.scatter(x_grid_hist,mu_true_hist[20])
-    plt.xlabel('x')
-    plt.ylabel('$\mu(x)$')
-    plt.title('Flocking, True Solution, T/2')
-    plt.savefig('flocking_true_solution_10_bins.eps')
+#    plt.scatter(x_grid_hist,mu_true_hist[30])
+#    plt.xlabel('x')
+#    plt.ylabel('$\mu(x)$')
+#    plt.title('Flocking, True Solution, T/2')
+#    plt.savefig('flocking_true_solution_10_bins_num_t_60.eps')
     
 #    #data=plt.hist(X[5])
 #    counts=data[0]
