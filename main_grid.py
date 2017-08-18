@@ -22,11 +22,11 @@ non constant, and multidimensional state space.
 from __future__ import division
 import numpy as np
 import math
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import scipy
 import time
 import scipy.stats
-#import os
+import os
 
 #Define functions b, f, and g for a variety of problems:
 
@@ -615,7 +615,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='flocking_Pontryagin'
+    problem='trader_Pontryagin'
 
 
 
@@ -624,11 +624,7 @@ if __name__ == '__main__':
 
     global execution
 
-<<<<<<< HEAD
-    execution='continuation_in_time'
-=======
-    execution='changing_rho'
->>>>>>> d1f47e52b869268e7acdfb2fa9551378178d702f
+    execution='ordinary'
 
 
     # possible values in order of appearance:
@@ -834,8 +830,8 @@ if __name__ == '__main__':
         rho=1
     elif problem=='trader_Pontryagin':
         sigma=0.7
-        rho=0.3
-        c_x=7
+        rho=7
+        c_x=2
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -915,7 +911,7 @@ if __name__ == '__main__':
 
     elif problem=='trader_solution':
         sigma=0.7
-        rho=0.3
+        rho=7
         c_x=2
         h_bar=2
         c_g=0.3
@@ -1171,15 +1167,11 @@ if __name__ == '__main__':
         print all_Y_0_values[index]
     
     elif execution=='changing_rho':
-<<<<<<< HEAD
-        num_rho=15
-        rho_values=np.linspace(2.5,5,num_rho)
-=======
+
         num_rho=10
         rho_values=np.linspace(3,12,num_rho)
         if problem=='flocking_Pontryagin' or problem=='flocking_weak':
             rho_values=np.linspace(1,10,num_rho)
->>>>>>> d1f47e52b869268e7acdfb2fa9551378178d702f
 
         all_Y_0_values=np.zeros((num_rho,num_keep))
         value_x=num_keep*[1]
@@ -1385,14 +1377,11 @@ if __name__ == '__main__':
 
         #np.save('./Data/trader/mu_trader_true_start_t20.npy',mu)
     if execution=='changing_delta_t':
-<<<<<<< HEAD
-        value_num_t=np.linspace(70,100,2)
-=======
+
         value_num_t=np.linspace(10,150,8)
         #value_num_t=np.linspace(4,20,9)
         all_Y_0_values=np.zeros((len(value_num_t),num_keep))
         all_Z_0_values=np.zeros((len(value_num_t),num_keep))
->>>>>>> d1f47e52b869268e7acdfb2fa9551378178d702f
         for n in range(len(value_num_t)):
 
             num_t=int(value_num_t[n])
@@ -1508,13 +1497,11 @@ if __name__ == '__main__':
             #     for t in range(num_t):
             #         bounds[0,t]=sigma*min(u[t])
             #         bounds[1,t]=sigma*max(u[t])
-<<<<<<< HEAD
             if num_t==70 or num_t==100:
                 np.save('./Data/trader/mu_Pont_t'+str(num_t)+'.npy',mu)
-=======
 #            if num_t==10 or num_t==30 or num_t==50:
 #                np.save('./Data/trader/mu_Pont_t'+str(num_t)+'.npy',mu)
->>>>>>> d1f47e52b869268e7acdfb2fa9551378178d702f
+
             #     np.save('./Data/trader/value_y_Pont_to_trunc_z_weak.npy',bounds)
             #     np.save('./Data/trader/y*sigma_trader_Pont_t20',np.multiply(sigma,u))
             # elif problem=='trader_weak':
@@ -1609,8 +1596,6 @@ if __name__ == '__main__':
     end_time=time.time()
 
     print('Time elapsted:',end_time-start_time)
-<<<<<<< HEAD
+
     os.system('say "Eureka!"')
-=======
     #os.system('say "your program has finished"')
->>>>>>> d1f47e52b869268e7acdfb2fa9551378178d702f

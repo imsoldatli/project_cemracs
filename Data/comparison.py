@@ -8,8 +8,8 @@ import math
 value_num_t=np.linspace(10,150,8)
 mu_weak_delta_t=[]
 mu_weak_trunc_delta_t=[]
-mu_Pont_delta_t_hist=[]
-mu_true_delta_t_hist=[]
+mu_Pont_delta_t=[]
+mu_true_delta_t=[]
 
 y_weak_delta_t=[]
 y_weak_trunc_delta_t=[]
@@ -23,26 +23,20 @@ z_true_delta_t=[]
 
 for k in range(len(value_num_t)):
     #load solutions: mu
-    mu_weak=np.load('./Data/trader/mu_weak_t'+str(value_num_t[k])+'.npy')
-    mu_weak_trunc=np.load('./Data/trader/mu_weak_trunc_t'+str(value_num_t[k])+'.npy')
-    mu_Pont=np.load('./Data/trader/mu_Pont_t'+str(value_num_t[k])+'.npy')
-    mu_true=np.load('./Data/trader/trader_solution'+str(value_num_t[k])+'.npy')
-    mu_true_hist=np.load('./Data/trader/trader_solution_hist'+str(value_num_t[k])+'.npy')
-    # load solutions: y
-    y_rho_Pont=np.load('./Data/trader/y*sigma_trader_Pont_t+str(value_num_t[k])+.npy')
-    y_Pont=np.load()
-    y_weak=np.load()
-    y_weak_trunc=np.load()
-    y_true=np.load()
-    # load solutions: z
-    z_Pont=np.load()
-    z_weak=np.load('./Data/trader/z_weak_t20.npy')
-    z_weak_trunc=np.load('./Data/trader/z_weak_trunc_t20.npy')
-    z_true=np.load()
 
-Pont_t10=np.load('./Data/trader/mu_Pont_t10.npy')
-Pont_t30=np.load('./Data/trader/mu_Pont_t30.npy')
-Pont_t50=np.load('./Data/trader/mu_Pont_t50.npy')
+    mu_weak_delta_t.append(np.load('./Data/from_cluster/trader/trader_mu_weak_t'+str(int(value_num_t[k]))+'.npy'))
+    mu_weak_trunc_delta_t.append(np.load('./Data/from_cluster/trader/trader_mu_weak_trunc_t'+str(int(value_num_t[k]))+'.npy'))
+    mu_Pont_delta_t.append(np.load('./Data/from_cluster/trader/trader_mu_Pont_t'+str(int(value_num_t[k]))+'.npy'))
+    mu_true_delta_t.append(np.load('./Data/from_cluster/trader/trader_solution'+str(int(value_num_t[k]))+'.npy'))
+    mu_true_delta_t.append(np.load('./Data/from_cluster/trader/trader_solution_hist'+str(int(value_num_t[k]))+'.npy'))
+    # load solutions: y
+    y_Pont_delta_t.append(np.load('trader_Y_0_Pont'+str(int(value_num_t[k]))+'.npy'))
+    # load solutions: z
+    z_Pont_delta_t.append(np.load())
+    z_weak_delta_t.append(np.load('./Data/trader/trader_Z_0_weak'+str(int(value_num_t[k]))+'.npy'))
+    z_weak_trunc_delta_t.append(np.load('./Data/trader/trader_Z_0_weak_trunc30.npy.npy'))
+    z_true_delta_t.append(np.load())
+
 
 
 # intialize counters of matching points between the solutions
