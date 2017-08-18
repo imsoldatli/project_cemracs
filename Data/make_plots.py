@@ -119,13 +119,25 @@ if __name__ == '__main__':
 #    plt.title('Flocking, Tree Algorithm, Pontryagin Approach, T/2')
 #    plt.savefig('flocking_Pontryagin_tree_10_bins.eps')
     
-    #data=plt.hist(X[5])
-    counts=data[0]
-    counts=counts/sum(counts)
-    markers=data[1]
-    centers=[(markers[i]+markers[i+1])/2.0 for i in range(len(markers)-1)]
-    plt.scatter(centers,counts)
-    plt.xlabel('x')
-    plt.ylabel('$\mu(x)$')
-    plt.title('Flocking, Tree Algorithm, Weak Approach, T/2')
-    plt.savefig('flocking_weak_tree_10_bins.eps')
+#    #data=plt.hist(X[5])
+#    counts=data[0]
+#    counts=counts/sum(counts)
+#    markers=data[1]
+#    centers=[(markers[i]+markers[i+1])/2.0 for i in range(len(markers)-1)]
+#    plt.scatter(centers,counts)
+#    plt.xlabel('x')
+#    plt.ylabel('$\mu(x)$')
+#    plt.title('Flocking, Tree Algorithm, Weak Approach, T/2')
+#    plt.savefig('flocking_weak_tree_10_bins.eps')
+
+    rho_values=np.load('./trader/trader_continuation_time_3_levels_c_x_values.npy')
+    grid_Y_0_values=np.load('./trader/trader_continuation_time_3_levels_changing_c_x.npy')
+    
+    num_keep=5
+    for index2 in range(num_keep):
+        for index in range(len(rho_values)):
+            grid=plt.scatter(rho_values[index],grid_Y_0_values[index][index2],color='blue')
+    plt.xlabel('c_x')
+    plt.ylabel('Y_0')
+    plt.title('Continuation in time : sigma = 0.7, rho = 1.5, $c_x /in [3,12]$, h_{bar}=2, c_g=0.3')
+    plt.savefig('trader_continuation_time_3_levels_changing_c_x.eps')
