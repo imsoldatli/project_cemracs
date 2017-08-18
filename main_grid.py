@@ -830,8 +830,8 @@ if __name__ == '__main__':
         rho=1
     elif problem=='trader_Pontryagin':
         sigma=0.7
-        rho=7
-        c_x=2
+        rho=0.3
+        c_x=8
         h_bar=2
         c_g=0.3
         # sigma=0.7
