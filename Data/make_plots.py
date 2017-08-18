@@ -145,4 +145,4 @@ if __name__ == '__main__':
     plt.scatter(log_num_t,log_errors)
     plt.xlabel('log number of time steps')
     plt.ylabel('log error in Y_0')
-    plt.savefig('ex_1_tree_one_level.eps')
+    plt.savefig('ex_1_grid.eps')

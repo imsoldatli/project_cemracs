@@ -615,7 +615,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='trader_Pontryagin'
+    problem='flocking_Pontryagin'
 
 
 
@@ -624,7 +624,7 @@ if __name__ == '__main__':
 
     global execution
 
-    execution='changing_delta_t'
+    execution='changing_rho'
 
 
     # possible values in order of appearance:
@@ -785,8 +785,8 @@ if __name__ == '__main__':
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
-        x_min=-1
-        x_max=5
+        x_min=-3
+        x_max=7
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
@@ -905,7 +905,7 @@ if __name__ == '__main__':
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
         global bounds
-        bounds=np.load('./Data/trader/value_y_Pont_to_trunc_z_weak.npy')
+        #bounds=np.load('./Data/trader/value_y_Pont_to_trunc_z_weak.npy')
     # Variable trader
 
 
@@ -1169,6 +1169,8 @@ if __name__ == '__main__':
     elif execution=='changing_rho':
         num_rho=10
         rho_values=np.linspace(3,12,num_rho)
+        if problem=='flocking_Pontryagin' or problem=='flocking_weak':
+            rho_values=np.linspace(1,10,num_rho)
 
         all_Y_0_values=np.zeros((num_rho,num_keep))
         value_x=num_keep*[1]
