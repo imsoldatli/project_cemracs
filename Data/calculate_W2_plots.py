@@ -53,11 +53,12 @@ if __name__ == '__main__':
     all_d5=np.zeros(20)
     all_d6=np.zeros(20)
     for k in range(20):
-        num_t=value_num_t[j]
-        mu_Pontryagin=np.load('./Data/trader_mu_Pont_t'+str(num_t)+'.npy')
-        mu_weak=np.load('./Data/trader_mu_weak_t'+str(num_t)+'.npy')
-        mu_weak_trunc=np.load('./Data/trader_mu_weak_trunc_t'+str(num_t)+'.npy')
-        mu_true=np.load('./Data/trader_mu_true_t'+str(num_t)+'.npy')
+        num_t=value_num_t[k]
+        num_t=int(num_t)
+        mu_Pontryagin=np.load('./Data/from_cluster/trader_mu_Pont_t'+str(num_t)+'.npy')
+        mu_weak=np.load('./Data/from_cluster/trader_mu_weak_t'+str(num_t)+'.npy')
+        mu_weak_trunc=np.load('./Data/from_cluster/trader_mu_weak_trunc_t'+str(num_t)+'.npy')
+        mu_true=np.load('./Data/from_cluster/trader_mu_true_t'+str(num_t)+'.npy')
 
         mu_Pontryagin_end=mu_Pontryagin[len(mu_Pontryagin)-1]
         mu_weak_end=mu_weak[len(mu_weak)-1]
