@@ -139,5 +139,5 @@ if __name__ == '__main__':
             grid=plt.scatter(rho_values[index],grid_Y_0_values[index][index2],color='blue')
     plt.xlabel('c_x')
     plt.ylabel('Y_0')
-    plt.title('Continuation in time : sigma = 0.7, rho = 1.5, $c_x /in [3,12]$, h_{bar}=2, c_g=0.3')
+    #plt.title('Continuation in time : sigma = 0.7, rho = 1.5, $c_x /in [3,12]$, h_{bar}=2, c_g=0.3')
     plt.savefig('trader_continuation_time_3_levels_changing_c_x.eps')
