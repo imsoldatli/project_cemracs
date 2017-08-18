@@ -5,124 +5,166 @@ import matplotlib.pyplot as plt
 from matplotlib import animation
 import math
 
-# load solutions
-weak=np.load('./Data/trader/mu_weak_t20.npy')
-weak_trunc=np.load('./Data/trader/mu_weak_trunc_t20.npy')
-Pont=np.load('./Data/trader/mu_Pont_t20.npy')
-true_solution=np.load('./Data/trader/trader_solution.npy')
-true_solution_hist=np.load('./Data/trader/trader_solution_hist.npy')
-#true_start=np.load('./Data/trader/mu_trader_true_start_t20.npy')
+value_num_t=np.linspace(10,150,8)
+mu_weak_delta_t=[]
+mu_weak_trunc_delta_t=[]
+mu_Pont_delta_t_hist=[]
+mu_true_delta_t_hist=[]
 
-y_rho_Pont=np.load('./Data/trader/y*sigma_trader_Pont_t20.npy')
-z_weak=np.load('./Data/trader/z_weak_t20.npy')
-z_weak_trunc=np.load('./Data/trader/z_weak_trunc_t20.npy')
+y_weak_delta_t=[]
+y_weak_trunc_delta_t=[]
+y_Pont_delta_t=[]
+y_true_delta_t=[]
+
+z_weak_delta_t=[]
+z_weak_trunc_delta_t=[]
+z_Pont_delta_t=[]
+z_true_delta_t=[]
+
+for k in range(len(value_num_t)):
+    #load solutions: mu
+    mu_weak=np.load('./Data/trader/mu_weak_t'+str(value_num_t[k])+'.npy')
+    mu_weak_trunc=np.load('./Data/trader/mu_weak_trunc_t'+str(value_num_t[k])+'.npy')
+    mu_Pont=np.load('./Data/trader/mu_Pont_t'+str(value_num_t[k])+'.npy')
+    mu_true=np.load('./Data/trader/trader_solution'+str(value_num_t[k])+'.npy')
+    mu_true_hist=np.load('./Data/trader/trader_solution_hist'+str(value_num_t[k])+'.npy')
+    # load solutions: y
+    y_rho_Pont=np.load('./Data/trader/y*sigma_trader_Pont_t+str(value_num_t[k])+.npy')
+    y_Pont=np.load()
+    y_weak=np.load()
+    y_weak_trunc=np.load()
+    y_true=np.load()
+    # load solutions: z
+    z_Pont=np.load()
+    z_weak=np.load('./Data/trader/z_weak_t20.npy')
+    z_weak_trunc=np.load('./Data/trader/z_weak_trunc_t20.npy')
+    z_true=np.load()
+
+Pont_t10=np.load('./Data/trader/mu_Pont_t10.npy')
+Pont_t30=np.load('./Data/trader/mu_Pont_t30.npy')
+Pont_t50=np.load('./Data/trader/mu_Pont_t50.npy')
+
+
 # intialize counters of matching points between the solutions
+# compare_weak_pont=0 #compare weak vs pontryagin
+# compare_weak_true=0 #compare weak vs true solution
+# compare_pont_true=0 #compare pont vs true solution
+# #compare_true_start_solution=0 #compare true vs pontryagin started from the true solution
+# compare_shift=0
 
-compare_weak_pont=0 #compare weak vs pontryagin
-compare_weak_true=0 #compare weak vs true solution
-compare_pont_true=0 #compare pont vs true solution
-#compare_true_start_solution=0 #compare true vs pontryagin started from the true solution
-compare_shift=0
 
-# construct x_grid (it will be necessary for the animation and to calculate the mean)
-T=1
-num_t=20
-delta_t=(T-0.06)/(num_t-1)
-t_grid=np.linspace(0.06,T,num_t)
-delta_x=delta_t**(2)
-x_min=-2
-x_max=4
-num_x=int((x_max-x_min)/delta_x+1)
-x_grid=np.linspace(x_min,x_max,num_x)
 
-# dimension of the solutions
-row=len(weak)
-col=len(weak[0])
 
-# max_diff[t]: max of the differences between two solutions at time t
-# max_diff initialization
-max_diff_weak_Pont=[] # Weak solution vs Pontryagin solution
-max_diff_true_weak=[] # true solution vs Weak solution
-max_diff_true_Pont=[] # true solution vs Pontryagin solution
+
+
+
 #max_diff_true_start_true_solut=[] # Pontryagin solution started in the true solution vs true solution
 #max_diff_true_start_Pont=[] # Pontryagin solution started in the true solution  vs Pontryagin solution
 
 # clean the solutions by all values behind a threshold and save the index of the remaining values
-threshold=10**(-3)
-# weak
-w=[]
-index_w=[]
-# Pontryagin
-P=[]
-index_P=[]
-# true solution
-T=[]
-index_T=[]
+# threshold=10**(-3)
+# # weak
+# w=[]
+# index_w=[]
+# # Pontryagin
+# P=[]
+# index_P=[]
+# # true solution
+# T=[]
+# index_T=[]
+#
+# row_c=[]
+#
+# # initializing the mean of each solution
+# mean_weak=[]
+# mean_Pont=[]
+# mean_true_solution=[]
 
-row_c=[]
 
-# initializing the mean of each solution
-mean_weak=[]
-mean_Pont=[]
-mean_true_solution=[]
+# max_diff[t]: max of the differences between two solutions at time t
+# max_diff initialization
+max_diff_y_true_Pont=np.zeros(num_t) # true solution vs Pontryagin solution
+max_diff_y_true_z_weak=np.zeros(num_t) # true solution vs Weak solution
+max_diff_y_true_z_weak_trunc=np.zeros(num_t) # true solution vs Weak solution
+max_diff_z_weak_trunc_weak=np.zeros(num_t) # Weak solution vs Weak solution truncated
+max_diff_z_weak_y_Pont=np.zeros(num_t) # Weak solution vs Pontryagin solution
+max_diff_z_weak_trunc_y_Pont=np.zeros(num_t)
 
-for i in range(row):
-    # evaluation of the max_diff
-    max_diff_weak_Pont.append(np.max(abs(weak[i]-Pont[i])))
-    max_diff_true_weak.append(np.max(abs(weak[i]-true_solution[i])))
-    max_diff_true_Pont.append(np.max(abs(true_solution[i]-Pont[i])))
+temp_true=np.zeros(num_x)
+temp_Pont=np.zeros(num_x)
+
+for i in range(num_t):
+    # evaluation of the max_diff divided by E[Z]
+    temp_true=np.dot(sigma,y_true)
+    temp_Pont=np.dot(sigma,y_Pont)
+    mean_Z_weak=np.dot(mu_true[i],z_weak[i])
+    mean_Z_weak_trunc=np.dot(mu_true[i],z_weak_trunc[i])
+    mean_Y_true=np.dot(y_true[i],mu_true[i])
+
+    max_diff_y_true_Pont.append(np.max(abs(y_true[i]-y_Pont[i]))/mean_Y_true)
+    max_diff_y_true_z_weak.append(np.max(abs(z_weak[i]-temp_true[i]))/mean_Z_weak)
+    max_diff_y_true_z_weak_trunc.append(np.max(abs(z_weak_trunc[i]-temp_true[i]))/mean_Z_weak_trunc)
+    max_diff_z_weak_trunc_weak.append(np.max(abs(z_weak[i]-z_weak_trunc[i]))/mean_Z_weak_trunc)
+    max_diff_z_weak_y_Pont.append(np.max(abs(z_weak[i]-temp_Pont[i]))/mean_Z_weak)
+    max_diff_z_weak_trunc_y_Pont.append(np.max(abs(z_weak_trunc[i]-temp_Pont[i]))/mean_Z_weak)
+
+
     #max_diff_true_start_true_solut.append(np.max(abs(true_solution[i]-true_start[i])))
     #max_diff_true_start_Pont.append(np.max(abs(Pont[i]-true_start[i])))
 
-    # cleaning the solutions & counting matching points
-    row_iw=[]
-    row_w=[]
-    row_P=[]
-    row_iP=[]
-    row_T=[]
-    row_iT=[]
-
-    for j in range(col):
-        if weak[i][j]>5*10**-2:
-            row_w.append(weak[i][j])
-            row_iw.append(j)
-        if Pont[i][j]>5*10**-2:
-            row_P.append(Pont[i][j])
-            row_iP.append(j)
-        if true_solution[i][j]>10**-2:
-            row_T.append(true_solution[i][j])
-            row_iT.append(j)
-
-        if abs(weak[i][j]-Pont[i][j])<10**(-2):
-            compare_weak_pont=compare_weak_pont+1
-        if abs(weak[i][j]-true_solution[i][j])<10**(-2):
-            compare_weak_true=compare_weak_true+1
-        if abs(Pont[i][j]-true_solution[i][j])<10**(-2):
-            compare_pont_true=compare_pont_true+1
-    mean_weak.append(np.dot(x_grid,weak[i]))
-    mean_Pont.append(np.dot(x_grid,Pont[i]))
-    mean_true_solution.append(np.dot(x_grid,true_solution[i]))
-
-    w.append(row_w)
-    index_w.append(row_iw)
-    P.append(row_P)
-    index_P.append(row_iP)
-    T.append(row_T)
-    index_T.append(row_iT)
+    # # cleaning the solutions & counting matching points
+    # row_iw=[]
+    # row_w=[]
+    # row_P=[]
+    # row_iP=[]
+    # row_T=[]
+    # row_iT=[]
+    #
+    # for j in range(col):
+    #     if weak[i][j]>5*10**-2:
+    #         row_w.append(weak[i][j])
+    #         row_iw.append(j)
+    #     if Pont[i][j]>5*10**-2:
+    #         row_P.append(Pont[i][j])
+    #         row_iP.append(j)
+    #     if true_solution[i][j]>10**-2:
+    #         row_T.append(true_solution[i][j])
+    #         row_iT.append(j)
+    #
+    #     if abs(weak[i][j]-Pont[i][j])<10**(-2):
+    #         compare_weak_pont=compare_weak_pont+1
+    #     if abs(weak[i][j]-true_solution[i][j])<10**(-2):
+    #         compare_weak_true=compare_weak_true+1
+    #     if abs(Pont[i][j]-true_solution[i][j])<10**(-2):
+    #         compare_pont_true=compare_pont_true+1
+    # mean_weak.append(np.dot(x_grid,weak[i]))
+    # mean_Pont.append(np.dot(x_grid,Pont[i]))
+    # mean_true_solution.append(np.dot(x_grid,true_solution[i]))
+    #
+    # w.append(row_w)
+    # index_w.append(row_iw)
+    # P.append(row_P)
+    # index_P.append(row_iP)
+    # T.append(row_T)
+    # index_T.append(row_iT)
 
 
 # print max diff
 plt.axes(xlim=(0, 1), ylim=(0,0.6))
-print('max diff: weak vs Pont',max_diff_weak_Pont)
-plt.plot(t_grid,max_diff_weak_Pont,'o',label='weak vs Pont')
-print('max diff: true vs Pont',max_diff_true_Pont)
-#plt.plot(t_grid,max_diff_true_Pont,'o',label='true vs Pont')
-print('max diff: true vs weak',max_diff_true_weak)
-#plt.plot(t_grid,max_diff_true_weak,'o',label='true vs weak')
-#print('max diff: true start vs true solution',max_diff_true_start_true_solut)
-#plt.plot(t_grid,max_diff_true_start_true_solut,'o',label='Pont start by true vs true solution')
-#print('max diff: true start vs Pont',max_diff_true_start_Pont)
-#plt.plot(t_grid,max_diff_true_start_Pont,'o',label='Pont start by true vs Pont')
+
+print('max diff: y_Pont vs y_true',max_diff_true_Pont)
+plt.plot(t_grid,max_diff_y_true_Pont,'o',label='y_Pont vs y_true')
+print('max diff: z_weak vs y_true',max_diff_true_Pont)
+plt.plot(t_grid,max_diff_y_true_z_weak,'o',label='z_weak vs y_true')
+print('max diff: z_weak_trunc vs y_true',max_diff_true_Pont)
+plt.plot(t_grid,max_diff_y_true_z_weak_trunc,'o',label='z_weak_trunc vs y_true')
+print('max diff: y_Pont vs z_weak',max_diff_weak_Pont)
+plt.plot(t_grid,max_diff_z_weak_y_Pont,'o',label='y_Pont vs z_weak')
+print('max diff: y_Pont vs z_weak_trunc',max_diff_true_start_Pont)
+plt.plot(t_grid,max_diff_z_weak_trunc_y_Pont,'o',label='y_Pont vs z_weak_trunc')
+print('max diff: z_weak vs z_weak_trunc',max_diff_true_start_Pont)
+plt.plot(t_grid,max_diff_z_weak_trunc_weak,'o',label='z_weak vs z_weak_trunc')
+
 plt.xlabel('time grid')
 plt.ylabel('max difference')
 plt.title('max of the differences between two solutions at time t')
@@ -130,6 +172,18 @@ plt.title('max of the differences between two solutions at time t')
 plt.legend()
 plt.imshow
 plt.savefig('grid_trader_error_max_diff.eps')
+
+max_diff_y_rho_Pont_z_weak_trunc=[]
+result_w=np.zeros(num_t)
+result_wt=np.zeros(num_t)
+for t in range(num_t):
+    square_P_w=np.power(y_rho_Pont[t]-z_weak[t],2)
+    result_w[t]=np.dot(square_P_w,true_solution[t])
+
+    square_P_wt=np.power(y_rho_Pont[t]-z_weak_trunc[t],2)
+    result_wt[t]=np.dot(square_P_wt,true_solution[t])
+    print('2norm_y_sigma_Pont_z_weak',result_w)
+    print('max_diff_y_sigma_Pont_z_weak_trunc',result_wt)
 
 
 # print a specific time of the cleaned vectors
@@ -151,6 +205,20 @@ print('mean_T',mean_true_solution)
 #writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
 
 # animation: plot all the solutions evolving in time
+
+# construct x_grid (it will be necessary for the animation and to calculate the mean)
+sigma=0.7
+T=1
+num_t=mu_weak.shape[0]
+num_x=mu_weak.shape[1]
+delta_t=(T-0.06)/(num_t-1)
+t_grid=np.linspace(0.06,T,num_t)
+delta_x=delta_t**(2)
+x_min=-2
+x_max=4
+num_x=int((x_max-x_min)/delta_x+1)
+x_grid=np.linspace(x_min,x_max,num_x)
+
 num_bins=int(num_x/15)
 print('num_x',num_x)
 num_x_hist=int(num_x/num_bins)
@@ -305,16 +373,33 @@ if __name__=='__main__':
     print('wdist_weak_trunc_true_hist',wdist_weak_trunc_true_hist)
 
 
-max_diff_y_rho_Pont_z_weak_trunc=[]
-result_w=np.zeros(num_t)
-result_wt=np.zeros(num_t)
-for t in range(num_t):
-    square_P_w=np.power(y_rho_Pont[t]-z_weak[t],2)
-    result_w[t]=np.dot(square_P_w,true_solution[t])
 
-    square_P_wt=np.power(y_rho_Pont[t]-z_weak_trunc[t],2)
-    result_wt[t]=np.dot(square_P_wt,true_solution[t])
-    print('2norm_y_sigma_Pont_z_weak',result_w)
-    print('max_diff_y_sigma_Pont_z_weak_trunc',result_wt)
+
+
+mu_Pont_delta_t=[Pont_t10, Pont_t30, Pont_t50]
+
+for k in range(len(mu_Pont_delta_t)):
+    num_t=mu_Pont_delta_t[k].shape[0]
+    num_x=mu_Pont_delta_t[k].shape[1]
+    num_x_hist=15
+    delta_x_hist=np.abs(x_max-x_min)/num_x_hist
+    x_grid_hist=np.linspace(x_min,x_max,num_x_hist)
+    mu_Pont_delta_t_hist=np.zeros((3,num_x_hist))
+
+    for i in range(num_x/num_bins):
+        mu_Pont_delta_t_hist[k,i]=np.sum(mu_Pont_delta_t[k][0,num_bins*i:num_bins*(i+1)])
+
+
+
+
+    plt.plot(x_grid_hist,mu_Pont_delta_t_hist[k],label='Pont with num_t_t='+str(num_t))
+plt.xlabel('time grid')
+plt.ylabel('max difference')
+plt.title('solution at time 0 with deifferent delta_t')
+
+plt.legend()
+plt.imshow
+
+
 
 

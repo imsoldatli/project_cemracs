@@ -624,7 +624,7 @@ if __name__ == '__main__':
 
     global execution
 
-    execution='changing_delta_t'
+    execution='continuation_in_time'
 
 
     # possible values in order of appearance:
@@ -831,7 +831,7 @@ if __name__ == '__main__':
     elif problem=='trader_Pontryagin':
         sigma=0.7
         rho=0.3
-        c_x=2
+        c_x=7
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -851,7 +851,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=50
+        num_t=20
         delta_t=(T-0.06)/(num_t-1)
         t_grid=np.linspace(0.06,T,num_t)
         delta_x=delta_t**(2)
@@ -1167,8 +1167,8 @@ if __name__ == '__main__':
         print all_Y_0_values[index]
     
     elif execution=='changing_rho':
-        num_rho=10
-        rho_values=np.linspace(3,12,num_rho)
+        num_rho=15
+        rho_values=np.linspace(2.5,5,num_rho)
 
         all_Y_0_values=np.zeros((num_rho,num_keep))
         value_x=num_keep*[1]
@@ -1176,7 +1176,7 @@ if __name__ == '__main__':
         for index in range(num_rho):
             index2=0
             #rho=rho_values[index]
-            c_x=rho_values[index]
+            rho=rho_values[index]
             
             
             mu_0=np.zeros((num_x))
@@ -1200,7 +1200,9 @@ if __name__ == '__main__':
             print all_Y_0_values[index]
 
             plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index],'o')
-        plt.title('sigma = 0.7, rho = 1.5, $c_x /in [3,12]$, h_{bar}=2, c_g=0.3')
+        #plt.title('sigma = str(sigma), rho = str(rho), $c_x \in [str(min(rho_values)),str(max(rho_values))]$, h_{bar}=str(h_bar), c_g=str(c_g)')
+        #plt.title('sigma = str(sigma), c_x = str(c_x), $rho \in [str(min(rho_values)),str(max(rho_values))]$, h_{bar}=str(h_bar), c_g=str(c_g)')
+
         plt.show()
 
         #plt.savefig('./Data/trader/grid_trader_pontryagin_changing_rho.eps')
@@ -1372,7 +1374,7 @@ if __name__ == '__main__':
 
         #np.save('./Data/trader/mu_trader_true_start_t20.npy',mu)
     if execution=='changing_delta_t':
-        value_num_t=np.linspace(5,50,10)
+        value_num_t=np.linspace(70,100,2)
         for n in range(len(value_num_t)):
 
             num_t=int(value_num_t[n])
@@ -1431,7 +1433,7 @@ if __name__ == '__main__':
             #     for t in range(num_t):
             #         bounds[0,t]=sigma*min(u[t])
             #         bounds[1,t]=sigma*max(u[t])
-            if num_t==10 or num_t==30 or num_t==50:
+            if num_t==70 or num_t==100:
                 np.save('./Data/trader/mu_Pont_t'+str(num_t)+'.npy',mu)
             #     np.save('./Data/trader/value_y_Pont_to_trunc_z_weak.npy',bounds)
             #     np.save('./Data/trader/y*sigma_trader_Pont_t20',np.multiply(sigma,u))
@@ -1488,43 +1490,43 @@ if __name__ == '__main__':
 
 
 ##### Uncomment the following if you want lunch the code for a single value of rho
-        # mu_0=np.zeros((num_x))
-        # mu_0[int(num_x/2)]=1.0
-        #
-        # [u_0,mu,u,v,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
-        # print(all_Y_0_values)
-        # end_time=time.time()
-        # print('Time elapsted:',end_time-start_time)
-        # os.system('say "bibidi bobidi bu"')
+        mu_0=np.zeros((num_x))
+        mu_0[int(num_x/2)]=1.0
+
+        [u_0,mu,u,v,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
+        print(all_Y_0_values)
+        end_time=time.time()
+        print('Time elapsted:',end_time-start_time)
+        os.system('say "bibidi bobidi bu"')
 
 
 ##### Uncomment the following if you want lunch the code for several values of rho
 
-        num_rho=11
-        rho_values=np.linspace(1,12,num_rho)
-
-        value_x=num_keep*[1]
-        plot_cx = plt.figure()
-        for index in range(num_rho):
-             #rho=rho_values[index]
-             c_x=rho_values[index]
-
-
-             mu_0=np.zeros((num_x))
-             mu_0[int(num_x/2)]=1.0
-
-             [u_0,mu,u,v,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
-
-
-             print all_Y_0_values
-
-             plot_cx=plt.plot(np.multiply(c_x,value_x),all_Y_0_values,'o')
-        plt.title('Continuation in time : sigma = 0.7, rho = 1.5, $c_x /in [3,12]$, h_{bar}=2, c_g=0.3')
-        plt.show()
-
+        # num_rho=11
+        # rho_values=np.linspace(1,12,num_rho)
+        #
+        # value_x=num_keep*[1]
+        # plot_cx = plt.figure()
+        # for index in range(num_rho):
+        #      #rho=rho_values[index]
+        #      c_x=rho_values[index]
+        #
+        #
+        #      mu_0=np.zeros((num_x))
+        #      mu_0[int(num_x/2)]=1.0
+        #
+        #      [u_0,mu,u,v,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
+        #
+        #
+        #      print all_Y_0_values
+        #
+        #      plot_cx=plt.plot(np.multiply(c_x,value_x),all_Y_0_values,'o')
+        # plt.title('Continuation in time : sigma = 0.7, rho = 1.5, $c_x /in [3,12]$, h_{bar}=2, c_g=0.3')
+        # plt.show()
+        #
 
 
     end_time=time.time()
 
     print('Time elapsted:',end_time-start_time)
-    os.system('say "your program has finished"')
+    os.system('say "Eureka!"')
