@@ -22,11 +22,11 @@ non constant, and multidimensional state space.
 from __future__ import division
 import numpy as np
 import math
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import scipy
 import time
 import scipy.stats
-import os
+#import os
 
 #Define functions b, f, and g for a variety of problems:
 
@@ -615,7 +615,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='trader_Pontryagin'
+    problem='ex_1'
 
 
 
@@ -1372,7 +1372,10 @@ if __name__ == '__main__':
 
         #np.save('./Data/trader/mu_trader_true_start_t20.npy',mu)
     if execution=='changing_delta_t':
-        value_num_t=np.linspace(10,200,20)
+        #value_num_t=np.linspace(10,200,20)
+        value_num_t=np.linspace(4,20,9)
+        all_Y_0_values=np.zeros((len(value_num_t),num_keep))
+        all_Z_0_values=np.zeros((len(value_num_t),num_keep))
         for n in range(len(value_num_t)):
 
             num_t=int(value_num_t[n])
@@ -1388,6 +1391,11 @@ if __name__ == '__main__':
                 t_grid=np.linspace(0,T,num_t)
                 x_min=-3
                 x_max=3
+            elif problem=='ex_1':
+                delta_t=T/(num_t-1)
+                t_grid=np.linspace(0,T,num_t)
+                x_min=-3
+                x_max=7
                 
             delta_x=delta_t**(2)
 
@@ -1410,8 +1418,6 @@ if __name__ == '__main__':
             u=np.zeros((num_t,num_x))
             v=np.zeros((num_t,num_x))
             index2=0
-            all_Y_0_values=np.zeros((len(value_num_t),num_keep))
-            all_Z_0_values=np.zeros((len(value_num_t),num_keep))
 
 
             for j in range(1):
@@ -1448,6 +1454,15 @@ if __name__ == '__main__':
             elif problem=='flocking_weak':
                 np.save('./Data/flocking_Z_0_weak_t'+str(num_t)+'.npy',all_Z_0_values)
                 np.save('./Data/flocking_mu_weak_t'+str(num_t)+'.npy',mu)
+                
+        if problem=='ex_1':
+            log_errors=np.zeros(len(value_num_t))
+            for n in range(len(value_num_t)):
+                log_errors[n]=math.log(abs(all_Y_0_values[n][num_keep-1]-true_Y_0)
+                
+            np.save('./Data/ex_1_log_errors.npy',log_errors)
+            log_num_t=math.log(value_num_t)
+            np.save('./Data/ex_1_log_num_t.npy',log_num_t)
 
             # if problem=='trader_Pontryagin':
             #     bounds=np.zeros((2,num_t))
@@ -1550,4 +1565,4 @@ if __name__ == '__main__':
     end_time=time.time()
 
     print('Time elapsted:',end_time-start_time)
-    os.system('say "your program has finished"')
+    #os.system('say "your program has finished"')

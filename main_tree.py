@@ -372,7 +372,7 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     start_time=time.time()
-    problem ='flocking_weak'
+    problem ='ex_1'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
     execution='ordinary'
@@ -458,7 +458,7 @@ if __name__ == '__main__':
         J_solver_bar=10
         num_keep=5
         T=1.0
-        num_intervals_total=6
+        num_intervals_total=8
         num_intervals_coarse=1
         x_0=[2.0]
         x_0_probs=[1.0]
