@@ -624,7 +624,7 @@ if __name__ == '__main__':
 
     global execution
 
-    execution='ordinary'
+    execution='continuation_in_time'
 
 
     # possible values in order of appearance:
@@ -911,7 +911,7 @@ if __name__ == '__main__':
 
     elif problem=='trader_solution':
         sigma=0.7
-        rho=7
+        rho=2
         c_x=2
         h_bar=2
         c_g=0.3
@@ -922,33 +922,35 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=20
-        delta_t=(T-0.06)/(num_t-1)
-        t_grid=np.linspace(0.06,T,num_t)
-        delta_x=delta_t**(2)
-        x_min=-2
-        x_max=4
-        num_x=int((x_max-x_min)/delta_x+1)
-        x_grid=np.linspace(x_min,x_max,num_x)
-        A=-h_bar*rho*0.5
-        B=rho
-        C=c_x
-        R=A**2+B*C
 
-        delta_up=-A+np.sqrt(R)
-        delta_down=-A-np.sqrt(R)
-        delta_delta=delta_up-delta_down
-
-        eta_bar=np.zeros((1,num_t))
-        eta=np.zeros((1,num_t))
-        ratio=np.sqrt(c_x*rho)
-        ratio2=ratio/rho
-        for k in range(num_t):
-            t=t_grid[k]
-            den_bar=(delta_down*np.exp(delta_delta*(T-t))-delta_up)-c_g*B*(np.exp(delta_delta*(T-t))-1)
-            eta_bar[0,k]=(-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down))/den_bar
-            den=(ratio2-c_g+(ratio2+c_g)*np.exp(2*ratio*(T-t)))
-            eta[0,k]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/den
+        #### uncomment if you use only one value for num_t
+        # num_t=20
+        # delta_t=(T-0.06)/(num_t-1)
+        # t_grid=np.linspace(0.06,T,num_t)
+        # delta_x=delta_t**(2)
+        # x_min=-2
+        # x_max=4
+        # num_x=int((x_max-x_min)/delta_x+1)
+        # x_grid=np.linspace(x_min,x_max,num_x)
+        # A=-h_bar*rho*0.5
+        # B=rho
+        # C=c_x
+        # R=A**2+B*C
+        #
+        # delta_up=-A+np.sqrt(R)
+        # delta_down=-A-np.sqrt(R)
+        # delta_delta=delta_up-delta_down
+        #
+        # eta_bar=np.zeros((1,num_t))
+        # eta=np.zeros((1,num_t))
+        # ratio=np.sqrt(c_x*rho)
+        # ratio2=ratio/rho
+        # for k in range(num_t):
+        #     t=t_grid[k]
+        #     den_bar=(delta_down*np.exp(delta_delta*(T-t))-delta_up)-c_g*B*(np.exp(delta_delta*(T-t))-1)
+        #     eta_bar[0,k]=(-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down))/den_bar
+        #     den=(ratio2-c_g+(ratio2+c_g)*np.exp(2*ratio*(T-t)))
+        #     eta[0,k]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/den
 
 
     elif problem=='flocking_Pontryagin':
@@ -1011,7 +1013,7 @@ if __name__ == '__main__':
             t=t_grid[k]
             eta[k]=np.sqrt(rho)*(np.exp(2*np.sqrt(rho)*(T-t))-1)/(np.exp(2*np.sqrt(rho)*(T-t))+1)
         
-    sqrt_delta_t=np.sqrt(delta_t)
+    #sqrt_delta_t=np.sqrt(delta_t)
 
     if execution=='ordinary':
 
@@ -1202,9 +1204,11 @@ if __name__ == '__main__':
                     index2+=1
             print all_Y_0_values[index]
 
-            plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index],'o')
+            plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index],'o',label='Pontryagin',color='blue')
         #plt.title('sigma = str(sigma), rho = str(rho), $c_x \in [str(min(rho_values)),str(max(rho_values))]$, h_{bar}=str(h_bar), c_g=str(c_g)')
         #plt.title('sigma = str(sigma), c_x = str(c_x), $rho \in [str(min(rho_values)),str(max(rho_values))]$, h_{bar}=str(h_bar), c_g=str(c_g)')
+        mu=np.zeros((num_t,num_x))
+
 
         plt.show()
 
@@ -1260,42 +1264,83 @@ if __name__ == '__main__':
             print(all_Y_0_values[index])
 
     elif execution=='trader_solution':
+        value_num_t=np.linspace(10,150,8)
+        #comment until ##end##  if you use only one value for num_t
+        for h in range(len(value_num_t)):
+            num_t=int(value_num_t[h])
+            delta_t=(T-0.06)/(num_t-1)
+            t_grid=np.linspace(0.06,T,num_t)
+            delta_x=delta_t**(2)
+            x_min=-2
+            x_max=4
+            num_x=int((x_max-x_min)/delta_x+1)
+            x_grid=np.linspace(x_min,x_max,num_x)
+            A=-h_bar*rho*0.5
+            B=rho
+            C=c_x
+            R=A**2+B*C
 
-        mu=np.zeros((num_t,num_x))
+            delta_up=-A+np.sqrt(R)
+            delta_down=-A-np.sqrt(R)
+            delta_delta=delta_up-delta_down
 
-        for t in range(1,num_t):
-            integral=np.sum(eta_bar[0,0:t])*delta_t
-            mean_mu=np.exp(-rho*integral)
-            variance_mu=0
-            for s in range(0,t):
-                variance_mu=variance_mu+delta_t*np.exp(-2*rho*np.sum(eta[0,s:t])*delta_t)
-            variance_mu=sigma**2*variance_mu
-            print(mean_mu,variance_mu)
-
-            mu[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid)
-            mu[t]=mu[t]/np.sum(mu[t])
-        mu[0,int(num_x/2)]=1
-
-        num_bins=5
-        num_x_hist=int(num_x/num_bins)
-        delta_x_hist=np.abs(x_max-x_min)/num_x_hist
-        x_grid_hist=np.linspace(x_min,x_max,num_x_hist)
-        mu_hist=np.zeros((num_t,num_x_hist))
+            eta_bar=np.zeros((1,num_t))
+            eta=np.zeros((1,num_t))
+            ratio=np.sqrt(c_x*rho)
+            ratio2=ratio/rho
+            for k in range(num_t):
+                t=t_grid[k]
+                den_bar=(delta_down*np.exp(delta_delta*(T-t))-delta_up)-c_g*B*(np.exp(delta_delta*(T-t))-1)
+                eta_bar[0,k]=(-C*(np.exp(delta_delta*(T-t))-1)-c_g*(delta_up*np.exp(delta_delta*(T-t))-delta_down))/den_bar
+                den=(ratio2-c_g+(ratio2+c_g)*np.exp(2*ratio*(T-t)))
+                eta[0,k]=-ratio2*(ratio2-c_g-(ratio2+c_g)*np.exp(2*ratio*(T-t)))/den
 
 
-        for t in range(1,num_t):
-            integral=np.sum(eta_bar[0,0:t])*delta_t
-            mean_mu=np.exp(-rho*integral)
-            variance_mu=0
-            for s in range(0,t):
-                variance_mu=variance_mu+delta_t*np.exp(-2*rho*np.sum(eta[0,s:t])*delta_t)
-            variance_mu=sigma**2*variance_mu
-            print(mean_mu,variance_mu)
+            #####end####
+            # comment above if you use only one value for num_t
+            mu=np.zeros((num_t,num_x))
 
-            mu_hist[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid_hist)
-            mu_hist[t]=mu_hist[t]/np.sum(mu_hist[t])
-        mu_hist[0,int(num_x_hist/2)]=1
+            for t in range(1,num_t):
+                integral=np.sum(eta_bar[0,0:t])*delta_t
+                mean_mu=np.exp(-rho*integral)
+                variance_mu=0
+                for s in range(0,t):
+                    variance_mu=variance_mu+delta_t*np.exp(-2*rho*np.sum(eta[0,s:t])*delta_t)
+                variance_mu=sigma**2*variance_mu
+                print(mean_mu,variance_mu)
 
+                mu[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid)
+                mu[t]=mu[t]/np.sum(mu[t])
+            mu[0,int(num_x/2)]=1
+
+            true_Y_0=np.zeros((num_t,num_x))
+            for t in range(num_t):
+                mean_t=np.dot(x_grid,mu[t])
+                true_Y_0[t]=eta[0,t]*x_grid+(eta_bar[0][t]-eta[0][t])*mean_t
+            np.save('./Data/from_cluster/trader/trader_Y_0_solution'+str(num_t)+'.npy',true_Y_0)
+
+
+            num_x_hist=15
+            delta_x_hist=np.abs(x_max-x_min)/num_x_hist
+            x_grid_hist=np.linspace(x_min,x_max,num_x_hist)
+            mu_hist=np.zeros((num_t,num_x_hist))
+
+
+            for t in range(1,num_t):
+                integral=np.sum(eta_bar[0,0:t])*delta_t
+                mean_mu=np.exp(-rho*integral)
+                variance_mu=0
+                for s in range(0,t):
+                    variance_mu=variance_mu+delta_t*np.exp(-2*rho*np.sum(eta[0,s:t])*delta_t)
+                variance_mu=sigma**2*variance_mu
+                print(mean_mu,variance_mu)
+
+                mu_hist[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid_hist)
+                mu_hist[t]=mu_hist[t]/np.sum(mu_hist[t])
+            mu_hist[0,int(num_x_hist/2)]=1
+
+            np.save('./Data/from_cluster/trader/mu_true_t'+str(num_t)+'.npy',mu)
+            np.save('./Data/from_cluster/trader/mu_true_hist_t'+str(num_t)+'.npy',mu_hist)
 
 
 
@@ -1309,9 +1354,8 @@ if __name__ == '__main__':
         # mu=forward(u,v,mu_0)
 
 
-        np.save('./Data/trader/trader_solution.npy',mu)
-        np.save('./Data/trader/trader_solution_hist.npy',mu_hist)
-        
+
+
     elif execution=='flocking_solution':
         mu=np.zeros((num_t,num_x))
 
@@ -1482,7 +1526,8 @@ if __name__ == '__main__':
             np.save('./Data/flocking_Y_0_Pont.npy',all_Y_0_values)
         elif problem=='flocking_weak':
             np.save('./Data/flocking_Z_0_weak.npy',all_Z_0_values)
-        
+
+        true_Y_0=0
         if problem=='ex_1':
             log_errors=np.zeros(len(value_num_t))
             for n in range(len(value_num_t)):
@@ -1518,9 +1563,9 @@ if __name__ == '__main__':
         J_2=25
         global num_level
         
-        num_level=3
+        num_level=1
 
-        num_t=5
+        num_t=20
         delta_t=T/num_level/(num_t-1)
         sqrt_delta_t=math.sqrt(delta_t)
         #delta_x=(delta_t*num_level)**2
@@ -1564,7 +1609,7 @@ if __name__ == '__main__':
         print(all_Y_0_values)
         end_time=time.time()
         print('Time elapsted:',end_time-start_time)
-        os.system('say "bibidi bobidi bu"')
+        os.system('say "picaaaaa"')
 
 
 ##### Uncomment the following if you want lunch the code for several values of rho
