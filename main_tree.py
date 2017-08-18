@@ -458,7 +458,7 @@ if __name__ == '__main__':
         J_solver_bar=10
         num_keep=5
         T=1.0
-        num_intervals_total=8
+        num_intervals_total=10
         num_intervals_coarse=1
         x_0=[2.0]
         x_0_probs=[1.0]
