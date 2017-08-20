@@ -77,7 +77,7 @@ if __name__ == '__main__':
     
     print(d1,d2,d3)
     
-    num_bins=int(num_x/10)
+    num_bins=int(num_x/30)
     num_x_hist=int(num_x/num_bins)
     delta_x_hist=np.abs(x_max-x_min)/num_x_hist
     x_grid_hist=np.linspace(x_min,x_max,num_x_hist)

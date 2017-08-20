@@ -90,63 +90,65 @@ if __name__ == '__main__':
 #    plt.savefig('grid_jetlag_Weak_larger_delta_t_truncation.eps')
     
     
-#    plt.scatter(x_grid_hist,mu_Pontryagin_hist[129])
-#    plt.xlabel('x')
-#    plt.ylabel('$\mu(x)$')
-#    #plt.title('Flocking, Grid Algorithm, Pontryagin Approach, T/2')
-#    plt.savefig('flocking_Pontryagin_t130.eps')
-
-#    plt.scatter(x_grid_hist,mu_weak_hist[129])
-#    plt.xlabel('x')
-#    plt.ylabel('$\mu(x)$')
-#    #plt.title('Flocking, Grid Algorithm, Weak Approach, T/2')
-#    plt.savefig('flocking_weak_t130.eps')
-
-#    plt.scatter(x_grid_hist,mu_true_hist[129])
-#    plt.xlabel('x')
-#    plt.ylabel('$\mu(x)$')
-#    #plt.title('Flocking, True Solution, T/2')
-#    plt.savefig('flocking_true_t130.eps')
-    
-   
-    num_t=20
-    path='/home/christy/Dropbox/CEMRACS_MFG/cluster_results/flocking_tree/'
-    X=np.load(path+'flocking_Pont_tree_X_t20.npy')
-    #data1=plt.hist(X[num_t-1])
-    counts=data1[0]
-    counts=counts/sum(counts)
-    markers=data[1]
-    centers=[(markers[i]+markers[i+1])/2.0 for i in range(len(markers)-1)]
-    plt.scatter(centers,counts,color='blue')
+    plt.scatter(x_grid_hist,mu_Pontryagin_hist[129],color='blue')
     plt.xlabel('x')
     plt.ylabel('$\mu(x)$')
-    #plt.title('Flocking, Tree Algorithm, Pontryagin Approach, T/2')
-    #plt.savefig('flocking_Pontryagin_tree_t20.eps')
-    
-    
-    num_t=20
-    path='/home/christy/Dropbox/CEMRACS_MFG/cluster_results/flocking_tree/'
-    X=np.load(path+'flocking_weak_tree_X_t20.npy')
-    #data2=plt.hist(X[num_t-1])
-    counts=data2[0]
-    counts=counts/sum(counts)
-    markers=data2[1]
-    centers=[(markers[i]+markers[i+1])/2.0 for i in range(len(markers)-1)]
-    plt.scatter(centers,counts,color='red')
+    #plt.title('Flocking, Grid Algorithm, Pontryagin Approach, T/2')
+    #plt.savefig('flocking_Pontryagin_t130.eps')
+
+    plt.scatter(x_grid_hist,mu_weak_hist[129],color='red')
     plt.xlabel('x')
     plt.ylabel('$\mu(x)$')
-    #plt.title('Flocking, Tree Algorithm, Pontryagin Approach, T/2')
-    #plt.savefig('flocking_weak_tree_t20.eps')
-    
+    #plt.title('Flocking, Grid Algorithm, Weak Approach, T/2')
+    #plt.savefig('flocking_weak_t130.eps')
 
-    mu_true_hist=scipy.stats.norm(mean_mu, variance_mu).pdf(centers)
-    plt.scatter(centers,mu_true_hist,color='black')
+    plt.scatter(x_grid_hist,mu_true_hist[129],color='black')
     plt.xlabel('x')
     plt.ylabel('$\mu(x)$')
     #plt.title('Flocking, True Solution, T/2')
-    #plt.savefig('flocking_true_10_bins.eps')
+    #plt.savefig('flocking_true_t130.eps')
     
-    plt.savefig('flocking_tree_and_true_t20.eps')
+    plt.savefig('flocking_grid_and_true.eps')
+    
+   
+#    num_t=20
+#    path='/home/christy/Dropbox/CEMRACS_MFG/cluster_results/flocking_tree/'
+#    X=np.load(path+'flocking_Pont_tree_X_t20.npy')
+#    #data1=plt.hist(X[num_t-1],bins=30)
+#    counts=data1[0]
+#    counts=counts/sum(counts)
+#    markers=data1[1]
+#    centers=[(markers[i]+markers[i+1])/2.0 for i in range(len(markers)-1)]
+#    plt.scatter(centers,counts,color='blue')
+#    plt.xlabel('x')
+#    plt.ylabel('$\mu(x)$')
+#    #plt.title('Flocking, Tree Algorithm, Pontryagin Approach, T/2')
+#    #plt.savefig('flocking_Pontryagin_tree_t20.eps')
+#    
+#    
+#    num_t=20
+#    path='/home/christy/Dropbox/CEMRACS_MFG/cluster_results/flocking_tree/'
+#    X=np.load(path+'flocking_weak_tree_X_t20.npy')
+#    #data2=plt.hist(X[num_t-1],bins=30)
+#    counts=data2[0]
+#    counts=counts/sum(counts)
+#    markers=data2[1]
+#    centers=[(markers[i]+markers[i+1])/2.0 for i in range(len(markers)-1)]
+#    plt.scatter(centers,counts,color='red')
+#    plt.xlabel('x')
+#    plt.ylabel('$\mu(x)$')
+#    #plt.title('Flocking, Tree Algorithm, Pontryagin Approach, T/2')
+#    #plt.savefig('flocking_weak_tree_t20.eps')
+#    
+#
+#    mu_true_hist=scipy.stats.norm(mean_mu, variance_mu).pdf(centers)
+#    plt.scatter(centers,mu_true_hist,color='black')
+#    plt.xlabel('x')
+#    plt.ylabel('$\mu(x)$')
+#    #plt.title('Flocking, True Solution, T/2')
+#    #plt.savefig('flocking_true_10_bins.eps')
+#    
+#    plt.savefig('flocking_tree_and_true_t20_30_bins.eps')
 
 
 #    #data=plt.hist(X[5])
