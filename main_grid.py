@@ -615,7 +615,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='flocking_Pontryagin'
+    problem='flocking_solution'
 
 
 
@@ -623,7 +623,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='changing_rho'
+    execution='flocking_solution'
 
 
     # possible values in order of appearance:
@@ -994,7 +994,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=150
+        num_t=130
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)

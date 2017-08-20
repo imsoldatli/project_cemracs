@@ -109,41 +109,44 @@ if __name__ == '__main__':
 #    plt.savefig('flocking_true_t130.eps')
     
    
-#    num_t=20
-#    path='/home/christy/Dropbox/CEMRACS_MFG/cluster_results/flocking_tree/'
-#    X=np.load(path+'flocking_Pont_tree_X_t20.npy')
-#    #data=plt.hist(X[num_t-1])
-#    counts=data[0]
-#    counts=counts/sum(counts)
-#    markers=data[1]
-#    centers=[(markers[i]+markers[i+1])/2.0 for i in range(len(markers)-1)]
-#    plt.scatter(centers,counts)
-#    plt.xlabel('x')
-#    plt.ylabel('$\mu(x)$')
-#    #plt.title('Flocking, Tree Algorithm, Pontryagin Approach, T/2')
-#    plt.savefig('flocking_Pontryagin_tree_t20.eps')
+    num_t=20
+    path='/home/christy/Dropbox/CEMRACS_MFG/cluster_results/flocking_tree/'
+    X=np.load(path+'flocking_Pont_tree_X_t20.npy')
+    #data1=plt.hist(X[num_t-1])
+    counts=data1[0]
+    counts=counts/sum(counts)
+    markers=data[1]
+    centers=[(markers[i]+markers[i+1])/2.0 for i in range(len(markers)-1)]
+    plt.scatter(centers,counts,color='blue')
+    plt.xlabel('x')
+    plt.ylabel('$\mu(x)$')
+    #plt.title('Flocking, Tree Algorithm, Pontryagin Approach, T/2')
+    #plt.savefig('flocking_Pontryagin_tree_t20.eps')
     
     
-#    num_t=20
-#    path='/home/christy/Dropbox/CEMRACS_MFG/cluster_results/flocking_tree/'
-#    X=np.load(path+'flocking_weak_tree_X_t20.npy')
-#    #data=plt.hist(X[num_t-1])
-#    counts=data[0]
-#    counts=counts/sum(counts)
-#    markers=data[1]
-#    centers=[(markers[i]+markers[i+1])/2.0 for i in range(len(markers)-1)]
-#    plt.scatter(centers,counts)
-#    plt.xlabel('x')
-#    plt.ylabel('$\mu(x)$')
-#    #plt.title('Flocking, Tree Algorithm, Pontryagin Approach, T/2')
-#    plt.savefig('flocking_weak_tree_t20.eps')
+    num_t=20
+    path='/home/christy/Dropbox/CEMRACS_MFG/cluster_results/flocking_tree/'
+    X=np.load(path+'flocking_weak_tree_X_t20.npy')
+    #data2=plt.hist(X[num_t-1])
+    counts=data2[0]
+    counts=counts/sum(counts)
+    markers=data2[1]
+    centers=[(markers[i]+markers[i+1])/2.0 for i in range(len(markers)-1)]
+    plt.scatter(centers,counts,color='red')
+    plt.xlabel('x')
+    plt.ylabel('$\mu(x)$')
+    #plt.title('Flocking, Tree Algorithm, Pontryagin Approach, T/2')
+    #plt.savefig('flocking_weak_tree_t20.eps')
     
 
-    plt.scatter(x_grid_hist,mu_true_hist[129])
+    mu_true_hist=scipy.stats.norm(mean_mu, variance_mu).pdf(centers)
+    plt.scatter(centers,mu_true_hist,color='black')
     plt.xlabel('x')
     plt.ylabel('$\mu(x)$')
     #plt.title('Flocking, True Solution, T/2')
-    plt.savefig('flocking_true_10_bins.eps')
+    #plt.savefig('flocking_true_10_bins.eps')
+    
+    plt.savefig('flocking_tree_and_true_t20.eps')
 
 
 #    #data=plt.hist(X[5])
