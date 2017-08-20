@@ -831,7 +831,7 @@ if __name__ == '__main__':
     elif problem=='trader_Pontryagin':
         sigma=0.7
         rho=0.3
-        c_x=8
+        c_x=7
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -1013,7 +1013,7 @@ if __name__ == '__main__':
             t=t_grid[k]
             eta[k]=np.sqrt(rho)*(np.exp(2*np.sqrt(rho)*(T-t))-1)/(np.exp(2*np.sqrt(rho)*(T-t))+1)
         
-    #sqrt_delta_t=np.sqrt(delta_t)
+    sqrt_delta_t=np.sqrt(delta_t)
 
     if execution=='ordinary':
 
@@ -1563,10 +1563,14 @@ if __name__ == '__main__':
         J_2=25
         global num_level
         
-        num_level=1
+        num_level=3
 
         num_t=20
-        delta_t=T/num_level/(num_t-1)
+        if problem=='trader_Pontryagin' or problem=='trader_weak':
+            delta_t=(T-0.06)/num_level/(num_t-1)
+        else:
+            delta_t=T/num_level/(num_t-1)
+
         sqrt_delta_t=math.sqrt(delta_t)
         #delta_x=(delta_t*num_level)**2
         delta_x=delta_t**(2)
