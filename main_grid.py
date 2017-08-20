@@ -615,7 +615,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='trader_Pontryagin'
+    problem='flocking_Pontryagin'
 
 
 
@@ -623,7 +623,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='changing_delta_t'
+    execution='changing_rho'
 
 
     # possible values in order of appearance:
@@ -960,7 +960,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=60
+        num_t=40
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -979,7 +979,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=60
+        num_t=40
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -1012,7 +1012,7 @@ if __name__ == '__main__':
             t=t_grid[k]
             eta[k]=np.sqrt(rho)*(np.exp(2*np.sqrt(rho)*(T-t))-1)/(np.exp(2*np.sqrt(rho)*(T-t))+1)
         
-    #sqrt_delta_t=np.sqrt(delta_t)
+    sqrt_delta_t=np.sqrt(delta_t)
 
     if execution=='ordinary':
 
@@ -1168,14 +1168,14 @@ if __name__ == '__main__':
         print all_Y_0_values[index]
     
     elif execution=='changing_rho':
-        num_rho=10
+        num_rho=5
         rho_values=np.linspace(3,12,num_rho)
         if problem=='flocking_Pontryagin' or problem=='flocking_weak':
-            rho_values=np.linspace(1,10,num_rho)
+            rho_values=np.linspace(10,50,num_rho)
 
         all_Y_0_values=np.zeros((num_rho,num_keep))
         value_x=num_keep*[1]
-        plot_cx = plt.figure()
+        #plot_cx = plt.figure()
         for index in range(num_rho):
             index2=0
             #rho=rho_values[index]
@@ -1202,13 +1202,13 @@ if __name__ == '__main__':
                     index2+=1
             print all_Y_0_values[index]
 
-            plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index],'o',label='Pontryagin',color='blue')
+            #plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index],'o',label='Pontryagin',color='blue')
         #plt.title('sigma = str(sigma), rho = str(rho), $c_x \in [str(min(rho_values)),str(max(rho_values))]$, h_{bar}=str(h_bar), c_g=str(c_g)')
         #plt.title('sigma = str(sigma), c_x = str(c_x), $rho \in [str(min(rho_values)),str(max(rho_values))]$, h_{bar}=str(h_bar), c_g=str(c_g)')
         mu=np.zeros((num_t,num_x))
 
 
-        plt.show()
+        #plt.show()
 
         #plt.savefig('./Data/trader/grid_trader_pontryagin_changing_rho.eps')
         #np.save('./Data/trader/grid_trader_pontryagin_rho_changing_rho.npy',all_Y_0_values)

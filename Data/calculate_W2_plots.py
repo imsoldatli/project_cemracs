@@ -45,20 +45,31 @@ def Wd(mu_1,grid_1,mu_2,grid_2,Nint,p=2):
     return W
     
 if __name__ == '__main__':
-    value_num_t=np.linspace(10,200,20)
-    all_d1=np.zeros(20)
-    all_d2=np.zeros(20)
-    all_d3=np.zeros(20)
-    all_d4=np.zeros(20)
-    all_d5=np.zeros(20)
-    all_d6=np.zeros(20)
-    for k in range(20):
+    path='/home/christy/Dropbox/CEMRACS_MFG/from_cluster_2/trader/'
+    num_trials=6
+    value_num_t=np.linspace(10,110,num_trials)
+    all_d1=np.zeros(num_trials)
+    all_d2=np.zeros(num_trials)
+    all_d3=np.zeros(num_trials)
+    all_d4=np.zeros(num_trials)
+    all_d5=np.zeros(num_trials)
+    all_d6=np.zeros(num_trials)
+    d1=0
+    d2=0
+    d3=0
+    d4=0
+    d5=0
+    d6=0
+    for k in range(num_trials):
         num_t=value_num_t[k]
         num_t=int(num_t)
-        mu_Pontryagin=np.load('./Data/from_cluster/trader_mu_Pont_t'+str(num_t)+'.npy')
-        mu_weak=np.load('./Data/from_cluster/trader_mu_weak_t'+str(num_t)+'.npy')
-        mu_weak_trunc=np.load('./Data/from_cluster/trader_mu_weak_trunc_t'+str(num_t)+'.npy')
-        mu_true=np.load('./Data/from_cluster/trader_mu_true_t'+str(num_t)+'.npy')
+        mu_Pontryagin=np.load(path+'trader_mu_Pont_t'+str(num_t)+'.npy')
+        mu_weak=np.load(path+'trader_mu_weak_t'+str(num_t)+'.npy')
+        mu_weak_trunc=np.load(path+'trader_mu_weak_trunc_t'+str(num_t)+'.npy')
+        mu_true=np.load('./trader/mu_true_t'+str(num_t)+'.npy')
+#        mu_Pontryagin=np.load(path+'flocking_mu_Pont_t'+str(num_t)+'.npy')
+#        mu_weak=np.load(path+'flocking_mu_weak_t'+str(num_t)+'_real.npy')
+#        mu_true=np.load('./flocking/mu_true_t'+str(num_t)+'.npy')
 
         mu_Pontryagin_end=mu_Pontryagin[len(mu_Pontryagin)-1]
         mu_weak_end=mu_weak[len(mu_weak)-1]
@@ -72,9 +83,9 @@ if __name__ == '__main__':
 #        x_max=3
         x_grid=np.linspace(x_min,x_max,num_x)
     
-        d1=Wd(mu_Pontryagin_end,x_grid,mu_weak_end,x_grid,1000)
-        d2=Wd(mu_Pontryagin_end,x_grid,mu_weak_trunc_end,x_grid,1000)
-        d3=Wd(mu_weak_end,x_grid,mu_weak_trunc_end,x_grid,1000)
+        #d1=Wd(mu_Pontryagin_end,x_grid,mu_weak_end,x_grid,1000)
+        #d2=Wd(mu_Pontryagin_end,x_grid,mu_weak_trunc_end,x_grid,1000)
+        #d3=Wd(mu_weak_end,x_grid,mu_weak_trunc_end,x_grid,1000)
         d4=Wd(mu_Pontryagin_end,x_grid,mu_true_end,x_grid,1000)
         d5=Wd(mu_weak_end,x_grid,mu_true_end,x_grid,1000)
         d6=Wd(mu_weak_trunc_end,x_grid,mu_true_end,x_grid,1000)
@@ -88,10 +99,11 @@ if __name__ == '__main__':
         all_d6[k]=d6
     
     T=1
-    delta_t_s=(T-0.06)/(value_num_t-1)
-    plt.scatter(delta_t_s,all_d1,color='blue')
-    plt.scatter(delta_t_s,all_d2,color='red')
-    plt.scatter(delta_t_s,all_d3,color='green')
-    plt.xlabel('\Delta t')
+    #delta_t_s=(T-0.06)/(value_num_t-1)
+#    delta_t_s=T/(value_num_t-1)
+    plt.scatter(value_num_t,all_d4,color='blue')
+    plt.scatter(value_num_t,all_d5,color='red')
+    plt.scatter(value_num_t,all_d6,color='green')
+    plt.xlabel('num time steps')
     plt.ylabel('W2 distance')
     plt.savefig('trader_changing_delta_t.eps')

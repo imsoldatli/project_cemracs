@@ -90,23 +90,23 @@ if __name__ == '__main__':
 #    plt.savefig('grid_jetlag_Weak_larger_delta_t_truncation.eps')
     
     
-#    plt.scatter(x_grid_hist,mu_Pontryagin_hist[30])
+#    plt.scatter(x_grid_hist,mu_Pontryagin_hist[129])
 #    plt.xlabel('x')
 #    plt.ylabel('$\mu(x)$')
-#    plt.title('Flocking, Grid Algorithm, Pontryagin Approach, T/2')
-#    plt.savefig('flocking_Pontryagin_grid_30_bins_num_t_60.eps')
+#    #plt.title('Flocking, Grid Algorithm, Pontryagin Approach, T/2')
+#    plt.savefig('flocking_Pontryagin_t130.eps')
 
-#    plt.scatter(x_grid_hist,mu_weak_hist[30])
+#    plt.scatter(x_grid_hist,mu_weak_hist[129])
 #    plt.xlabel('x')
 #    plt.ylabel('$\mu(x)$')
-#    plt.title('Flocking, Grid Algorithm, Weak Approach, T/2')
-#    plt.savefig('flocking_weak_grid_30_bins_num_t_60.eps')
+#    #plt.title('Flocking, Grid Algorithm, Weak Approach, T/2')
+#    plt.savefig('flocking_weak_t130.eps')
 
-#    plt.scatter(x_grid_hist,mu_true_hist[30])
-#    plt.xlabel('x')
-#    plt.ylabel('$\mu(x)$')
-#    plt.title('Flocking, True Solution, T/2')
-#    plt.savefig('flocking_true_solution_30_bins_num_t_60.eps')
+    plt.scatter(x_grid_hist,mu_true_hist[129])
+    plt.xlabel('x')
+    plt.ylabel('$\mu(x)$')
+    #plt.title('Flocking, True Solution, T/2')
+    plt.savefig('flocking_true_t130.eps')
     
 #    #data=plt.hist(X[5])
 #    counts=data[0]
@@ -142,7 +142,14 @@ if __name__ == '__main__':
 #    #plt.title('Continuation in time : sigma = 0.7, rho = 1.5, $c_x /in [3,12]$, h_{bar}=2, c_g=0.3')
 #    plt.savefig('trader_continuation_time_3_levels_changing_c_x.eps')
 
-    plt.scatter(log_num_t,log_errors)
-    plt.xlabel('log number of time steps')
-    plt.ylabel('log error in Y_0')
-    plt.savefig('ex_1_grid.eps')
+
+#    thing1=np.load('./ex_1/ex_1_log_errors.npy')
+#    thing2=np.load('./ex_1/ex_1_log_errors_2.npy')
+#    log_errors=np.concatenate((thing1,thing2))
+#    thing3=np.load('ex_1/ex_1_log_num_t.npy')
+#    thing4=np.load('ex_1/ex_1_log_num_t_2.npy')
+#    log_num_t=np.concatenate((thing3,thing4))
+#    plt.scatter(log_num_t,log_errors)
+#    plt.xlabel('log number of time steps')
+#    plt.ylabel('log error in Y_0')
+#    plt.savefig('ex_1_grid_3.eps')
