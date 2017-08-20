@@ -22,11 +22,11 @@ non constant, and multidimensional state space.
 from __future__ import division
 import numpy as np
 import math
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import scipy
 import time
 import scipy.stats
-import os
+#import os
 
 #Define functions b, f, and g for a variety of problems:
 
@@ -615,7 +615,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='trader_Pontryagin'
+    problem='flocking_Pontryagin'
 
 
 
@@ -623,8 +623,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-
-    execution='continuation_in_time'
+    execution='changing_rho'
 
 
     # possible values in order of appearance:
@@ -781,7 +780,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=12
+        num_t=30
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -831,7 +830,7 @@ if __name__ == '__main__':
     elif problem=='trader_Pontryagin':
         sigma=0.7
         rho=0.3
-        c_x=8
+        c_x=2
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -995,7 +994,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=60
+        num_t=150
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -1169,7 +1168,6 @@ if __name__ == '__main__':
         print all_Y_0_values[index]
     
     elif execution=='changing_rho':
-
         num_rho=10
         rho_values=np.linspace(3,12,num_rho)
         if problem=='flocking_Pontryagin' or problem=='flocking_weak':
@@ -1317,7 +1315,7 @@ if __name__ == '__main__':
             for t in range(num_t):
                 mean_t=np.dot(x_grid,mu[t])
                 true_Y_0[t]=eta[0,t]*x_grid+(eta_bar[0][t]-eta[0][t])*mean_t
-            np.save('./Data/from_cluster/trader/trader_Y_0_solution'+str(num_t)+'.npy',true_Y_0)
+            np.save('./Data/trader/trader_Y_0_solution'+str(num_t)+'.npy',true_Y_0)
 
 
             num_x_hist=15
@@ -1339,8 +1337,8 @@ if __name__ == '__main__':
                 mu_hist[t]=mu_hist[t]/np.sum(mu_hist[t])
             mu_hist[0,int(num_x_hist/2)]=1
 
-            np.save('./Data/from_cluster/trader/mu_true_t'+str(num_t)+'.npy',mu)
-            np.save('./Data/from_cluster/trader/mu_true_hist_t'+str(num_t)+'.npy',mu_hist)
+            np.save('./Data/trader/mu_true_t'+str(num_t)+'.npy',mu)
+            np.save('./Data/trader/mu_true_hist_t'+str(num_t)+'.npy',mu_hist)
 
 
 
@@ -1393,8 +1391,8 @@ if __name__ == '__main__':
         #mu=[mu[10*i] for i in range(40)]
         #mu_hist=[mu_hist[10*i] for i in range(40)]
 
-        np.save('./Data/flocking/true_solution_num_t_60.npy',mu)
-        np.save('./Data/flocking/true_solution_hist_num_t_60.npy',mu_hist)
+#        np.save('./Data/flocking/true_solution_num_t_60.npy',mu)
+#        np.save('./Data/flocking/true_solution_hist_num_t_60.npy',mu_hist)
         
     elif execution=='true_start': # only for some problems
 
@@ -1421,9 +1419,9 @@ if __name__ == '__main__':
 
         #np.save('./Data/trader/mu_trader_true_start_t20.npy',mu)
     if execution=='changing_delta_t':
-
-        value_num_t=np.linspace(10,150,8)
-        #value_num_t=np.linspace(4,20,9)
+        #value_num_t=np.linspace(70,100,2)
+        value_num_t=np.linspace(10,130,7)
+        #value_num_t=np.linspace(40,100,4)
         all_Y_0_values=np.zeros((len(value_num_t),num_keep))
         all_Z_0_values=np.zeros((len(value_num_t),num_keep))
         for n in range(len(value_num_t)):
@@ -1436,7 +1434,7 @@ if __name__ == '__main__':
                 t_grid=np.linspace(0.06,T,num_t)
                 x_min=-2
                 x_max=4
-            elif problem=='flocking_Pontryagin' or problem=='flocking_Pontryagin':
+            elif problem=='flocking_Pontryagin' or problem=='flocking_weak':
                 delta_t=T/(num_t-1)
                 t_grid=np.linspace(0,T,num_t)
                 x_min=-3
@@ -1450,6 +1448,7 @@ if __name__ == '__main__':
                 bounds=np.load('./Data/trader_bounds'+str(num_t)+'.npy')
                 
             delta_x=delta_t**(2)
+            sqrt_delta_t=math.sqrt(delta_t)
 
             num_x=int((x_max-x_min)/delta_x+1)
             x_grid=np.linspace(x_min,x_max,num_x)
@@ -1494,18 +1493,23 @@ if __name__ == '__main__':
             if problem=='trader_Pontryagin':
                 np.save('./Data/trader_mu_Pont_t'+str(num_t)+'.npy',mu)
                 np.save('./Data/trader_Y_0_Pont'+str(num_t)+'.npy',all_Y_0_values[n])
+                np.save('./Data/trader_Y_Pont'+str(num_t)+'.npy',u)
             elif problem=='trader_weak':
                 np.save('./Data/trader_mu_weak_t'+str(num_t)+'.npy',mu)
                 np.save('./Data/trader_Z_0_weak'+str(num_t)+'.npy',all_Z_0_values[n])
+                np.save('./Data/trader_Z_weak'+str(num_t)+'.npy',v)
             elif problem=='trader_weak_trunc':
                 np.save('./Data/trader_mu_weak_trunc_t'+str(num_t)+'.npy',mu)
                 np.save('./Data/trader_Z_0_weak_trunc'+str(num_t)+'.npy',all_Z_0_values[n])
+                np.save('./Data/trader_Z_weak'+str(num_t)+'.npy',v)
             elif problem=='flocking_Pontryagin':
                 np.save('./Data/flocking_mu_Pont_t'+str(num_t)+'.npy',mu)
                 np.save('./Data/flocking_Y_0_Pont'+str(num_t)+'.npy',all_Y_0_values[n])
+                np.save('./Data/trader_Y_Pont'+str(num_t)+'.npy',u)
             elif problem=='flocking_weak':
-                np.save('./Data/flocking_mu_weak_t'+str(num_t)+'.npy',mu)
-                np.save('./Data/flocking_Z_0_weak'+str(num_t)+'.npy',all_Z_0_values[n])
+                np.save('./Data/flocking_mu_weak_t'+str(num_t)+'_real.npy',mu)
+                np.save('./Data/flocking_Z_0_weak'+str(num_t)+'_real.npy',all_Z_0_values[n])
+                np.save('./Data/trader_Z_weak'+str(num_t)+'.npy',v)
                 
             if problem=='trader_Pontryagin':
                 bounds=np.zeros((2,num_t))
@@ -1533,17 +1537,15 @@ if __name__ == '__main__':
             for n in range(len(value_num_t)):
                 log_errors[n]=math.log(abs(all_Y_0_values[n][num_keep-1]-true_Y_0))
                 
-            np.save('./Data/ex_1_log_errors.npy',log_errors)
+            np.save('./Data/ex_1_log_errors_2.npy',log_errors)
             log_num_t=math.log(value_num_t)
-            np.save('./Data/ex_1_log_num_t.npy',log_num_t)
+            np.save('./Data/ex_1_log_num_t_2.npy',log_num_t)
 
             # if problem=='trader_Pontryagin':
             #     bounds=np.zeros((2,num_t))
             #     for t in range(num_t):
             #         bounds[0,t]=sigma*min(u[t])
             #         bounds[1,t]=sigma*max(u[t])
-            if num_t==70 or num_t==100:
-                np.save('./Data/trader/mu_Pont_t'+str(num_t)+'.npy',mu)
 #            if num_t==10 or num_t==30 or num_t==50:
 #                np.save('./Data/trader/mu_Pont_t'+str(num_t)+'.npy',mu)
 
@@ -1642,5 +1644,5 @@ if __name__ == '__main__':
 
     print('Time elapsted:',end_time-start_time)
 
-    os.system('say "Eureka!"')
+    #os.system('say "Eureka!"')
     #os.system('say "your program has finished"')
