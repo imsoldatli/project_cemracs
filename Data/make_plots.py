@@ -102,13 +102,17 @@ if __name__ == '__main__':
 #    #plt.title('Flocking, Grid Algorithm, Weak Approach, T/2')
 #    plt.savefig('flocking_weak_t130.eps')
 
-    plt.scatter(x_grid_hist,mu_true_hist[129])
-    plt.xlabel('x')
-    plt.ylabel('$\mu(x)$')
-    #plt.title('Flocking, True Solution, T/2')
-    plt.savefig('flocking_true_t130.eps')
+#    plt.scatter(x_grid_hist,mu_true_hist[129])
+#    plt.xlabel('x')
+#    plt.ylabel('$\mu(x)$')
+#    #plt.title('Flocking, True Solution, T/2')
+#    plt.savefig('flocking_true_t130.eps')
     
-#    #data=plt.hist(X[5])
+   
+#    num_t=20
+#    path='/home/christy/Dropbox/CEMRACS_MFG/cluster_results/flocking_tree/'
+#    X=np.load(path+'flocking_Pont_tree_X_t20.npy')
+#    #data=plt.hist(X[num_t-1])
 #    counts=data[0]
 #    counts=counts/sum(counts)
 #    markers=data[1]
@@ -116,9 +120,32 @@ if __name__ == '__main__':
 #    plt.scatter(centers,counts)
 #    plt.xlabel('x')
 #    plt.ylabel('$\mu(x)$')
-#    plt.title('Flocking, Tree Algorithm, Pontryagin Approach, T/2')
-#    plt.savefig('flocking_Pontryagin_tree_10_bins.eps')
+#    #plt.title('Flocking, Tree Algorithm, Pontryagin Approach, T/2')
+#    plt.savefig('flocking_Pontryagin_tree_t20.eps')
     
+    
+#    num_t=20
+#    path='/home/christy/Dropbox/CEMRACS_MFG/cluster_results/flocking_tree/'
+#    X=np.load(path+'flocking_weak_tree_X_t20.npy')
+#    #data=plt.hist(X[num_t-1])
+#    counts=data[0]
+#    counts=counts/sum(counts)
+#    markers=data[1]
+#    centers=[(markers[i]+markers[i+1])/2.0 for i in range(len(markers)-1)]
+#    plt.scatter(centers,counts)
+#    plt.xlabel('x')
+#    plt.ylabel('$\mu(x)$')
+#    #plt.title('Flocking, Tree Algorithm, Pontryagin Approach, T/2')
+#    plt.savefig('flocking_weak_tree_t20.eps')
+    
+
+    plt.scatter(x_grid_hist,mu_true_hist[129])
+    plt.xlabel('x')
+    plt.ylabel('$\mu(x)$')
+    #plt.title('Flocking, True Solution, T/2')
+    plt.savefig('flocking_true_10_bins.eps')
+
+
 #    #data=plt.hist(X[5])
 #    counts=data[0]
 #    counts=counts/sum(counts)
