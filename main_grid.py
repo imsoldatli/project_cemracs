@@ -922,6 +922,7 @@ if __name__ == '__main__':
         num_keep=5
         T=1
 
+        delta_t=1000.0
         #### uncomment if you use only one value for num_t
         # num_t=20
         # delta_t=(T-0.06)/(num_t-1)
@@ -1262,7 +1263,8 @@ if __name__ == '__main__':
             print(all_Y_0_values[index])
 
     elif execution=='trader_solution':
-        value_num_t=np.linspace(10,150,8)
+        #value_num_t=np.linspace(10,150,8)
+        value_num_t=np.linspace(130,130,1)
         #comment until ##end##  if you use only one value for num_t
         for h in range(len(value_num_t)):
             num_t=int(value_num_t[h])
@@ -1315,7 +1317,7 @@ if __name__ == '__main__':
             for t in range(num_t):
                 mean_t=np.dot(x_grid,mu[t])
                 true_Y_0[t]=eta[0,t]*x_grid+(eta_bar[0][t]-eta[0][t])*mean_t
-            np.save('./Data/trader/trader_Y_0_solution'+str(num_t)+'.npy',true_Y_0)
+            #np.save('./Data/trader/trader_Y_0_solution'+str(num_t)+'.npy',true_Y_0)
 
 
             num_x_hist=15
@@ -1337,8 +1339,8 @@ if __name__ == '__main__':
                 mu_hist[t]=mu_hist[t]/np.sum(mu_hist[t])
             mu_hist[0,int(num_x_hist/2)]=1
 
-            np.save('./Data/trader/mu_true_t'+str(num_t)+'.npy',mu)
-            np.save('./Data/trader/mu_true_hist_t'+str(num_t)+'.npy',mu_hist)
+            #np.save('./Data/trader/mu_true_t'+str(num_t)+'.npy',mu)
+            #np.save('./Data/trader/mu_true_hist_t'+str(num_t)+'.npy',mu_hist)
 
 
 
