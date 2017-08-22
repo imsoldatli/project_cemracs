@@ -6,10 +6,11 @@ from matplotlib import animation
 import math
 
 sigma=0.7
+nfig=0
+value_num_t=np.linspace(10,130,7)
 
-value_num_t=np.linspace(10,30,2)
-
-anim_num_t=value_num_t[1]
+index_anim_num_t=5
+anim_num_t=int(value_num_t[index_anim_num_t])
 
 ## functions to calculate the Wasserstein distance
 def firstindex(list,target):
@@ -64,20 +65,22 @@ z_true_delta_t=[]
 for k in range(len(value_num_t)):
     #load solutions: mu
 
-    mu_weak_delta_t.append(np.load('./Data/from_cluster/trader/trader_mu_weak_t'+str(int(value_num_t[k]))+'.npy'))
-    mu_weak_trunc_delta_t.append(np.load('./Data/from_cluster/trader/trader_mu_weak_trunc_t'+str(int(value_num_t[k]))+'.npy'))
-    mu_Pont_delta_t.append(np.load('./Data/from_cluster/trader/trader_mu_Pont_t'+str(int(value_num_t[k]))+'.npy'))
-    mu_true_delta_t.append(np.load('./Data/from_cluster/trader/mu_true_t'+str(int(value_num_t[k]))+'.npy'))
-    mu_true_delta_t.append(np.load('./Data/from_cluster/trader/mu_true_hist_t'+str(int(value_num_t[k]))+'.npy'))
+    mu_weak_delta_t.append(np.load('/Users/zioepa/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_mu_weak_t'+str(int(value_num_t[k]))+'.npy'))
+    mu_weak_trunc_delta_t.append(np.load('/Users/zioepa/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_mu_weak_trunc_t'+str(int(value_num_t[k]))+'.npy'))
+    mu_Pont_delta_t.append(np.load('/Users/zioepa/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_mu_Pont_t'+str(int(value_num_t[k]))+'.npy'))
+    mu_true_delta_t.append(np.load('/Users/zioepa/PycharmProjects/Cemracs /project_cemracs/Data/trader/trunc_true/trader_mu_true_t'+str(int(value_num_t[k]))+'.npy'))
+    #mu_true_delta_t.append(np.load('/Users/zioepa/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/mu_true_hist_t'+str(int(value_num_t[k]))+'.npy'))
     # load solutions: y
-    y_Pont_delta_t.append(np.load('./Data/from_cluster/trader/trader_Y_0_Pont'+str(int(value_num_t[k]))+'.npy'))
-    y_true_delta_t.append(np.load('./Data/from_cluster/trader/trader_Y_0_solution'+str(int(value_num_t[k]))+'.npy'))
+    y_Pont_delta_t.append(np.load('/Users/zioepa/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_Y_Pont_t'+str(int(value_num_t[k]))+'.npy'))
+    y_true_delta_t.append(np.load('/Users/zioepa/PycharmProjects/Cemracs /project_cemracs/Data/trader/trunc_true/trader_Y_solution'+str(int(value_num_t[k]))+'.npy'))
     # load solutions: z
-    z_weak_delta_t.append(np.load('./Data/from_cluster/trader/trader_Z_0_weak'+str(int(value_num_t[k]))+'.npy'))
-    z_weak_trunc_delta_t.append(np.load('./Data/from_cluster/trader/trader_Z_0_weak_trunc'+str(int(value_num_t[k]))+'.npy'))
+    z_weak_delta_t.append(np.load('/Users/zioepa/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_Z_weak_t'+str(int(value_num_t[k]))+'.npy'))
+    z_weak_trunc_delta_t.append(np.load('/Users/zioepa/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_Z_weak_trunc_t'+str(int(value_num_t[k]))+'.npy'))
 
 
-print(len(z_weak_delta_t[1]))
+
+
+
 # intialize counters of matching points between the solutions
 # compare_weak_pont=0 #compare weak vs pontryagin
 # compare_weak_true=0 #compare weak vs true solution
@@ -113,26 +116,37 @@ print(len(z_weak_delta_t[1]))
 # mean_Pont=[]
 # mean_true_solution=[]
 max_diff_y_true_Pont_delta_t=[] # true solution vs Pontryagin solution
+max_diff_y_true_Pont_delta_t_plot=[]
 max_diff_y_true_z_weak_delta_t=[] # true solution vs Weak solution
-max_diff_y_true_z_weak_trunc_delta_t=[] # true solution vs Weak solution
-max_diff_z_weak_trunc_weak_delta_t=[] # Weak solution vs Weak solution truncated
-max_diff_z_weak_y_Pont_delta_t=[] # Weak solution vs Pontryagin solution
-max_diff_z_weak_trunc_y_Pont_delta_t=[]
+max_diff_y_true_z_weak_delta_t_plot=[] # true solution vs Weak solution
 
-max_diff_y_true_Pont=0 # true solution vs Pontryagin solution
-max_diff_y_true_z_weak=0 # true solution vs Weak solution
-max_diff_y_true_z_weak_trunc=0 # true solution vs Weak solution
-max_diff_z_weak_trunc_weak=0 # Weak solution vs Weak solution truncated
-max_diff_z_weak_y_Pont=0 # Weak solution vs Pontryagin solution
-max_diff_z_weak_trunc_y_Pont=0
+#max_diff_y_true_z_weak_trunc_delta_t=[] # true solution vs Weak solution
+#max_diff_y_true_z_weak_trunc_delta_t_plot=[] # true solution vs Weak solution
+
+#max_diff_z_weak_trunc_weak_delta_t=[] # Weak solution vs Weak solution truncated
+#max_diff_z_weak_trunc_weak_delta_t_plot=[] # Weak solution vs Weak solution truncated
+
+max_diff_z_weak_y_Pont_delta_t=[] # Weak solution vs Pontryagin solution
+max_diff_z_weak_y_Pont_delta_t_plot=[] # Weak solution vs Pontryagin solution
+
+#max_diff_z_weak_trunc_y_Pont_delta_t=[]
+#max_diff_z_weak_trunc_y_Pont_delta_t_plot=[]
+
+
+max_diff_y_true_Pont=[] # true solution vs Pontryagin solution
+max_diff_y_true_z_weak=[] # true solution vs Weak solution
+#max_diff_y_true_z_weak_trunc=[] # true solution vs Weak solution
+#max_diff_z_weak_trunc_weak=[] # Weak solution vs Weak solution truncated
+max_diff_z_weak_y_Pont=[] # Weak solution vs Pontryagin solution
+#max_diff_z_weak_trunc_y_Pont=[]
 
 
 mse_y_true_Pont_delta_t=[] # true solution vs Pontryagin solution
 mse_true_z_weak_delta_t=[] # true solution vs Weak solution
 mse_y_true_z_weak_trunc_delta_t=[] # true solution vs Weak solution
-mse_z_weak_trunc_weak_delta_t=[] # Weak solution vs Weak solution truncated
+#mse_z_weak_trunc_weak_delta_t=[] # Weak solution vs Weak solution truncated
 mse_z_weak_y_Pont_delta_t=[] # Weak solution vs Pontryagin solution
-mse_z_weak_trunc_y_Pont_delta_t=[]
+#mse_z_weak_trunc_y_Pont_delta_t=[]
 
 
 # max_diff[t]: max of the differences between two solutions at time t
@@ -147,43 +161,56 @@ for k in range(len(value_num_t)):
 
     num_x=mu_weak.shape[1]
 
+
+
     y_Pont=np.asarray(y_Pont_delta_t[k])
     y_true=np.asarray(y_true_delta_t[k])
-
     z_weak=np.asarray(z_weak_delta_t[k])
     z_weak_trunc=np.asarray(z_weak_trunc_delta_t[k])
 
-
-
     temp_true=np.zeros(num_x)
     temp_Pont=np.zeros(num_x)
-    num_true_Pont=np.max(abs(y_true-y_Pont))
-    num_weak_true=np.max(abs(z_weak-temp_true))
-    num_weak_trunc_true=np.max(abs(z_weak_trunc-temp_true))
-    num_weak_weak_trunc=np.max(abs(z_weak-z_weak_trunc))
-    num_weak_Pont=np.max(abs(z_weak-temp_Pont))
-    num_weak_trunc_Pont=np.max(abs(z_weak_trunc-temp_Pont))
     for i in range(num_t):
         # evaluation of the max_diff divided by E[Z]
-        temp_true=np.dot(sigma,y_true)
-        temp_Pont=np.dot(sigma,y_Pont)
-        mean_Z_weak=np.dot(mu_true[i],z_weak)
-        mean_Z_weak_trunc=np.dot(mu_true[i],z_weak_trunc)
-        mean_Y_true=np.dot(y_true,mu_true[i])
+        temp_true=np.dot(sigma,y_true[i])
+        temp_Pont=np.dot(sigma,y_Pont[i])
+        mean_Z_weak=np.dot(mu_true[i],z_weak[i])
+        # mean_Z_weak_trunc=np.dot(mu_true[i],z_weak_trunc[i])
+        mean_Y_true=np.dot(y_true[i],mu_true[i])
 
-        max_diff_y_true_Pont=num_true_Pont/mean_Y_true
-        max_diff_y_true_z_weak=num_weak_true/mean_Z_weak
-        max_diff_y_true_z_weak_trunc=num_weak_trunc_true/mean_Z_weak_trunc
-        max_diff_z_weak_trunc_weak=num_weak_weak_trunc/mean_Z_weak_trunc
-        max_diff_z_weak_y_Pont=num_weak_Pont/mean_Z_weak
-        max_diff_z_weak_trunc_y_Pont=num_weak_trunc_Pont/mean_Z_weak
+        num_true_Pont=np.max(abs(y_true[i]-y_Pont[i]))
+        max_diff_y_true_Pont.append(num_true_Pont/mean_Y_true)
 
-    max_diff_y_true_Pont_delta_t.append(max_diff_y_true_Pont) # true solution vs Pontryagin solution
+        num_weak_true=np.max(abs(z_weak[i]-temp_true))
+        max_diff_y_true_z_weak.append(num_weak_true/mean_Z_weak)
+
+        #num_weak_trunc_true=np.max(abs(z_weak_trunc[i]-temp_true))
+        #max_diff_y_true_z_weak_trunc.append(num_weak_trunc_true/mean_Z_weak_trunc)
+
+        #num_weak_weak_trunc=np.max(abs(z_weak[i]-z_weak_trunc[i]))
+        #max_diff_z_weak_trunc_weak.append(num_weak_weak_trunc/mean_Z_weak_trunc)
+
+        num_weak_Pont=np.max(abs(z_weak[i]-temp_Pont))
+        max_diff_z_weak_y_Pont.append(num_weak_Pont/mean_Z_weak)
+
+        #num_weak_trunc_Pont=np.max(abs(z_weak_trunc[i]-temp_Pont))
+        #max_diff_z_weak_trunc_y_Pont.append(num_weak_trunc_Pont/mean_Z_weak)
+
+    max_diff_y_true_Pont_delta_t.append(max_diff_y_true_Pont)# true solution vs Pontryagin solution
+    max_diff_y_true_Pont_delta_t_plot.append(max_diff_y_true_Pont[num_t-1])
     max_diff_y_true_z_weak_delta_t.append(max_diff_y_true_z_weak) # true solution vs Weak solution
-    max_diff_y_true_z_weak_trunc_delta_t.append(max_diff_y_true_z_weak_trunc) # true solution vs Weak solution
-    max_diff_z_weak_trunc_weak_delta_t.append(max_diff_y_true_z_weak) # Weak solution vs Weak solution truncated
+    max_diff_y_true_z_weak_delta_t_plot.append(max_diff_y_true_z_weak[num_t-1]) # true solution vs Weak solution
+
+    #max_diff_y_true_z_weak_trunc_delta_t.append(max_diff_y_true_z_weak_trunc) # true solution vs Weak solution
+    #max_diff_y_true_z_weak_trunc_delta_t_plot.append(max_diff_y_true_z_weak_trunc[num_t-1]) # true solution vs Weak solution
+
+    #max_diff_z_weak_trunc_weak_delta_t.append(max_diff_y_true_z_weak) # Weak solution vs Weak solution truncated
+    #max_diff_z_weak_trunc_weak_delta_t_plot.append(max_diff_y_true_z_wea[num_t-1]k) # Weak solution vs Weak solution truncated
+
     max_diff_z_weak_y_Pont_delta_t.append(max_diff_z_weak_y_Pont) # Weak solution vs Pontryagin solution
-    max_diff_z_weak_trunc_y_Pont_delta_t.append(max_diff_z_weak_trunc_y_Pont)
+    max_diff_z_weak_y_Pont_delta_t_plot.append(max_diff_z_weak_y_Pont[num_t-1]) # Weak solution vs Pontryagin solution
+    #max_diff_z_weak_trunc_y_Pont_delta_t.append(max_diff_z_weak_trunc_y_Pont)
+    #max_diff_z_weak_trunc_y_Pont_delta_t_plot.append(max_diff_z_weak_trunc_y_Pont[num_t-1])
 
 
         #max_diff_true_start_true_solut.append(np.max(abs(true_solution[i]-true_start[i])))
@@ -234,73 +261,98 @@ for k in range(len(value_num_t)):
     result_tw=np.zeros(num_t)
     result_twt=np.zeros(num_t)
     result_wwt=np.zeros(num_t)
-    Pont=np.multiply(sigma,y_Pont)
-    square_P_w=np.power(Pont-z_weak,2)
-    square_P_wt=np.power(Pont-z_weak_trunc,2)
-    square_t_P=np.power(y_Pont-y_true,2)
-    true=np.multiply(sigma,y_true)
-    square_t_w=np.power(z_weak-true,2)
-    square_t_wt=np.power(z_weak_trunc-true,2)
-    square_w_wt=np.power(z_weak[t]-z_weak_trunc[t],2)
-
-
     for t in range(num_t):
+        Pont=np.multiply(sigma,y_Pont[t])
+        square_P_w=np.power(Pont-z_weak[t],2)
         result_Pw[t]=np.dot(square_P_w,mu_true[t])
-        result_Pwt[t]=np.dot(square_P_wt,mu_true[t])
+
+        # square_P_wt=np.power(Pont-z_weak_trunc[t],2)
+        #result_Pwt[t]=np.dot(square_P_wt,mu_true[t])
+
+        square_t_P=np.power(y_Pont[t]-y_true[t],2)
         result_tP[t]=np.dot(square_t_P,mu_true[t])
+
+        true=np.multiply(sigma,y_true[t])
+        square_t_w=np.power(z_weak[t]-true,2)
         result_tw[t]=np.dot(square_t_w,mu_true[t])
+
+        square_t_wt=np.power(z_weak_trunc[t]-true,2)
         result_twt[t]=np.dot(square_t_wt,mu_true[t])
-        result_wwt[t]=np.dot(square_w_wt,mu_true[t])
+
+        #square_w_wt=np.power(z_weak[t]-z_weak_trunc[t],2)
+        #result_wwt[t]=np.dot(square_w_wt,mu_true[t])
 
         #print('2norm_y_sigma_Pont_z_weak',result_w)
         #print('max_diff_y_sigma_Pont_z_weak_trunc',result_wt)
-    mse_y_true_Pont_delta_t.append(result_tP[num_t-1]) # true solution vs Pontryagin solution
-    mse_true_z_weak_delta_t.append(result_tw[num_t-1]) # true solution vs Weak solution
-    mse_y_true_z_weak_trunc_delta_t.append(result_twt[num_t-1]) # true solution vs Weak solution
-    mse_z_weak_trunc_weak_delta_t.append(result_wwt[num_t-1]) # Weak solution vs Weak solution truncated
-    mse_z_weak_y_Pont_delta_t.append(result_Pw[num_t-1]) # Weak solution vs Pontryagin solution
-    mse_z_weak_trunc_y_Pont_delta_t.append(result_Pwt[num_t-1])
-
+    plot_mse=int(num_t/2)
+    #mse_y_true_Pont_delta_t.append(result_tP[plot_mse]) # true solution vs Pontryagin solution
+    #mse_true_z_weak_delta_t.append(result_tw[plot_mse]) # true solution vs Weak solution
+    mse_y_true_z_weak_trunc_delta_t.append(result_twt[plot_mse]) # true solution vs Weak solution
+    #mse_z_weak_trunc_weak_delta_t.append(result_wwt[num_t-1]) # Weak solution vs Weak solution truncated
+    #mse_z_weak_y_Pont_delta_t.append(result_Pw[plot_mse]) # Weak solution vs Pontryagin solution
+    #mse_z_weak_trunc_y_Pont_delta_t.append(result_Pwt[num_t-1])
 #### Plot max_diff
 # print max diff
-plt.axes(xlim=(0, 1), ylim=(0,0.6))
+#plt.axes(xlim=(0, 1), ylim=(0,0.6))
 
 print('max diff: y_Pont vs y_true',max_diff_y_true_Pont_delta_t)
-plt.plot(value_num_t,max_diff_y_true_Pont,'o',label='y_Pont vs y_true')
+plt.figure(nfig)
+nfig=nfig+1
+plt.plot(value_num_t,max_diff_y_true_Pont_delta_t_plot,'o',label='y_Pont vs y_true')
+plt.xlabel('number of time steps')
+plt.ylabel('max difference')
+plt.legend()
+plt.savefig('max_diff_true_Pont.eps')
+
 print('max diff: z_weak vs y_true',max_diff_y_true_z_weak_delta_t)
-plt.plot(value_num_t,max_diff_y_true_z_weak,'o',label='z_weak vs y_true')
-print('max diff: z_weak_trunc vs y_true',max_diff_y_true_z_weak_trunc_delta_t)
-plt.plot(value_num_t,max_diff_y_true_z_weak_trunc,'o',label='z_weak_trunc vs y_true')
+plt.figure(nfig)
+nfig=nfig+1
+plt.plot(value_num_t,max_diff_y_true_z_weak_delta_t_plot,'o',label='z_weak vs y_true')
+plt.xlabel('number of time steps')
+plt.ylabel('max difference')
+plt.legend()
+plt.savefig('max_diff_weak_true')
+
+
+#print('max diff: z_weak_trunc vs y_true',max_diff_y_true_z_weak_trunc_delta_t)
+#plt.plot(value_num_t,max_diff_y_true_z_weak_trunc_delta_t_plot,'o',label='z_weak_trunc vs y_true')
 print('max diff: y_Pont vs z_weak',max_diff_z_weak_y_Pont_delta_t)
-plt.plot(value_num_t,max_diff_z_weak_y_Pont,'o',label='y_Pont vs z_weak')
-print('max diff: y_Pont vs z_weak_trunc',max_diff_z_weak_trunc_y_Pont_delta_t)
-plt.plot(value_num_t,max_diff_z_weak_trunc_y_Pont,'o',label='y_Pont vs z_weak_trunc')
-print('max diff: z_weak vs z_weak_trunc',max_diff_z_weak_trunc_weak_delta_t)
-plt.plot(value_num_t,max_diff_z_weak_trunc_weak,'o',label='z_weak vs z_weak_trunc')
+plt.figure(nfig)
+nfig=nfig+1
+plt.plot(value_num_t,max_diff_z_weak_y_Pont_delta_t_plot,'o',label='y_Pont vs z_weak')
+
+
+
+#print('max diff: y_Pont vs z_weak_trunc',max_diff_z_weak_trunc_y_Pont_delta_t)
+#plt.plot(value_num_t,max_diff_z_weak_trunc_y_Pont_delta_t_plot,'o',label='y_Pont vs z_weak_trunc')
+#print('max diff: z_weak vs z_weak_trunc',max_diff_z_weak_trunc_weak_delta_t)
+#plt.plot(value_num_t,max_diff_z_weak_trunc_weak_delta_t_plot,'o',label='z_weak vs z_weak_trunc')
 
 plt.xlabel('number of time steps')
 plt.ylabel('max difference')
-plt.title('max of the differences between two solutions at time 0 wrt num_t')
+#plt.title('max of the differences between two solutions at time 0 wrt num_t')
 
 plt.legend()
-plt.imshow
-plt.savefig('trader-max of the differences between two solutions at time 0 wrt num_t.eps')
+plt.show
+plt.savefig('max_diff_Pont_weak')
 
 ### Plot MSE
-plt.plot(value_num_t,mse_y_true_Pont_delta_t,'o',label='y_Pont vs y_true')
-plt.plot(value_num_t,mse_true_z_weak_delta_t,'o',label='z_weak vs y_true')
-plt.plot(value_num_t,mse_y_true_z_weak_trunc_delta_t,'o',label='z_weak_trunc vs y_true')
-plt.plot(value_num_t,mse_z_weak_y_Pont_delta_t,'o',label='y_Pont vs z_weak')
-plt.plot(value_num_t,mse_z_weak_trunc_y_Pont_delta_t,'o',label='y_Pont vs z_weak_trunc')
-plt.plot(value_num_t,mse_z_weak_trunc_weak_delta_t,'o',label='z_weak vs z_weak_trunc')
+plt.figure(nfig)
+nfig=nfig+1
+#plt.plot(value_num_t[1:7],mse_y_true_Pont_delta_t[1:7],'o',label='Pontryagin',color='blue')
+#plt.plot(value_num_t,mse_true_z_weak_delta_t,'o',label='z_weak vs y_true')
+plt.plot(value_num_t,mse_y_true_z_weak_trunc_delta_t,'o',label='Weak truncated')
+#plt.plot(value_num_t,mse_z_weak_y_Pont_delta_t,'o',label='mse y_Pont vs z_weak')
+#plt.plot(value_num_t,mse_z_weak_trunc_y_Pont_delta_t,'o',label='y_Pont vs z_weak_trunc')
+#plt.plot(value_num_t,mse_z_weak_trunc_weak_delta_t,'o',label='z_weak vs z_weak_trunc')
 
 plt.xlabel('number of time steps')
-plt.ylabel('mean square error')
-plt.title('mean square error between two solutions at time 0 wrt num_t')
+plt.ylabel('Mean Square Error of Controls')
+#plt.title('mean square error between two solutions at time 0 wrt num_t')
 
 plt.legend()
-plt.imshow
-plt.savefig('trader-MSE between two solutions at time 0 wrt num_t.eps')
+plt.show
+plt.savefig('MSE: weak2.eps')
 
 # print a specific time of the cleaned vectors
 # print('w',w[4])
@@ -327,10 +379,10 @@ plt.savefig('trader-MSE between two solutions at time 0 wrt num_t.eps')
 
 # construct x_grid (it will be necessary for the animation and to calculate the mean)
 T=1
-mu_weak=mu_weak_delta_t[anim_num_t]
-mu_weak_trunc=mu_weak_trunc_delta_t[anim_num_t]
-mu_Pont=mu_Pont_delta_t[anim_num_t]
-mu_true=mu_true_delta_t[anim_num_t]
+mu_weak=mu_weak_delta_t[index_anim_num_t]
+mu_weak_trunc=mu_weak_trunc_delta_t[index_anim_num_t]
+mu_Pont=mu_Pont_delta_t[index_anim_num_t]
+mu_true=mu_true_delta_t[index_anim_num_t]
 
 
 num_t=int(anim_num_t)
@@ -364,7 +416,8 @@ for t in range(num_t):
 # print('sum mu_P_hist',np.sum(mu_Pont_hist[num_t-1]))
 # print('sum mu_T_hist',np.sum(mu_T_hist[num_t-1]))
 
-fig = plt.figure()
+fig=plt.figure(nfig)
+nfig=nfig+1
 ax1 = plt.axes(xlim=(-1, 3), ylim=(0,1))
 line, = ax1.plot([], [],'o')
 plotlays, plotcols = [3], ["green","yellow","red","blue"]
@@ -412,6 +465,8 @@ def animate(i):
 
     x = x_grid_hist
     y = mu_weak_trunc_hist[i]
+    #y = mu_Pont_hist[i] #at the moment, we don't have the data for x
+
     x4.append(x)
     y4.append(y)
 
@@ -435,12 +490,12 @@ plt.show()
 
 
 if __name__=='__main__':
-    wdist_true_Pont_delta_t=np.zeros(value_num_t) # true solution vs Pontryagin solution
-    wdist_true_weak_delta_t=np.zeros(value_num_t) # true solution vs Weak solution
-    wdist_true_weak_trunc_delta_t=np.zeros(value_num_t) # true solution vs Weak solution
-    wdist_weak_trunc_weak_delta_t=np.zeros(value_num_t) # Weak solution vs Weak solution truncated
-    wdist_weak_Pont_delta_t=np.zeros(value_num_t) # Weak solution vs Pontryagin solution
-    wdist_weak_trunc_Pont_delta_t=np.zeros(value_num_t)
+    wdist_true_Pont_delta_t=[] # true solution vs Pontryagin solution
+    wdist_true_weak_delta_t=[] # true solution vs Weak solution
+    #wdist_true_weak_trunc_delta_t=np.zeros(value_num_t) # true solution vs Weak solution
+    #wdist_weak_trunc_weak_delta_t=np.zeros(value_num_t) # Weak solution vs Weak solution truncated
+    wdist_weak_Pont_delta_t=[] # Weak solution vs Pontryagin solution
+    #wdist_weak_trunc_Pont_delta_t=np.zeros(value_num_t)
 
     # wdist_true_Pont_hist_delta_t=np.zeros(value_num_t) # true solution vs Pontryagin solution
     # wdist_true_weak_hist_delta_t=np.zeros(value_num_t) # true solution vs Weak solution
@@ -449,20 +504,28 @@ if __name__=='__main__':
     # wdist_weak_Pont_hist_delta_t=np.zeros(value_num_t) # Weak solution vs Pontryagin solution
     # wdist_weak_trunc_Pont_hist_delta_t=np.zeros(value_num_t)
     for k in range(len(value_num_t)):
-        num_t=value_num_t[k]
+        num_t=int(value_num_t[k])
 
         mu_weak=mu_weak_delta_t[k]
-        mu_weak_trunc=mu_weak_trunc_delta_t[k]
+        #mu_weak_trunc=mu_weak_trunc_delta_t[k]
         mu_Pont=mu_Pont_delta_t[k]
         mu_true=mu_true_delta_t[k]
 
-        num_x=mu_weak.shape[1]
+        delta_t=(T-0.06)/(num_t-1)
+        t_grid=np.linspace(0.06,T,num_t)
+        delta_x=delta_t**(2)
+        x_min=-2
+        x_max=4
+        num_x=int((x_max-x_min)/delta_x+1)
+        x_grid=np.linspace(x_min,x_max,num_x)
 
-        y_Pont=y_Pont_delta_t[k]
-        y_true=y_true_delta_t[k]
-
-        z_weak=z_weak_delta_t[k]
-        z_weak_trunc=z_weak_trunc_delta_t=[k]
+        # num_x=mu_weak.shape[1]
+        #
+        # y_Pont=y_Pont_delta_t[k]
+        # y_true=y_true_delta_t[k]
+        #
+        # z_weak=z_weak_delta_t[k]
+        # z#_weak_trunc=z_weak_trunc_delta_t=[k]
 
         # wdist_y_true_Pont=np.zeros(num_t) # true solution vs Pontryagin solution
         # wdist_y_true_z_weak=np.zeros(num_t) # true solution vs Weak solution
@@ -471,22 +534,25 @@ if __name__=='__main__':
         # wdist_z_weak_y_Pont=np.zeros(num_t) # Weak solution vs Pontryagin solution
         # wdist_z_weak_trunc_y_Pont=np.zeros(num_t)
 
-        wdist_weak_Pont_delta_t[k]=Wd(mu_weak[num_t-1],x_grid,mu_Pont[num_t-1],x_grid,10**4)
-        print('wdist_weak_Pont',wdist_weak_Pont_delta_t[k])
-        wdist_true_weak_delta_t[k]=Wd(mu_weak[num_t-1],x_grid,mu_true[num_t-1],x_grid,10**4)
-        print('wdist_true_weak',wdist_true_weak_delta_t[k])
-        wdist_true_Pont_delta_t[k]=Wd(mu_true[num_t-1],x_grid,mu_Pont[num_t-1],x_grid,10**4)
-        print('wdist_true_Pont',wdist_true_Pont_delta_t[k])
-        #wdist_true_start_true_solut=Wd(true_solution[num_t-1],x_grid,true_start[num_t-1],x_grid,10**4)
+        wdist_weak_Pont_delta_t.append(Wd(mu_weak[num_t-1],x_grid,mu_Pont[num_t-1],x_grid,10**4))
+        print('wdist_weak_Pont'+str(num_t),wdist_weak_Pont_delta_t[k])
+
+        wdist_true_weak_delta_t.append(Wd(mu_weak[num_t-1],x_grid,mu_true[num_t-1],x_grid,10**4))
+        print('wdist_true_weak'+str(num_t),wdist_true_weak_delta_t[k])
+        wdist_true_Pont_delta_t.append(Wd(mu_true[num_t-1],x_grid,mu_Pont[num_t-1],x_grid,10**4))
+        print('wdist_true_Pont'+str(num_t),wdist_true_Pont_delta_t[k])
+        #wdist_true_start_true_solut.append(Wd(true_solution[num_t-1],x_grid,true_start[num_t-1],x_grid,10**4))
         #print('wdist_true_start_true_solut',wdist_true_start_true_solut)
-        #wdist_true_start_Pont=Wd(true_start[num_t-1],x_grid,Pont[num_t-1],x_grid,10**4)
+        #wdist_true_start_Pont.append(Wd(true_start[num_t-1],x_grid,Pont[num_t-1],x_grid,10**4))
         #print('wdist_true_start_Pont',wdist_true_start_Pont)
-        wdist_true_weak_trunc_delta_t[k]=Wd(mu_weak_trunc[num_t-1],x_grid,mu_true[num_t-1],x_grid,10**4)
-        print('wdist_weak_trunc_true',wdist_true_weak_trunc_delta_t[k])
-        wdist_weak_trunc_weak_delta_t[k]=Wd(mu_weak_trunc[num_t-1],x_grid,mu_weak[num_t-1],x_grid,10**4)
-        print('wdist_true_weak',wdist_weak_trunc_weak_delta_t[k])
-        wdist_weak_trunc_Pont_delta_t[k]=Wd(mu_weak_trunc[num_t-1],x_grid,mu_Pont[num_t-1],x_grid,10**4)
-        print('wdist_true_weak',wdist_weak_trunc_Pont_delta_t[k])
+
+        # to uncomment when we have the data
+        #wdist_true_weak_trunc_delta_t[k].append(Wd(mu_weak_trunc[num_t-1],x_grid,mu_true[num_t-1],x_grid,10**4))
+        #print('wdist_weak_trunc_true',wdist_true_weak_trunc_delta_t[k])
+        #wdist_weak_trunc_weak_delta_t[k].append(Wd(mu_weak_trunc[num_t-1],x_grid,mu_weak[num_t-1],x_grid,10**4))
+        #print('wdist_true_weak',wdist_weak_trunc_weak_delta_t[k])
+        #wdist_weak_trunc_Pont_delta_t[k].append(Wd(mu_weak_trunc[num_t-1],x_grid,mu_Pont[num_t-1],x_grid,10**4))
+        #print('wdist_true_weak',wdist_weak_trunc_Pont_delta_t[k])
 
         # wdist_weak_Pont_hist_delta_t=Wd(mu_weak_hist[num_t-1],x_grid_hist,mu_Pont_hist[num_t-1],x_grid_hist,10**4)
         # print('wdist_weak_Pont_hist',wdist_weak_Pont_hist_delta_t)
@@ -503,20 +569,28 @@ if __name__=='__main__':
         # wdist_weak_trunc_Pont_hist=Wd(mu_weak_trunc_hist[num_t-1],x_grid_hist,mu_Pont_hist[num_t-1],x_grid_hist,10**4)
         # print('wdist_weak_trunc_true_hist',wdist_weak_trunc_true_hist)
 
+    plt.figure(nfig)
+    nfig=nfig+1
+    np.save('wdist_true_Pont_delta_t.npy',wdist_true_Pont_delta_t)
+    np.save('wdist_true_weak_delta_t.npy',wdist_true_weak_delta_t)
+    np.save('wdist_weak_Pont_delta_t.npy',wdist_true_weak_delta_t)
+
+
     plt.plot(value_num_t,wdist_true_Pont_delta_t,'o',label='mu_Pont vs mu_true')
     plt.plot(value_num_t,wdist_true_weak_delta_t,'o',label='mu_weak vs mu_true')
-    plt.plot(value_num_t,wdist_true_weak_trunc_delta_t,'o',label='mu_weak_trunc vs mu_true')
+    #plt.plot(value_num_t,wdist_true_weak_trunc_delta_t,'o',label='mu_weak_trunc vs mu_true')
     plt.plot(value_num_t,wdist_weak_Pont_delta_t,'o',label='mu_Pont vs mu_weak')
-    plt.plot(value_num_t,wdist_weak_trunc_Pont_delta_t,'o',label='mu_Pont vs mu_weak_trunc')
-    plt.plot(value_num_t,wdist_weak_trunc_weak_delta_t,'o',label='mu_weak vs mu_weak_trunc')
+    #plt.plot(value_num_t,wdist_weak_trunc_Pont_delta_t,'o',label='mu_Pont vs mu_weak_trunc')
+    #plt.plot(value_num_t,wdist_weak_trunc_weak_delta_t,'o',label='mu_weak vs mu_weak_trunc')
 
     plt.xlabel('number of time steps')
-    plt.ylabel('mean square error')
-    plt.title('mean square error between two solutions at time 0 wrt num_t')
+    plt.ylabel('Wasserstein distance')
+    #plt.title('Wasserstein distance at time T wrt num_t')
 
     plt.legend()
-    plt.imshow
-    plt.savefig('trader-Wasserstein distance at time T wrt num_t.eps')
+    plt.show()
+    plt.savefig('trader-Wasserstein.eps')
+
 
 
 

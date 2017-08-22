@@ -624,7 +624,7 @@ if __name__ == '__main__':
 
     global execution
 
-    execution='continuation_in_time'
+    execution='changing_rho'
 
 
     # possible values in order of appearance:
@@ -830,8 +830,8 @@ if __name__ == '__main__':
         rho=1
     elif problem=='trader_Pontryagin':
         sigma=0.7
-        rho=0.3
-        c_x=7
+        rho=7
+        c_x=1
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -851,7 +851,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=20
+        num_t=30
         delta_t=(T-0.06)/(num_t-1)
         t_grid=np.linspace(0.06,T,num_t)
         delta_x=delta_t**(2)
@@ -896,7 +896,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=20
+        num_t=30
         delta_t=(T-0.06)/(num_t-1)
         t_grid=np.linspace(0.06,T,num_t)
         delta_x=delta_t**(2)
@@ -905,13 +905,13 @@ if __name__ == '__main__':
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
         global bounds
-        #bounds=np.load('./Data/trader/value_y_Pont_to_trunc_z_weak.npy')
+        bounds=np.load('./Data/trader/trunc_true/value_y_true_to_trunc_z_weak.npy')
     # Variable trader
 
 
     elif problem=='trader_solution':
         sigma=0.7
-        rho=2
+        rho=0.3
         c_x=2
         h_bar=2
         c_g=0.3
@@ -923,8 +923,9 @@ if __name__ == '__main__':
         num_keep=5
         T=1
 
+        delta_t=1
         #### uncomment if you use only one value for num_t
-        # num_t=20
+        # num_t=30
         # delta_t=(T-0.06)/(num_t-1)
         # t_grid=np.linspace(0.06,T,num_t)
         # delta_x=delta_t**(2)
@@ -1069,8 +1070,8 @@ if __name__ == '__main__':
             np.save('./Data/trader/mu_weak_t20.npy',mu)
             np.save('./Data/trader/z_weak_t20.npy',v)
         elif problem=='trader_weak_trunc':
-            np.save('./Data/trader/mu_weak_trunc_t20.npy',mu)
-            np.save('./Data/trader/z_weak_trunc_t20.npy',v)
+            np.save('./Data/trader/trunc_true/mu_weak_trunc_t30.npy',mu)
+            np.save('./Data/trader/trunc_true/z_weak_trunc_t30.npy',v)
 
     if execution=='changing_bounds':
             step=np.linspace(1,10,15)
@@ -1170,8 +1171,8 @@ if __name__ == '__main__':
     
     elif execution=='changing_rho':
 
-        num_rho=10
-        rho_values=np.linspace(3,12,num_rho)
+        num_rho=8
+        rho_values=np.linspace(3.5,5,num_rho)
         if problem=='flocking_Pontryagin' or problem=='flocking_weak':
             rho_values=np.linspace(1,10,num_rho)
 
@@ -1205,14 +1206,17 @@ if __name__ == '__main__':
             print all_Y_0_values[index]
 
             plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index],'o',label='Pontryagin',color='blue')
+            plt.xlabel('$\\rho$')
+            plt.ylabel('$Y_0$')
+            plt.legend()
         #plt.title('sigma = str(sigma), rho = str(rho), $c_x \in [str(min(rho_values)),str(max(rho_values))]$, h_{bar}=str(h_bar), c_g=str(c_g)')
         #plt.title('sigma = str(sigma), c_x = str(c_x), $rho \in [str(min(rho_values)),str(max(rho_values))]$, h_{bar}=str(h_bar), c_g=str(c_g)')
         mu=np.zeros((num_t,num_x))
 
 
-        plt.show()
+        #plt.show()
 
-        #plt.savefig('./Data/trader/grid_trader_pontryagin_changing_rho.eps')
+        plt.savefig('./Data/trader/grid_trader_pontryagin_changing_rho.eps')
         #np.save('./Data/trader/grid_trader_pontryagin_rho_changing_rho.npy',all_Y_0_values)
 
 
@@ -1270,6 +1274,7 @@ if __name__ == '__main__':
             num_t=int(value_num_t[h])
             delta_t=(T-0.06)/(num_t-1)
             t_grid=np.linspace(0.06,T,num_t)
+            sqrt_delta_t=np.sqrt(delta_t)
             delta_x=delta_t**(2)
             x_min=-2
             x_max=4
@@ -1312,35 +1317,42 @@ if __name__ == '__main__':
                 mu[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid)
                 mu[t]=mu[t]/np.sum(mu[t])
             mu[0,int(num_x/2)]=1
+            np.save('./Data/trader/trunc_true/trader_mu_true_t'+str(num_t)+'.npy',mu)
 
-            true_Y_0=np.zeros((num_t,num_x))
+            true_Y=np.zeros((num_t,num_x))
             for t in range(num_t):
                 mean_t=np.dot(x_grid,mu[t])
-                true_Y_0[t]=eta[0,t]*x_grid+(eta_bar[0][t]-eta[0][t])*mean_t
-            np.save('./Data/from_cluster/trader/trader_Y_0_solution'+str(num_t)+'.npy',true_Y_0)
+                true_Y[t]=eta[0,t]*x_grid+(eta_bar[0][t]-eta[0][t])*mean_t
+            np.save('./Data/trader/trunc_true/trader_Y_solution_t'+str(num_t)+'.npy',true_Y)
 
+            bounds=np.zeros((2,num_t))
+            for t in range(num_t):
+                bounds[0,t]=sigma*min(true_Y[t])
+                bounds[1,t]=sigma*max(true_Y[t])
+            np.save('./Data/trader/trunc_true/bounds_t'+str(num_t)+'.npy',bounds)
 
-            num_x_hist=15
-            delta_x_hist=np.abs(x_max-x_min)/num_x_hist
-            x_grid_hist=np.linspace(x_min,x_max,num_x_hist)
-            mu_hist=np.zeros((num_t,num_x_hist))
+            #np.save('./Data/trader/y*sigma_trader_Pont_t20',np.multiply(sigma,u))
 
+            # num_x_hist=15
+            # delta_x_hist=np.abs(x_max-x_min)/num_x_hist
+            # x_grid_hist=np.linspace(x_min,x_max,num_x_hist)
+            # mu_hist=np.zeros((num_t,num_x_hist))
+            #
+            #
+            # for t in range(1,num_t):
+            #     integral=np.sum(eta_bar[0,0:t])*delta_t
+            #     mean_mu=np.exp(-rho*integral)
+            #     variance_mu=0
+            #     for s in range(0,t):
+            #         variance_mu=variance_mu+delta_t*np.exp(-2*rho*np.sum(eta[0,s:t])*delta_t)
+            #     variance_mu=sigma**2*variance_mu
+            #     print(mean_mu,variance_mu)
+            #
+            #     mu_hist[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid_hist)
+            #     mu_hist[t]=mu_hist[t]/np.sum(mu_hist[t])
+            # mu_hist[0,int(num_x_hist/2)]=1
 
-            for t in range(1,num_t):
-                integral=np.sum(eta_bar[0,0:t])*delta_t
-                mean_mu=np.exp(-rho*integral)
-                variance_mu=0
-                for s in range(0,t):
-                    variance_mu=variance_mu+delta_t*np.exp(-2*rho*np.sum(eta[0,s:t])*delta_t)
-                variance_mu=sigma**2*variance_mu
-                print(mean_mu,variance_mu)
-
-                mu_hist[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid_hist)
-                mu_hist[t]=mu_hist[t]/np.sum(mu_hist[t])
-            mu_hist[0,int(num_x_hist/2)]=1
-
-            np.save('./Data/from_cluster/trader/mu_true_t'+str(num_t)+'.npy',mu)
-            np.save('./Data/from_cluster/trader/mu_true_hist_t'+str(num_t)+'.npy',mu_hist)
+            # np.save('./Data/from_cluster/trader/mu_true_hist_t'+str(num_t)+'.npy',mu_hist)
 
 
 
@@ -1564,8 +1576,8 @@ if __name__ == '__main__':
         global num_level
         
         num_level=3
-
-        num_t=20
+        print('rho, cx',rho,c_x)
+        num_t=5
         if problem=='trader_Pontryagin' or problem=='trader_weak':
             delta_t=(T-0.06)/num_level/(num_t-1)
         else:
@@ -1610,6 +1622,10 @@ if __name__ == '__main__':
         mu_0[int(num_x/2)]=1.0
 
         [u_0,mu,u,v,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
+        np.save('mu_level'+str(num_level)+'_t_'+str(num_t)+'.npy',mu)
+        np.save('y_level'+str(num_level)+'_t_'+str(num_t)+'.npy',u)
+        np.save('all_Y_0_values_level'+str(num_level)+'_t_'+str(num_t)+'.npy',all_Y_0_values)
+
         print(all_Y_0_values)
         end_time=time.time()
         print('Time elapsted:',end_time-start_time)
@@ -1645,6 +1661,6 @@ if __name__ == '__main__':
     end_time=time.time()
 
     print('Time elapsted:',end_time-start_time)
-
-    os.system('say "Eureka!"')
+    if os.sys.platform=='darwin':
+        os.system('say "Eureka!"')
     #os.system('say "your program has finished"')
