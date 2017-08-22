@@ -22,7 +22,7 @@ non constant, and multidimensional state space.
 from __future__ import division
 import numpy as np
 import math
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import time
 
 #Define functions b, f, and g for a variety of problems:
@@ -372,7 +372,7 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     start_time=time.time()
-    problem ='ex_1'
+    problem ='trader_Pontryagin'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
     execution='ordinary'
@@ -514,7 +514,7 @@ if __name__ == '__main__':
         J_solver_bar=10
         num_keep=5
         T=1.0
-        num_intervals_total=6
+        num_intervals_total=15
         num_intervals_coarse=1
         x_0=[1.0]
         x_0_probs=[1.0]
@@ -532,7 +532,7 @@ if __name__ == '__main__':
         J_solver_bar=10
         num_keep=5
         T=1.0
-        num_intervals_total=6
+        num_intervals_total=15
         num_intervals_coarse=1
         x_0=[1.0]
         x_0_probs=[1.0]
@@ -546,7 +546,7 @@ if __name__ == '__main__':
         J_solver_bar=10
         num_keep=5
         T=1.0
-        num_intervals_total=10
+        num_intervals_total=15
         num_intervals_coarse=1
         x_0=[0.0]
         x_0_probs=[1.0]
@@ -561,7 +561,7 @@ if __name__ == '__main__':
         J_solver_bar=10
         num_keep=5
         T=1.0
-        num_intervals_total=10
+        num_intervals_total=15
         num_intervals_coarse=1
         x_0=[0.0]
         x_0_probs=[1.0]
@@ -581,6 +581,22 @@ if __name__ == '__main__':
     
     if execution=='ordinary':
         [Y_initial,X,Y,Z,Y_0_values]=solver(0,x_0,x_0_probs)
+        num_t=num_intervals_total
+        if problem=='flocking_Pontryagin':
+            np.save('flocking_Pont_tree_X_t'+str(num_t)+'.npy',X)
+            np.save('flocking_Pont_tree_Y_t'+str(num_t)+'.npy',Y)
+            np.save('flocking_Pont_tree_Z_t'+str(num_t)+'.npy',Z)
+        elif problem=='flocking_weak':
+            np.save('flocking_weak_tree_X_t'+str(num_t)+'.npy',X)
+            np.save('flocking_weak_tree_Y_t'+str(num_t)+'.npy',Y)
+            np.save('flocking_weak_tree_Z_t'+str(num_t)+'.npy',Z)
+        elif problem=='trader_Pontryagin':
+            np.save('trader_Pont_tree_X_t'+str(num_t)+'.npy',X)
+            np.save('trader_Pont_tree_Y_t'+str(num_t)+'.npy',Y)
+        elif problem=='trader_weak':
+            np.save('trader_weak_tree_X_t'+str(num_t)+'.npy',X)
+            np.save('trader_weak_tree_Z_t'+str(num_t)+'.npy',Z)
+            
         print(Y_0_values)
         if problem=='ex_1':
             m_0=0

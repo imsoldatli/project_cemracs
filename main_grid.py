@@ -22,11 +22,11 @@ non constant, and multidimensional state space.
 from __future__ import division
 import numpy as np
 import math
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import scipy
 import time
 import scipy.stats
-import os
+#import os
 
 #Define functions b, f, and g for a variety of problems:
 
@@ -623,8 +623,12 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
+<<<<<<< HEAD
 
     execution='changing_rho'
+=======
+    execution='continuation_in_time'
+>>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
 
 
     # possible values in order of appearance:
@@ -781,7 +785,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=12
+        num_t=30
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -830,8 +834,13 @@ if __name__ == '__main__':
         rho=1
     elif problem=='trader_Pontryagin':
         sigma=0.7
+<<<<<<< HEAD
         rho=7
         c_x=1
+=======
+        rho=1.5 #0.3
+        c_x=2
+>>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -923,7 +932,11 @@ if __name__ == '__main__':
         num_keep=5
         T=1
 
+<<<<<<< HEAD
         delta_t=1
+=======
+        delta_t=1000.0
+>>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
         #### uncomment if you use only one value for num_t
         # num_t=30
         # delta_t=(T-0.06)/(num_t-1)
@@ -962,7 +975,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=60
+        num_t=40
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -981,7 +994,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=60
+        num_t=40
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -996,7 +1009,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=60
+        num_t=130
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -1170,19 +1183,25 @@ if __name__ == '__main__':
         print all_Y_0_values[index]
     
     elif execution=='changing_rho':
+<<<<<<< HEAD
 
         num_rho=8
         rho_values=np.linspace(3.5,5,num_rho)
+=======
+        num_rho=11
+        #rho_values=np.linspace(3,12,num_rho)
+        rho_values=np.linspace(1,12,num_rho)
+>>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
         if problem=='flocking_Pontryagin' or problem=='flocking_weak':
-            rho_values=np.linspace(1,10,num_rho)
+            rho_values=np.linspace(10,50,num_rho)
 
         all_Y_0_values=np.zeros((num_rho,num_keep))
         value_x=num_keep*[1]
-        plot_cx = plt.figure()
+        #plot_cx = plt.figure()
         for index in range(num_rho):
             index2=0
             #rho=rho_values[index]
-            rho=rho_values[index]
+            c_x=rho_values[index]
             
             
             mu_0=np.zeros((num_x))
@@ -1205,13 +1224,17 @@ if __name__ == '__main__':
                     index2+=1
             print all_Y_0_values[index]
 
+<<<<<<< HEAD
             plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index],'o',label='Pontryagin',color='blue')
             plt.xlabel('$\\rho$')
             plt.ylabel('$Y_0$')
             plt.legend()
+=======
+            #plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index],'o',label='Pontryagin',color='blue')
+>>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
         #plt.title('sigma = str(sigma), rho = str(rho), $c_x \in [str(min(rho_values)),str(max(rho_values))]$, h_{bar}=str(h_bar), c_g=str(c_g)')
         #plt.title('sigma = str(sigma), c_x = str(c_x), $rho \in [str(min(rho_values)),str(max(rho_values))]$, h_{bar}=str(h_bar), c_g=str(c_g)')
-        mu=np.zeros((num_t,num_x))
+        #mu=np.zeros((num_t,num_x))
 
 
         #plt.show()
@@ -1268,7 +1291,8 @@ if __name__ == '__main__':
             print(all_Y_0_values[index])
 
     elif execution=='trader_solution':
-        value_num_t=np.linspace(10,150,8)
+        value_num_t=np.linspace(10,130,7)
+        #value_num_t=np.linspace(130,130,1)
         #comment until ##end##  if you use only one value for num_t
         for h in range(len(value_num_t)):
             num_t=int(value_num_t[h])
@@ -1323,6 +1347,7 @@ if __name__ == '__main__':
             for t in range(num_t):
                 mean_t=np.dot(x_grid,mu[t])
                 true_Y[t]=eta[0,t]*x_grid+(eta_bar[0][t]-eta[0][t])*mean_t
+<<<<<<< HEAD
             np.save('./Data/trader/trunc_true/trader_Y_solution_t'+str(num_t)+'.npy',true_Y)
 
             bounds=np.zeros((2,num_t))
@@ -1353,6 +1378,32 @@ if __name__ == '__main__':
             # mu_hist[0,int(num_x_hist/2)]=1
 
             # np.save('./Data/from_cluster/trader/mu_true_hist_t'+str(num_t)+'.npy',mu_hist)
+=======
+            np.save('./Data/trader/trader_Y_solution'+str(num_t)+'.npy',true_Y)
+
+
+            num_x_hist=15
+            delta_x_hist=np.abs(x_max-x_min)/num_x_hist
+            x_grid_hist=np.linspace(x_min,x_max,num_x_hist)
+            mu_hist=np.zeros((num_t,num_x_hist))
+
+
+            for t in range(1,num_t):
+                integral=np.sum(eta_bar[0,0:t])*delta_t
+                mean_mu=np.exp(-rho*integral)
+                variance_mu=0
+                for s in range(0,t):
+                    variance_mu=variance_mu+delta_t*np.exp(-2*rho*np.sum(eta[0,s:t])*delta_t)
+                variance_mu=sigma**2*variance_mu
+                print(mean_mu,variance_mu)
+
+                mu_hist[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid_hist)
+                mu_hist[t]=mu_hist[t]/np.sum(mu_hist[t])
+            mu_hist[0,int(num_x_hist/2)]=1
+
+            #np.save('./Data/trader/mu_true_t'+str(num_t)+'.npy',mu)
+            #np.save('./Data/trader/mu_true_hist_t'+str(num_t)+'.npy',mu_hist)
+>>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
 
 
 
@@ -1405,8 +1456,8 @@ if __name__ == '__main__':
         #mu=[mu[10*i] for i in range(40)]
         #mu_hist=[mu_hist[10*i] for i in range(40)]
 
-        np.save('./Data/flocking/true_solution_num_t_60.npy',mu)
-        np.save('./Data/flocking/true_solution_hist_num_t_60.npy',mu_hist)
+#        np.save('./Data/flocking/true_solution_num_t_60.npy',mu)
+#        np.save('./Data/flocking/true_solution_hist_num_t_60.npy',mu_hist)
         
     elif execution=='true_start': # only for some problems
 
@@ -1433,9 +1484,11 @@ if __name__ == '__main__':
 
         #np.save('./Data/trader/mu_trader_true_start_t20.npy',mu)
     if execution=='changing_delta_t':
-
-        value_num_t=np.linspace(10,150,8)
-        #value_num_t=np.linspace(4,20,9)
+#        value_num_t=np.linspace(130,130,1)
+#        value_num_t=np.linspace(110,110,1)
+#        value_num_t=np.linspace(90,90,1)
+#        value_num_t=np.linspace(70,70,1)
+        value_num_t=np.linspace(10,50,3)
         all_Y_0_values=np.zeros((len(value_num_t),num_keep))
         all_Z_0_values=np.zeros((len(value_num_t),num_keep))
         for n in range(len(value_num_t)):
@@ -1448,7 +1501,7 @@ if __name__ == '__main__':
                 t_grid=np.linspace(0.06,T,num_t)
                 x_min=-2
                 x_max=4
-            elif problem=='flocking_Pontryagin' or problem=='flocking_Pontryagin':
+            elif problem=='flocking_Pontryagin' or problem=='flocking_weak':
                 delta_t=T/(num_t-1)
                 t_grid=np.linspace(0,T,num_t)
                 x_min=-3
@@ -1462,6 +1515,7 @@ if __name__ == '__main__':
                 bounds=np.load('./Data/trader_bounds'+str(num_t)+'.npy')
                 
             delta_x=delta_t**(2)
+            sqrt_delta_t=math.sqrt(delta_t)
 
             num_x=int((x_max-x_min)/delta_x+1)
             x_grid=np.linspace(x_min,x_max,num_x)
@@ -1505,26 +1559,31 @@ if __name__ == '__main__':
 
             if problem=='trader_Pontryagin':
                 np.save('./Data/trader_mu_Pont_t'+str(num_t)+'.npy',mu)
-                np.save('./Data/trader_Y_0_Pont'+str(num_t)+'.npy',all_Y_0_values[n])
+                np.save('./Data/trader_Y_0_Pont_t'+str(num_t)+'.npy',all_Y_0_values[n])
+                np.save('./Data/trader_Y_Pont_t'+str(num_t)+'.npy',u)
             elif problem=='trader_weak':
                 np.save('./Data/trader_mu_weak_t'+str(num_t)+'.npy',mu)
-                np.save('./Data/trader_Z_0_weak'+str(num_t)+'.npy',all_Z_0_values[n])
+                np.save('./Data/trader_Z_0_weak_t'+str(num_t)+'.npy',all_Z_0_values[n])
+                np.save('./Data/trader_Z_weak_t'+str(num_t)+'.npy',v)
             elif problem=='trader_weak_trunc':
                 np.save('./Data/trader_mu_weak_trunc_t'+str(num_t)+'.npy',mu)
-                np.save('./Data/trader_Z_0_weak_trunc'+str(num_t)+'.npy',all_Z_0_values[n])
+                np.save('./Data/trader_Z_0_weak_trunc_t'+str(num_t)+'.npy',all_Z_0_values[n])
+                np.save('./Data/trader_Z_weak_trunc_t'+str(num_t)+'.npy',v)
             elif problem=='flocking_Pontryagin':
                 np.save('./Data/flocking_mu_Pont_t'+str(num_t)+'.npy',mu)
-                np.save('./Data/flocking_Y_0_Pont'+str(num_t)+'.npy',all_Y_0_values[n])
+                np.save('./Data/flocking_Y_0_Pont_t'+str(num_t)+'.npy',all_Y_0_values[n])
+                np.save('./Data/flocking_Y_Pont_t'+str(num_t)+'.npy',u)
             elif problem=='flocking_weak':
                 np.save('./Data/flocking_mu_weak_t'+str(num_t)+'.npy',mu)
-                np.save('./Data/flocking_Z_0_weak'+str(num_t)+'.npy',all_Z_0_values[n])
+                np.save('./Data/flocking_Z_0_weak_t'+str(num_t)+'.npy',all_Z_0_values[n])
+                np.save('./Data/flocking_Z_weak_t'+str(num_t)+'.npy',v)
                 
             if problem=='trader_Pontryagin':
                 bounds=np.zeros((2,num_t))
                 for t in range(num_t):
                     bounds[0,t]=sigma*min(u[t])
                     bounds[1,t]=sigma*max(u[t])
-                np.save('./Data/trader_bounds'+str(num_t)+'.npy',bounds)
+                np.save('./Data/bounds_t'+str(num_t)+'.npy',bounds)
                 
                 
                 
@@ -1545,17 +1604,15 @@ if __name__ == '__main__':
             for n in range(len(value_num_t)):
                 log_errors[n]=math.log(abs(all_Y_0_values[n][num_keep-1]-true_Y_0))
                 
-            np.save('./Data/ex_1_log_errors.npy',log_errors)
+            np.save('./Data/ex_1_log_errors_2.npy',log_errors)
             log_num_t=math.log(value_num_t)
-            np.save('./Data/ex_1_log_num_t.npy',log_num_t)
+            np.save('./Data/ex_1_log_num_t_2.npy',log_num_t)
 
             # if problem=='trader_Pontryagin':
             #     bounds=np.zeros((2,num_t))
             #     for t in range(num_t):
             #         bounds[0,t]=sigma*min(u[t])
             #         bounds[1,t]=sigma*max(u[t])
-            if num_t==70 or num_t==100:
-                np.save('./Data/trader/mu_Pont_t'+str(num_t)+'.npy',mu)
 #            if num_t==10 or num_t==30 or num_t==50:
 #                np.save('./Data/trader/mu_Pont_t'+str(num_t)+'.npy',mu)
 
@@ -1618,9 +1675,16 @@ if __name__ == '__main__':
 
 
 ##### Uncomment the following if you want lunch the code for a single value of rho
-        mu_0=np.zeros((num_x))
-        mu_0[int(num_x/2)]=1.0
+#        mu_0=np.zeros((num_x))
+#        mu_0[int(num_x/2)]=1.0
+#
+#        [u_0,mu,u,v,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
+#        print(all_Y_0_values)
+#        end_time=time.time()
+#        print('Time elapsted:',end_time-start_time)
+#        os.system('say "picaaaaa"')
 
+<<<<<<< HEAD
         [u_0,mu,u,v,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
         np.save('mu_level'+str(num_level)+'_t_'+str(num_t)+'.npy',mu)
         np.save('y_level'+str(num_level)+'_t_'+str(num_t)+'.npy',u)
@@ -1630,37 +1694,47 @@ if __name__ == '__main__':
         end_time=time.time()
         print('Time elapsted:',end_time-start_time)
         os.system('say "picaaaaa"')
+=======
+>>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
+
+#### Uncomment the following if you want lunch the code for several values of rho
+
+        num_rho=11
+        rho_values=np.linspace(1,12,num_rho)
+        
+        value_x=num_keep*[1]
+        #plot_cx = plt.figure()
+        all_Y_0_values=np.zeros((num_rho,num_keep))
+        for index in range(num_rho):
+             #rho=rho_values[index]
+             c_x=rho_values[index]
 
 
-##### Uncomment the following if you want lunch the code for several values of rho
-
-        # num_rho=11
-        # rho_values=np.linspace(1,12,num_rho)
-        #
-        # value_x=num_keep*[1]
-        # plot_cx = plt.figure()
-        # for index in range(num_rho):
-        #      #rho=rho_values[index]
-        #      c_x=rho_values[index]
-        #
-        #
-        #      mu_0=np.zeros((num_x))
-        #      mu_0[int(num_x/2)]=1.0
-        #
-        #      [u_0,mu,u,v,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
-        #
-        #
-        #      print all_Y_0_values
-        #
-        #      plot_cx=plt.plot(np.multiply(c_x,value_x),all_Y_0_values,'o')
-        # plt.title('Continuation in time : sigma = 0.7, rho = 1.5, $c_x /in [3,12]$, h_{bar}=2, c_g=0.3')
-        # plt.show()
-        #
+             mu_0=np.zeros((num_x))
+             mu_0[int(num_x/2)]=1.0
+    
+             [u_0,mu,u,v,Y_0_values]=solver_grid(0,mu_0,X_grids)
+    
+    
+             print Y_0_values
+             all_Y_0_values[index]=Y_0_values
+        np.save('trader_continuation_time_1_levels_changing_c_x.npy',all_Y_0_values)
+        np.save('trader_continuation_time_1_levels_c_x_values.npy',rho_values)
+    
+             #plot_cx=plt.plot(np.multiply(c_x,value_x),all_Y_0_values,'o')
+        #plt.title('Continuation in time : sigma = 0.7, rho = 1.5, $c_x /in [3,12]$, h_{bar}=2, c_g=0.3')
+        #plt.show()
+        
 
 
     end_time=time.time()
 
     print('Time elapsted:',end_time-start_time)
+<<<<<<< HEAD
     if os.sys.platform=='darwin':
         os.system('say "Eureka!"')
+=======
+
+    #os.system('say "Eureka!"')
+>>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
     #os.system('say "your program has finished"')
