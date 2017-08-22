@@ -615,7 +615,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='flocking_solution'
+    problem='trader_weak_trunc'
 
 
 
@@ -623,7 +623,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='flocking_solution'
+    execution='changing_delta_t'
 
 
     # possible values in order of appearance:
@@ -910,7 +910,7 @@ if __name__ == '__main__':
 
     elif problem=='trader_solution':
         sigma=0.7
-        rho=2
+        rho=0.3
         c_x=2
         h_bar=2
         c_g=0.3
@@ -1421,9 +1421,11 @@ if __name__ == '__main__':
 
         #np.save('./Data/trader/mu_trader_true_start_t20.npy',mu)
     if execution=='changing_delta_t':
-        #value_num_t=np.linspace(70,100,2)
-        value_num_t=np.linspace(10,130,7)
-        #value_num_t=np.linspace(40,100,4)
+#        value_num_t=np.linspace(130,130,1)
+#        value_num_t=np.linspace(110,110,1)
+#        value_num_t=np.linspace(90,90,1)
+#        value_num_t=np.linspace(70,70,1)
+        value_num_t=np.linspace(10,50,3)
         all_Y_0_values=np.zeros((len(value_num_t),num_keep))
         all_Z_0_values=np.zeros((len(value_num_t),num_keep))
         for n in range(len(value_num_t)):
@@ -1518,7 +1520,7 @@ if __name__ == '__main__':
                 for t in range(num_t):
                     bounds[0,t]=sigma*min(u[t])
                     bounds[1,t]=sigma*max(u[t])
-                np.save('./Data/trader_bounds'+str(num_t)+'.npy',bounds)
+                np.save('./Data/bounds_t'+str(num_t)+'.npy',bounds)
                 
                 
                 
