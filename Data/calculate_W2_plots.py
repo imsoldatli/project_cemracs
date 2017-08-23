@@ -112,7 +112,7 @@ if __name__ == '__main__':
         MSE_weak_trunc=0
         num_x=len(mu_true[0])
         #for i in range(num_t):
-        i=int(num_t/2)
+        i=0
         
         square_t_weak=np.power(Z_weak[i]-0.7*true_Y[i],2)
         thing=np.dot(square_t_weak,mu_true[i])
@@ -146,9 +146,9 @@ if __name__ == '__main__':
 #    plt.legend([plot1], ['Pontryagin'],bbox_to_anchor=(0, 1), loc=2, borderaxespad=0.)
 #    plt.savefig('trader_changing_delta_t_MSE_legend_1.eps')
     
-    plot1=plt.plot(value_num_t,all_d7,'o',color='blue')
+    plot1=plt.scatter(value_num_t,all_d7,color='blue')
     #plot2=plt.scatter(value_num_t,all_d8,color='red')
-    plot3=plt.plot(value_num_t,all_d9,'o',color='green')
+    plot3=plt.scatter(value_num_t,all_d9,color='green')
     plt.xlabel('number of time steps')
     plt.ylabel('Mean Square Error of Controls')
     plt.legend([plot1,plot3], ['Pontryagin', 'Weak Truncated'],bbox_to_anchor=(0, 1), loc=2, borderaxespad=0.)

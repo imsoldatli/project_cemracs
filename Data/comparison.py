@@ -4,13 +4,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
 import math
+from matplotlib.legend_handler import HandlerLine2D
 
 sigma=0.7
 nfig=0
 value_num_t=np.linspace(10,130,7)
 
-index_anim_num_t=5
+index_anim_num_t=1
 anim_num_t=int(value_num_t[index_anim_num_t])
+
 
 ## functions to calculate the Wasserstein distance
 def firstindex(list,target):
@@ -65,17 +67,17 @@ z_true_delta_t=[]
 for k in range(len(value_num_t)):
     #load solutions: mu
 
-    mu_weak_delta_t.append(np.load('/Users/zioepa/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_mu_weak_t'+str(int(value_num_t[k]))+'.npy'))
-    mu_weak_trunc_delta_t.append(np.load('/Users/zioepa/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_mu_weak_trunc_t'+str(int(value_num_t[k]))+'.npy'))
-    mu_Pont_delta_t.append(np.load('/Users/zioepa/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_mu_Pont_t'+str(int(value_num_t[k]))+'.npy'))
-    mu_true_delta_t.append(np.load('/Users/zioepa/PycharmProjects/Cemracs /project_cemracs/Data/trader/trunc_true/trader_mu_true_t'+str(int(value_num_t[k]))+'.npy'))
+    mu_weak_delta_t.append(np.load('/home/christy/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_mu_weak_t'+str(int(value_num_t[k]))+'.npy'))
+    mu_weak_trunc_delta_t.append(np.load('/home/christy/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_mu_weak_trunc_t'+str(int(value_num_t[k]))+'.npy'))
+    mu_Pont_delta_t.append(np.load('/home/christy/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_mu_Pont_t'+str(int(value_num_t[k]))+'.npy'))
+    mu_true_delta_t.append(np.load('/home/christy/Documents/MFG_git/large_data_trader/mu_true_t'+str(int(value_num_t[k]))+'.npy'))
     #mu_true_delta_t.append(np.load('/Users/zioepa/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/mu_true_hist_t'+str(int(value_num_t[k]))+'.npy'))
     # load solutions: y
-    y_Pont_delta_t.append(np.load('/Users/zioepa/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_Y_Pont_t'+str(int(value_num_t[k]))+'.npy'))
-    y_true_delta_t.append(np.load('/Users/zioepa/PycharmProjects/Cemracs /project_cemracs/Data/trader/trunc_true/trader_Y_solution'+str(int(value_num_t[k]))+'.npy'))
+    y_Pont_delta_t.append(np.load('/home/christy/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_Y_Pont_t'+str(int(value_num_t[k]))+'.npy'))
+    y_true_delta_t.append(np.load('/home/christy/Documents/MFG_git/large_data_trader/trader_Y_solution'+str(int(value_num_t[k]))+'.npy'))
     # load solutions: z
-    z_weak_delta_t.append(np.load('/Users/zioepa/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_Z_weak_t'+str(int(value_num_t[k]))+'.npy'))
-    z_weak_trunc_delta_t.append(np.load('/Users/zioepa/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_Z_weak_trunc_t'+str(int(value_num_t[k]))+'.npy'))
+    z_weak_delta_t.append(np.load('/home/christy/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_Z_weak_t'+str(int(value_num_t[k]))+'.npy'))
+    z_weak_trunc_delta_t.append(np.load('/home/christy/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/trader_Z_weak_trunc_t'+str(int(value_num_t[k]))+'.npy'))
 
 
 
@@ -285,9 +287,9 @@ for k in range(len(value_num_t)):
         #print('2norm_y_sigma_Pont_z_weak',result_w)
         #print('max_diff_y_sigma_Pont_z_weak_trunc',result_wt)
     plot_mse=int(num_t/2)
-    #mse_y_true_Pont_delta_t.append(result_tP[plot_mse]) # true solution vs Pontryagin solution
+    mse_y_true_Pont_delta_t.append(result_tP[plot_mse]) # true solution vs Pontryagin solution
     #mse_true_z_weak_delta_t.append(result_tw[plot_mse]) # true solution vs Weak solution
-    mse_y_true_z_weak_trunc_delta_t.append(result_twt[plot_mse]) # true solution vs Weak solution
+    #mse_y_true_z_weak_trunc_delta_t.append(result_twt[plot_mse]) # true solution vs Weak solution
     #mse_z_weak_trunc_weak_delta_t.append(result_wwt[num_t-1]) # Weak solution vs Weak solution truncated
     #mse_z_weak_y_Pont_delta_t.append(result_Pw[plot_mse]) # Weak solution vs Pontryagin solution
     #mse_z_weak_trunc_y_Pont_delta_t.append(result_Pwt[num_t-1])
@@ -339,9 +341,10 @@ plt.savefig('max_diff_Pont_weak')
 ### Plot MSE
 plt.figure(nfig)
 nfig=nfig+1
-#plt.plot(value_num_t[1:7],mse_y_true_Pont_delta_t[1:7],'o',label='Pontryagin',color='blue')
+#ax1=plt.axes(xlim=(0,130),ylim=(0,0.17))
+thing2, =plt.plot(value_num_t[1:7],mse_y_true_Pont_delta_t[1:7],'o',label='Pontryagin',color='blue')
 #plt.plot(value_num_t,mse_true_z_weak_delta_t,'o',label='z_weak vs y_true')
-plt.plot(value_num_t,mse_y_true_z_weak_trunc_delta_t,'o',label='Weak truncated')
+#thing1,=plt.plot(value_num_t,mse_y_true_z_weak_trunc_delta_t,'o',label='Weak truncated')
 #plt.plot(value_num_t,mse_z_weak_y_Pont_delta_t,'o',label='mse y_Pont vs z_weak')
 #plt.plot(value_num_t,mse_z_weak_trunc_y_Pont_delta_t,'o',label='y_Pont vs z_weak_trunc')
 #plt.plot(value_num_t,mse_z_weak_trunc_weak_delta_t,'o',label='z_weak vs z_weak_trunc')
@@ -350,9 +353,10 @@ plt.xlabel('number of time steps')
 plt.ylabel('Mean Square Error of Controls')
 #plt.title('mean square error between two solutions at time 0 wrt num_t')
 
-plt.legend()
+plt.legend(bbox_to_anchor=(0,1,1,.102),loc=3)
+#
 plt.show
-plt.savefig('MSE: weak2.eps')
+plt.savefig('MSE_Pont.eps')
 
 # print a specific time of the cleaned vectors
 # print('w',w[4])
@@ -485,7 +489,7 @@ anim = animation.FuncAnimation(fig, animate, init_func=init,
 
 plt.show()
 
-#anim.save('comparison_mu_trader.mp4')
+anim.save('comparison_mu_trader.mp4')
 
 
 
