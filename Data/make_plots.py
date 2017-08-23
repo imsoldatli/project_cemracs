@@ -241,3 +241,15 @@ if __name__ == '__main__':
 #    plt.legend([thing1, thing2], ['Grid Pontryagin N=1','Grid Pontryagin N=3'],bbox_to_anchor=(0, 1), loc=2, borderaxespad=0.)
 #
 #    plt.savefig('trader_continuation_time_3_levels_changing_c_x.eps')
+
+
+    c_x_values=np.load('./Data/trader/trader_continuation_time_3_levels_c_x_values.npy')
+    all_Y_0=np.load('./Data/trader/trader_continuation_time_3_levels_changing_c_x.npy')
+    
+    for index2 in range(len(c_x_values)):
+        for index in range(5):
+            plt.scatter(c_x_values[index2],all_Y_0[index2][index])
+    plt.xlabel('$c_X$')
+    plt.ylabel('$Y_0$')
+    
+    plt.save('trader_continuation_time_3_levels_changing_c_x.eps')

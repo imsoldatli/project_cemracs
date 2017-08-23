@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Jul 28 17:37:27 2017
-    
 @author: Andrea Angiuli, Christy Graves, Houzhi Li
 
 This code implements the grid algorithm described in
@@ -623,12 +622,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-<<<<<<< HEAD
-
     execution='changing_rho'
-=======
-    execution='continuation_in_time'
->>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
 
 
     # possible values in order of appearance:
@@ -834,13 +828,8 @@ if __name__ == '__main__':
         rho=1
     elif problem=='trader_Pontryagin':
         sigma=0.7
-<<<<<<< HEAD
-        rho=7
-        c_x=1
-=======
-        rho=1.5 #0.3
+        rho=0.3
         c_x=2
->>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
         h_bar=2
         c_g=0.3
         # sigma=0.7
@@ -932,11 +921,7 @@ if __name__ == '__main__':
         num_keep=5
         T=1
 
-<<<<<<< HEAD
-        delta_t=1
-=======
         delta_t=1000.0
->>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
         #### uncomment if you use only one value for num_t
         # num_t=30
         # delta_t=(T-0.06)/(num_t-1)
@@ -1183,15 +1168,9 @@ if __name__ == '__main__':
         print all_Y_0_values[index]
     
     elif execution=='changing_rho':
-<<<<<<< HEAD
-
-        num_rho=8
-        rho_values=np.linspace(3.5,5,num_rho)
-=======
         num_rho=11
         #rho_values=np.linspace(3,12,num_rho)
         rho_values=np.linspace(1,12,num_rho)
->>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
         if problem=='flocking_Pontryagin' or problem=='flocking_weak':
             rho_values=np.linspace(10,50,num_rho)
 
@@ -1224,14 +1203,11 @@ if __name__ == '__main__':
                     index2+=1
             print all_Y_0_values[index]
 
-<<<<<<< HEAD
-            plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index],'o',label='Pontryagin',color='blue')
-            plt.xlabel('$\\rho$')
-            plt.ylabel('$Y_0$')
-            plt.legend()
-=======
-            #plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index],'o',label='Pontryagin',color='blue')
->>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
+#            plot_cx=plt.plot(np.multiply(rho,value_x),all_Y_0_values[index],'o',label='Pontryagin',color='blue')
+#            plt.xlabel('$\\rho$')
+#            plt.ylabel('$Y_0$')
+#            plt.legend()
+
         #plt.title('sigma = str(sigma), rho = str(rho), $c_x \in [str(min(rho_values)),str(max(rho_values))]$, h_{bar}=str(h_bar), c_g=str(c_g)')
         #plt.title('sigma = str(sigma), c_x = str(c_x), $rho \in [str(min(rho_values)),str(max(rho_values))]$, h_{bar}=str(h_bar), c_g=str(c_g)')
         #mu=np.zeros((num_t,num_x))
@@ -1347,7 +1323,6 @@ if __name__ == '__main__':
             for t in range(num_t):
                 mean_t=np.dot(x_grid,mu[t])
                 true_Y[t]=eta[0,t]*x_grid+(eta_bar[0][t]-eta[0][t])*mean_t
-<<<<<<< HEAD
             np.save('./Data/trader/trunc_true/trader_Y_solution_t'+str(num_t)+'.npy',true_Y)
 
             bounds=np.zeros((2,num_t))
@@ -1378,32 +1353,6 @@ if __name__ == '__main__':
             # mu_hist[0,int(num_x_hist/2)]=1
 
             # np.save('./Data/from_cluster/trader/mu_true_hist_t'+str(num_t)+'.npy',mu_hist)
-=======
-            np.save('./Data/trader/trader_Y_solution'+str(num_t)+'.npy',true_Y)
-
-
-            num_x_hist=15
-            delta_x_hist=np.abs(x_max-x_min)/num_x_hist
-            x_grid_hist=np.linspace(x_min,x_max,num_x_hist)
-            mu_hist=np.zeros((num_t,num_x_hist))
-
-
-            for t in range(1,num_t):
-                integral=np.sum(eta_bar[0,0:t])*delta_t
-                mean_mu=np.exp(-rho*integral)
-                variance_mu=0
-                for s in range(0,t):
-                    variance_mu=variance_mu+delta_t*np.exp(-2*rho*np.sum(eta[0,s:t])*delta_t)
-                variance_mu=sigma**2*variance_mu
-                print(mean_mu,variance_mu)
-
-                mu_hist[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid_hist)
-                mu_hist[t]=mu_hist[t]/np.sum(mu_hist[t])
-            mu_hist[0,int(num_x_hist/2)]=1
-
-            #np.save('./Data/trader/mu_true_t'+str(num_t)+'.npy',mu)
-            #np.save('./Data/trader/mu_true_hist_t'+str(num_t)+'.npy',mu_hist)
->>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
 
 
 
@@ -1684,7 +1633,6 @@ if __name__ == '__main__':
 #        print('Time elapsted:',end_time-start_time)
 #        os.system('say "picaaaaa"')
 
-<<<<<<< HEAD
         [u_0,mu,u,v,all_Y_0_values]=solver_grid(0,mu_0,X_grids)
         np.save('mu_level'+str(num_level)+'_t_'+str(num_t)+'.npy',mu)
         np.save('y_level'+str(num_level)+'_t_'+str(num_t)+'.npy',u)
@@ -1694,8 +1642,6 @@ if __name__ == '__main__':
         end_time=time.time()
         print('Time elapsted:',end_time-start_time)
         os.system('say "picaaaaa"')
-=======
->>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
 
 #### Uncomment the following if you want lunch the code for several values of rho
 
@@ -1730,11 +1676,5 @@ if __name__ == '__main__':
     end_time=time.time()
 
     print('Time elapsted:',end_time-start_time)
-<<<<<<< HEAD
     if os.sys.platform=='darwin':
         os.system('say "Eureka!"')
-=======
-
-    #os.system('say "Eureka!"')
->>>>>>> c25febfc9b43756406b250d7796f0c10c58bdafe
-    #os.system('say "your program has finished"')
