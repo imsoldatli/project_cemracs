@@ -12,37 +12,7 @@ import matplotlib.pyplot as plt
 import scipy
 import time
 import scipy.stats
-
-def firstindex(list,target):
-    nl=len(list)
-    for i in range(nl):
-        if list[i]>target:
-#            return i
-            if i>0:
-                return (i-1)
-            else:
-                return 0
-    return (nl-1)
-
-
-
-def Wd(mu_1,grid_1,mu_2,grid_2,Nint,p=2):
-    CDF_1=np.cumsum(mu_1)
-    CDF_2=np.cumsum(mu_2)
-    n_1=len(mu_1)
-    n_2=len(mu_2)
-    u_vec=np.linspace(0,1,Nint)
-    du=1.0/Nint
-    
-    W=0
-    for i in range(Nint):
-        i1=firstindex(CDF_1,u_vec[i])
-        i2=firstindex(CDF_2,u_vec[i])
-        dW=du*pow(math.fabs(grid_1[i1]-grid_2[i2]),p)
-        #print(dW)
-        W+=dW
-    W=pow(W,1.0/p)
-    return W
+from Wd_exact import *
     
 if __name__ == '__main__':
     path='/home/christy/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/'
@@ -87,12 +57,12 @@ if __name__ == '__main__':
 #        x_max=3
         x_grid=np.linspace(x_min,x_max,num_x)
     
-        #d1=Wd(mu_Pontryagin_end,x_grid,mu_weak_end,x_grid,1000)
-        #d2=Wd(mu_Pontryagin_end,x_grid,mu_weak_trunc_end,x_grid,1000)
-        #d3=Wd(mu_weak_end,x_grid,mu_weak_trunc_end,x_grid,1000)
-        d4=Wd(mu_Pontryagin_end,x_grid,mu_true_end,x_grid,1000)
-        d5=Wd(mu_weak_end,x_grid,mu_true_end,x_grid,1000)
-        d6=Wd(mu_weak_trunc_end,x_grid,mu_true_end,x_grid,1000)
+        #d1=Wd_exact_R(x_grid,mu_Pontryagin_end,mu_weak_end,2)
+        #d2=Wd_exact_R(x_grid,mu_Pontryagin_end,mu_weak_trunc_end,2)
+        #d3=Wd_exact_R(x_grid,mu_weak_end,mu_weak_trunc_end,2)
+        d4=Wd_exact_R(x_grid,mu_Pontryagin_end,mu_true_end,2)
+        d5=Wd_exact_R(x_grid,mu_weak_end,mu_true_end,2)
+        d6=Wd_exact_R(x_grid,mu_weak_trunc_end,mu_true_end,2)
     
         print(d1,d2,d3,d4,d5,d6)
         all_d1[k]=d1

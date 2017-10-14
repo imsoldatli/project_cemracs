@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib import animation
 import math
 from matplotlib.legend_handler import HandlerLine2D
+from Wd_exact import *
 
 sigma=0.7
 nfig=0
@@ -12,41 +13,6 @@ value_num_t=np.linspace(10,130,7)
 
 index_anim_num_t=1
 anim_num_t=int(value_num_t[index_anim_num_t])
-
-
-## functions to calculate the Wasserstein distance
-def firstindex(list,target):
-    nl=len(list)
-    for i in range(nl):
-        if list[i]>target:
-#            return i
-            if i>0:
-                return (i-1)
-            else:
-                return 0
-    return (nl-1)
-
-
-
-def Wd(mu_1,grid_1,mu_2,grid_2,Nint,p=2):
-    CDF_1=np.cumsum(mu_1)
-    CDF_2=np.cumsum(mu_2)
-    n_1=len(mu_1)
-    n_2=len(mu_2)
-    u_vec=np.linspace(0,1,Nint)
-    du=1.0/Nint
-
-    W=0
-    for i in range(Nint):
-        i1=firstindex(CDF_1,u_vec[i])
-        i2=firstindex(CDF_2,u_vec[i])
-        dW=du*pow(math.fabs(grid_1[i1]-grid_2[i2]),p)
-        #print(dW)
-        W+=dW
-    W=pow(W,1.0/p)
-    return W
-
-
 
 
 mu_weak_delta_t=[]
