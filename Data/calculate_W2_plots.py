@@ -15,8 +15,10 @@ import scipy.stats
 from Wd_exact import *
     
 if __name__ == '__main__':
-    path='/home/christy/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/'
-    path2='/home/christy/Documents/MFG_git/large_data_trader/'
+#    path='/home/christy/Dropbox/CEMRACS_MFG/cluster_results/trader_grid/'
+#    path2='/home/christy/Documents/CEMRACS/large_data_trader/'
+    path='/home/christy/Dropbox/CEMRACS_MFG/cluster_results/flocking/'
+    path2='/home/christy/Documents/CEMRACS/large_data_flocking/'
     num_trials=7
     value_num_t=np.linspace(10,130,num_trials)
     all_d1=np.zeros(num_trials)
@@ -37,13 +39,13 @@ if __name__ == '__main__':
     for k in range(num_trials):
         num_t=value_num_t[k]
         num_t=int(num_t)
-        mu_Pontryagin=np.load(path+'trader_mu_Pont_t'+str(num_t)+'.npy')
-        mu_weak=np.load(path+'trader_mu_weak_t'+str(num_t)+'.npy')
-        mu_weak_trunc=np.load(path+'trader_mu_weak_trunc_t'+str(num_t)+'.npy')
-        mu_true=np.load(path2+'mu_true_t'+str(num_t)+'.npy')
-#        mu_Pontryagin=np.load(path+'flocking_mu_Pont_t'+str(num_t)+'.npy')
-#        mu_weak=np.load(path+'flocking_mu_weak_t'+str(num_t)+'_real.npy')
-#        mu_true=np.load('mu_true_t'+str(num_t)+'.npy')
+#        mu_Pontryagin=np.load(path+'trader_mu_Pont_t'+str(num_t)+'.npy')
+#        mu_weak=np.load(path+'trader_mu_weak_t'+str(num_t)+'.npy')
+#        mu_weak_trunc=np.load(path+'trader_mu_weak_trunc_t'+str(num_t)+'.npy')
+#        mu_true=np.load(path2+'mu_true_t'+str(num_t)+'.npy')
+        mu_Pontryagin=np.load(path+'flocking_mu_Pont_t'+str(num_t)+'.npy')
+        mu_weak=np.load(path+'flocking_mu_weak_t'+str(num_t)+'_real.npy')
+        mu_true=np.load('mu_true_t'+str(num_t)+'.npy')
 
         mu_Pontryagin_end=mu_Pontryagin[len(mu_Pontryagin)-1]
         mu_weak_end=mu_weak[len(mu_weak)-1]
@@ -122,4 +124,4 @@ if __name__ == '__main__':
     plt.xlabel('number of time steps')
     plt.ylabel('Mean Square Error of Controls')
     plt.legend([plot1,plot3], ['Pontryagin', 'Weak Truncated'],bbox_to_anchor=(0, 1), loc=2, borderaxespad=0.)
-    plt.savefig('trader_changing_delta_t_MSE_legend_3.eps')
+    #plt.savefig('trader_changing_delta_t_MSE_legend_3.eps')

@@ -49,7 +49,7 @@ def Wd_exact_R(x_grid,mu_1,mu_2,p):
     
 def Wd_exact_circle(x_grid,mu_1,mu_2,p):
     N=len(x_grid)
-    Wd=10000;
+    Wd=10000
     for i in range(N):
         mu_1=[mu_1[(i+1)%N] for i in range(N)]
         mu_2=[mu_2[(i+1)%N] for i in range(N)]
