@@ -237,42 +237,77 @@ if __name__ == '__main__':
 #    plt.legend([plot1,plot2,plot3], ['Grid, Pontryagin', 'Grid, Weak', 'True'],bbox_to_anchor=(0, 1), loc=2, borderaxespad=0.)
 #    plt.savefig('paper_flocking_grid_and_true_t130.eps')
             
-    ### Example 5 (flocking), mu(x) tree_Pont, tree_weak, true, histogram
-    num_t=20
-    path='/home/christy/Documents/CEMRACS/flocking_tree/'
-    X=np.load(path+'flocking_Pont_tree_X_t20.npy')
-    #data1=plt.hist(X[num_t-1],bins=10)
-    counts=data1[0]
-    counts=counts/sum(counts)
-    markers=data1[1]
-    centers=[(markers[i]+markers[i+1])/2.0 for i in range(len(markers)-1)]
-    print([centers[i+1]-centers[i] for i in range(9)])
-    delta_x=centers[1]-centers[0]
-    plot1=plt.scatter(centers,counts/(delta_x),color='blue',marker='o')
-    plt.xlabel('x')
-    plt.ylabel('$\mu(x)$')
-    X=np.load(path+'flocking_weak_tree_X_t20.npy')
-    #data2=plt.hist(X[num_t-1],bins=10)
-    counts=data2[0]
-    counts=counts/sum(counts)
-    markers=data2[1]
-    centers=[(markers[i]+markers[i+1])/2.0 for i in range(len(markers)-1)]
-    delta_x=centers[1]-centers[0]
-    print([centers[i+1]-centers[i] for i in range(9)])
-    plot2=plt.scatter(centers,counts/delta_x,color='red',marker='s')
-    mu_true_hist=scipy.stats.norm(mean_mu, variance_mu).pdf(centers)
-    plt.scatter(centers,mu_true_hist/(delta_x*sum(mu_true_hist)),color='black',marker='*')
-    plt.legend([plot1,plot2,plot3], ['Tree, Pontryagin', 'Tree, Weak', 'True'],bbox_to_anchor=(0, 1), loc=2, borderaxespad=0.)
-    plt.savefig('paper_flocking_tree_and_true_t20.eps')
+#    ### Example 5 (flocking), mu(x) tree_Pont, tree_weak, true, histogram
+#    num_t=20
+#    path='/home/christy/Documents/CEMRACS/flocking_tree/'
+#    X=np.load(path+'flocking_Pont_tree_X_t20.npy')
+#    #data1=plt.hist(X[num_t-1],bins=10)
+#    counts=data1[0]
+#    counts=counts/sum(counts)
+#    markers=data1[1]
+#    centers=[(markers[i]+markers[i+1])/2.0 for i in range(len(markers)-1)]
+#    print([centers[i+1]-centers[i] for i in range(9)])
+#    delta_x=centers[1]-centers[0]
+#    plot1=plt.scatter(centers,counts/(delta_x),color='blue',marker='o')
+#    plt.xlabel('x')
+#    plt.ylabel('$\mu(x)$')
+#    X=np.load(path+'flocking_weak_tree_X_t20.npy')
+#    #data2=plt.hist(X[num_t-1],bins=10)
+#    counts=data2[0]
+#    counts=counts/sum(counts)
+#    markers=data2[1]
+#    centers=[(markers[i]+markers[i+1])/2.0 for i in range(len(markers)-1)]
+#    delta_x=centers[1]-centers[0]
+#    print([centers[i+1]-centers[i] for i in range(9)])
+#    plot2=plt.scatter(centers,counts/delta_x,color='red',marker='s')
+#    mu_true_hist=scipy.stats.norm(mean_mu, variance_mu).pdf(centers)
+#    plt.scatter(centers,mu_true_hist/(delta_x*sum(mu_true_hist)),color='black',marker='*')
+#    plt.legend([plot1,plot2,plot3], ['Tree, Pontryagin', 'Tree, Weak', 'True'],bbox_to_anchor=(0, 1), loc=2, borderaxespad=0.)
+#    plt.savefig('paper_flocking_tree_and_true_t20.eps')
             
-            
-#    d1=Wd_exact_R(x_grid,mu_Pontryagin_end,mu_weak_end,2)
-#    d2=Wd_exact_R(x_grid,mu_Pontryagin_end,mu_true_end,2)
-#    d3=Wd_exact_R(x_grid,mu_weak_end,mu_true_end,2)
-#    
-#    print(d1,d2,d3)
-#    for t in range(num_t):       
-#        d1=Wd_exact_R(x_grid_hist,mu_Pontryagin_hist[t],mu_weak_hist[t],2)
-#        d2=Wd_exact_R(x_grid_hist,mu_Pontryagin_hist[t],mu_true_hist[t],2)
-#        d3=Wd_exact_R(x_grid_hist,mu_weak_hist[t],mu_true_hist[t],2)
-#        print(d1,d2,d3)
+#    ### Example 5 (flocking), W2 between true and grid_Pont, and true and grid_weak
+#    path='/home/christy/Documents/CEMRACS/'
+#    num_trials=7
+#    value_num_t=np.linspace(10,130,num_trials)
+#    all_d1=np.zeros(num_trials)
+#    all_d2=np.zeros(num_trials)
+#    d1=0
+#    d2=0
+#
+#    for k in range(4,num_trials):
+#        print(k)
+#        num_t=value_num_t[k]
+#        num_t=int(num_t)
+#        mu_Pontryagin=np.load(path+'flocking_grid/flocking_mu_Pont_t'+str(num_t)+'.npy')
+#        mu_weak=np.load(path+'flocking_grid/flocking_mu_weak_t'+str(num_t)+'.npy')
+#        mu_true=np.load(path+'flocking_true/mu_true_t'+str(num_t)+'.npy')
+#        mu_Pontryagin_end=mu_Pontryagin[len(mu_Pontryagin)-1]
+#        mu_weak_end=mu_weak[len(mu_weak)-1]
+#        mu_true_end=mu_true[len(mu_true)-1]
+#        num_x=len(mu_Pontryagin[0])
+#        x_min=-3
+#        x_max=3
+#        x_grid=np.linspace(x_min,x_max,num_x)
+#        d1=Wd_exact_R(x_grid,mu_Pontryagin_end,mu_true_end,2)
+#        d2=Wd_exact_R(x_grid,mu_weak_end,mu_true_end,2)
+#        all_d1[k]=d1
+#        all_d2[k]=d2
+#
+#    all_d1_short=np.load('all_d1.npy')
+#    all_d2_short=np.load('all_d2.npy')
+#    all_d1_long=np.load('all_d1_long.npy')
+#    all_d2_long=np.load('all_d2_long.npy')
+#    all_d1[0:4]=all_d1_short[0:4]
+#    all_d2[0:4]=all_d2_short[0:4]
+#
+#    all_d1[4:7]=all_d1_long[4:7]
+#    all_d2[4:7]=all_d2_long[4:7]
+#
+#    plot1=plt.scatter(value_num_t,all_d1,color='blue',marker='o')
+#    plot2=plt.scatter(value_num_t,all_d2,color='red',marker='s')
+#
+#    plt.xlabel('number of time steps')
+#    plt.ylabel('$W_2$ distance from true solution at time $T$')
+#    plt.legend([plot1, plot2], ['Pontryagin', 'Weak',],bbox_to_anchor=(1, 1), loc=1, borderaxespad=0.)
+#
+#    plt.savefig('paper_flocking_changing_delta_t.eps')

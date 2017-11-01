@@ -10,6 +10,8 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
+#Note: use proceedings_make_plots instead
+
 if __name__ == '__main__':
     rho_values=np.load('./ex 73/tree_example_73_rho_values.npy')
     tree_Y_0_values_1=np.load('./ex 73/tree_example_73_one_level_changing_rho.npy')
