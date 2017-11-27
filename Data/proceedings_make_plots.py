@@ -88,25 +88,25 @@ if __name__ == '__main__':
 #    plt.ylabel('$Y_0$')
 #    plt.savefig('paper_tree_example_72_changing_sigma_rho_4.eps')
 
-#### Example 3
-    ### Example 3, tree with 1, 2, 3 levels, and grid, changing rho
-    rho_values=np.load('./ex 73/tree_example_73_rho_values.npy')
-    tree_Y_0_values_1=np.load('./ex 73/tree_example_73_one_level_changing_rho.npy')
-    tree_Y_0_values_2=np.load('./ex 73/tree_example_73_two_level_changing_rho.npy')
-    tree_Y_0_values_3=np.load('./ex 73/tree_example_73_three_level_changing_rho.npy')
-    grid_Y_0_values=np.load('./ex 73/grid_example_73_changing_rho.npy')
-
-    num_keep=5
-    for index2 in range(num_keep):
-        for index in range(len(rho_values)):
-            tree_1=plt.scatter(rho_values[index],tree_Y_0_values_1[index][index2],color='blue', marker="o")
-            tree_2=plt.scatter(rho_values[index],tree_Y_0_values_2[index][index2],color='red',marker='s')
-            tree_3=plt.scatter(rho_values[index],tree_Y_0_values_3[index][index2],color='green',marker='^')
-            grid=plt.scatter(rho_values[index],grid_Y_0_values[index][index2],color='black',marker='*')
-    plt.xlabel('$\\rho$')
-    plt.ylabel('$Y_0$')
-    plt.legend([tree_1, tree_2, tree_3, grid], ['Tree, N=1', 'Tree, N=2','Tree, N=3', 'Grid, N=1'],bbox_to_anchor=(0, 1), loc=2, borderaxespad=0.)
-    plt.savefig('paper_tree_and_grid_example_73_changing_rho.eps')
+##### Example 3
+#    ### Example 3, tree with 1, 2, 3 levels, and grid, changing rho
+#    rho_values=np.load('./ex 73/tree_example_73_rho_values.npy')
+#    tree_Y_0_values_1=np.load('./ex 73/tree_example_73_one_level_changing_rho.npy')
+#    tree_Y_0_values_2=np.load('./ex 73/tree_example_73_two_level_changing_rho.npy')
+#    tree_Y_0_values_3=np.load('./ex 73/tree_example_73_three_level_changing_rho.npy')
+#    grid_Y_0_values=np.load('./ex 73/grid_example_73_changing_rho.npy')
+#
+#    num_keep=5
+#    for index2 in range(num_keep):
+#        for index in range(len(rho_values)):
+#            tree_1=plt.scatter(rho_values[index],tree_Y_0_values_1[index][index2],color='blue', marker="o")
+#            tree_2=plt.scatter(rho_values[index],tree_Y_0_values_2[index][index2],color='red',marker='s')
+#            tree_3=plt.scatter(rho_values[index],tree_Y_0_values_3[index][index2],color='green',marker='^')
+#            grid=plt.scatter(rho_values[index],grid_Y_0_values[index][index2],color='black',marker='*')
+#    plt.xlabel('$\\rho$')
+#    plt.ylabel('$Y_0$')
+#    plt.legend([tree_1, tree_2, tree_3, grid], ['Tree, N=1', 'Tree, N=2','Tree, N=3', 'Grid, N=1'],bbox_to_anchor=(0, 1), loc=2, borderaxespad=0.)
+#    plt.savefig('paper_tree_and_grid_example_73_changing_rho.eps')
 
 #    ### Example 3, tree with 1, changing sigma (rho=2)
 #    sigma_values=np.load('./ex 73/tree_example_73_sigma_values.npy')
@@ -276,7 +276,7 @@ if __name__ == '__main__':
 #    d1=0
 #    d2=0
 #
-#    for k in range(4,num_trials):
+#    for k in range(num_trials):
 #        print(k)
 #        num_t=value_num_t[k]
 #        num_t=int(num_t)
@@ -291,7 +291,13 @@ if __name__ == '__main__':
 #        x_max=3
 #        x_grid=np.linspace(x_min,x_max,num_x)
 #        d1=Wd_exact_R(x_grid,mu_Pontryagin_end,mu_true_end,2)
+#        print(d1)
+#        d1=Wd_approx_R(x_grid,mu_Pontryagin_end,mu_true_end,2)
+#        print(d1)
 #        d2=Wd_exact_R(x_grid,mu_weak_end,mu_true_end,2)
+#        print(d2)
+#        d2=Wd_approx_R(x_grid,mu_weak_end,mu_true_end,2)
+#        print(d2)
 #        all_d1[k]=d1
 #        all_d2[k]=d2
 #
@@ -311,5 +317,5 @@ if __name__ == '__main__':
 #    plt.xlabel('number of time steps')
 #    plt.ylabel('$W_2$ distance from true solution at time $T$')
 #    plt.legend([plot1, plot2], ['Pontryagin', 'Weak',],bbox_to_anchor=(1, 1), loc=1, borderaxespad=0.)
-#
+
 #    plt.savefig('paper_flocking_changing_delta_t.eps')

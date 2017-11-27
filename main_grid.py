@@ -614,7 +614,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='flocking_solution'
+    problem='jetlag_Pontryagin'
 
 
 
@@ -622,7 +622,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='flocking_solution'
+    execution='ordinary'
 
 
     # possible values in order of appearance:
@@ -674,8 +674,8 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=24.0*1
-        #num_t=int(T)*5+1
-        num_t=50
+        num_t=int(T*1.5)+1
+        #num_t=100
         delta_t=T/(num_t-1)
 #        t_grid=np.linspace(0,T,num_t)
         #delta_x=delta_t**2
@@ -1018,11 +1018,11 @@ if __name__ == '__main__':
 
         mu_0=np.zeros((num_x))
         if periodic_2_pi:
-            mu_0=np.load('mu_initial_reference_set_158.npy')
-            #mu_0=scipy.io.loadmat('mu_initial_reference_set_158.mat')['mu_initial']
-            #mu_0=[mu_0[int(i/6)] for i in range(num_x)]
-            #mu_0=mu_0/np.sum(mu_0)
-            #mu_0[0]=1
+            #mu_0=np.load('./Data/jetlag/mu_initial_reference_set_158.npy')
+            mu_0=scipy.io.loadmat('./Data/jetlag/mu_initial_reference_set_158.mat')['mu_initial']
+#            mu_0=[mu_0[int(i/6)] for i in range(num_x)]
+#            mu_0=mu_0/np.sum(mu_0)
+#            mu_0[0]=1
         else:
             mu_0[int(num_x/2)]=1.0
         
