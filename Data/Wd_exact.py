@@ -13,17 +13,6 @@ import scipy
 import time
 import scipy.stats
 
-def firstindex_approx(cdf,target):
-    nl=len(cdf)
-    for i in range(nl):
-        if cdf[i]>target:
-#            return i
-            if i>0:
-                return (i-1)
-            else:
-                return 0
-    return (nl-1)
-
 
 def Wd_approx_R(x_grid,mu_1,mu_2,p):
     Nint=100000
