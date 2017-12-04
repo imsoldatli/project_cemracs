@@ -63,6 +63,18 @@ if __name__ == '__main__':
 #    plt.xlabel('$\sigma$')
 #    plt.ylabel('$Y_0$')
 #    plt.savefig('paper_tree_example_72_changing_sigma.eps')
+
+    ### Example 2, grid with 1, changing sigma (rho=5)
+    sigma_values=np.load('./ex 72/grid_example_72_sigma_values.npy')
+    grid_Y_0_values_one=np.load('./ex 72/grid_example_72_one_level_changing_sigma.npy')
+    num_keep=5
+    num_sigma=20
+    for index in range(num_sigma):
+        for index2 in range(num_keep):
+            grid_1=plt.scatter(sigma_values[index],grid_Y_0_values_one[index][index2],color='black',marker='*')
+    plt.xlabel('$\sigma$')
+    plt.ylabel('$Y_0$')
+    plt.savefig('paper_grid_example_72_changing_sigma.eps')
     
 #    ### Example 2, tree with 1, changing sigma (rho=3.5)
 #    sigma_values=np.load('./ex 72/tree_example_72_sigma_values.npy')
@@ -175,8 +187,8 @@ if __name__ == '__main__':
 
 #### Example 4
 #    ### Example 4, tree with 1
-    rho_values=np.load('./ex 73/tree_example_73_E_rho_values.npy')
-    tree_Y_0_values_1=np.load('./ex 73/tree_example_73_E_one_level_changing_rho.npy')
+#    rho_values=np.load('./ex 73/tree_example_73_E_rho_values.npy')
+#    tree_Y_0_values_1=np.load('./ex 73/tree_example_73_E_one_level_changing_rho.npy')
 #    num_keep=5
 #    for index2 in range(num_keep):
 #        for index in range(len(rho_values)):
@@ -239,7 +251,7 @@ if __name__ == '__main__':
 #    plt.legend([plot1,plot2,plot3], ['Grid, Pontryagin', 'Grid, Weak', 'True'],bbox_to_anchor=(0, 1), loc=2, borderaxespad=0.)
 #    plt.savefig('paper_flocking_grid_and_true_t130.eps')
             
-#    ### Example 5 (flocking), mu(x) tree_Pont, tree_weak, true, histogram
+    ### Example 5 (flocking), mu(x) tree_Pont, tree_weak, true, histogram
 #    num_t=20
 #    path='/home/christy/Documents/CEMRACS/flocking_tree/'
 #    X=np.load(path+'flocking_Pont_tree_X_t20.npy')

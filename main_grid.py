@@ -614,7 +614,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='ex_73'
+    problem='ex_72'
 
 
 
@@ -622,7 +622,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='changing_rho'
+    execution='changing_sigma'
 
 
     # possible values in order of appearance:
@@ -807,7 +807,7 @@ if __name__ == '__main__':
         num_x=int((x_max-x_min)/delta_x)+1
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
-        rho=2
+        rho=5 #2
     elif problem=='ex_73':
         b=b_example_73
         f=f_example_73
@@ -1141,7 +1141,7 @@ if __name__ == '__main__':
 
     ###############
     elif execution=='changing_sigma':
-        num_sigma=10
+        num_sigma=20
         sigma_values=np.linspace(0.5,10,num_sigma)
         all_Y_0_values=np.zeros((num_sigma,num_keep))
         for index in range(num_sigma):
@@ -1165,12 +1165,13 @@ if __name__ == '__main__':
                 if j>J-num_keep-1:
                     all_Y_0_values[index][index2]=np.dot(u[0],mu[0])
                     index2+=1
-        print all_Y_0_values[index]
-    
+            print all_Y_0_values[index]
+        np.save('grid_example_72_sigma_values.npy',sigma_values)
+        np.save('grid_example_72_one_level_changing_sigma.npy',all_Y_0_values)
     elif execution=='changing_rho':
         num_rho=20
-        #rho_values=np.linspace(2,9,num_rho)
-        rho_values=np.linspace(1,6,num_rho)
+        rho_values=np.linspace(2,9,num_rho)
+        #rho_values=np.linspace(1,6,num_rho)
         if problem=='flocking_Pontryagin' or problem=='flocking_weak':
             rho_values=np.linspace(10,50,num_rho)
 
@@ -1438,7 +1439,7 @@ if __name__ == '__main__':
 #        value_num_t=np.linspace(110,110,1)
 #        value_num_t=np.linspace(90,90,1)
 #        value_num_t=np.linspace(70,70,1)
-        value_num_t=np.linspace(10,50,3)
+        value_num_t=np.linspace(10,10,1)
         all_Y_0_values=np.zeros((len(value_num_t),num_keep))
         all_Z_0_values=np.zeros((len(value_num_t),num_keep))
         for n in range(len(value_num_t)):
