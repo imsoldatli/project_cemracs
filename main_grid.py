@@ -614,7 +614,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='jetlag_Pontryagin'
+    problem='ex_73'
 
 
 
@@ -622,7 +622,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='ordinary'
+    execution='changing_rho'
 
 
     # possible values in order of appearance:
@@ -795,15 +795,15 @@ if __name__ == '__main__':
         f=f_example_72
         g=g_example_72
         periodic_2_pi=False
-        J=25
+        J=10
         num_keep=5
         T=1
         num_t=12
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
-        x_min=-3
-        x_max=3
+        x_min=-10 #-3
+        x_max=10 #3
         num_x=int((x_max-x_min)/delta_x)+1
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
@@ -813,10 +813,10 @@ if __name__ == '__main__':
         f=f_example_73
         g=g_example_73
         periodic_2_pi=False
-        J=25
+        J=10
         num_keep=5
         T=1
-        num_t=13
+        num_t=10
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -1168,9 +1168,9 @@ if __name__ == '__main__':
         print all_Y_0_values[index]
     
     elif execution=='changing_rho':
-        num_rho=11
-        #rho_values=np.linspace(3,12,num_rho)
-        rho_values=np.linspace(1,12,num_rho)
+        num_rho=20
+        #rho_values=np.linspace(2,9,num_rho)
+        rho_values=np.linspace(1,6,num_rho)
         if problem=='flocking_Pontryagin' or problem=='flocking_weak':
             rho_values=np.linspace(10,50,num_rho)
 
@@ -1179,8 +1179,8 @@ if __name__ == '__main__':
         #plot_cx = plt.figure()
         for index in range(num_rho):
             index2=0
-            #rho=rho_values[index]
-            c_x=rho_values[index]
+            rho=rho_values[index]
+            #c_x=rho_values[index]
             
             
             mu_0=np.zeros((num_x))
@@ -1215,7 +1215,7 @@ if __name__ == '__main__':
 
         #plt.show()
 
-        plt.savefig('./Data/trader/grid_trader_pontryagin_changing_rho.eps')
+        #plt.savefig('./Data/trader/grid_trader_pontryagin_changing_rho.eps')
         #np.save('./Data/trader/grid_trader_pontryagin_rho_changing_rho.npy',all_Y_0_values)
 
 
@@ -1224,7 +1224,8 @@ if __name__ == '__main__':
         x_min_0=-3
         x_max_0=3
         num_rho=20
-        rho_values=np.linspace(0.5,10.0,num_rho)
+        #rho_values=np.linspace(0.5,10.0,num_rho)
+        rho_values=np.linspace(2,9,num_rho)
         num_t_0=12
         delta_t_0=T/(num_t_0-1)
         delta_x=delta_t_0**2

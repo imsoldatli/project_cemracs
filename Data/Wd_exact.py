@@ -15,7 +15,7 @@ import scipy.stats
 
 
 def Wd_approx_R(x_grid,mu_1,mu_2,p):
-    Nint=100000
+    Nint=10000
     CDF_1=np.cumsum(mu_1)
     CDF_2=np.cumsum(mu_2)
     n_1=len(mu_1)

@@ -58,13 +58,12 @@ def b_example_73(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
     return -rho*Y[i][j]
 
 def f_example_73(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
-#    num_initial=len(X[0])
-#    X_mean=0
-#    num_per_initial=len(X[i])/num_initial
-#    for k in range(len(X[i])):
-#        index=int(math.floor(k/num_per_initial))
-#        X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
-    #X_mean=X_mean_all[i]
+    num_initial=len(X[0])
+    X_mean=0
+    num_per_initial=len(X[i])/num_initial
+    for k in range(len(X[i])):
+        index=int(math.floor(k/num_per_initial))
+        X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
     return -np.arctan(X_mean)
 
 def g_example_73(index,xi_vals,xi_probs):
@@ -72,12 +71,14 @@ def g_example_73(index,xi_vals,xi_probs):
     return np.arctan(x)
 
 def b_example_73_E(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
-#    num_initial=len(X[0])
-#    Y_mean=0
-#    num_per_initial=len(Y[i])/num_initial
-#    for k in range(len(Y[i])):
-#        index=int(math.floor(k/num_per_initial))
-#        Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
+    #print(Y_mean)
+    num_initial=len(X[0])
+    Y_mean=0
+    num_per_initial=len(Y[i])/num_initial
+    for k in range(len(Y[i])):
+        index=int(math.floor(k/num_per_initial))
+        Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
+    #print(Y_mean)
     return -rho*Y_mean
 
 def g_example_73_E(index,xi_vals,xi_probs):
@@ -209,15 +210,15 @@ def continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
                 Y_mean=0
                 Z_mean=0
                 num_per_initial=len(X[i])/num_initial
-                if problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+                if problem=='ex_73' or problem=='ex_73_E' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
                     for k2 in range(len(X[i])):
                         index=int(math.floor(k2/num_per_initial))
                         X_mean+=X[i][k2]*X_initial_probs[index]/num_per_initial
-                elif problem=='ex_1' or problem=='trader_Pontryagin':
+                if problem=='ex_1' or problem=='ex_73_E' or problem=='trader_Pontryagin':
                     for k2 in range(len(Y[i])):
                         index=int(math.floor(k2/num_per_initial))
                         Y_mean+=Y[i][k2]*X_initial_probs[index]/num_per_initial
-                elif problem=='trader_weak':
+                if problem=='trader_weak':
                     for k2 in range(len(Z[i])):
                         index=int(math.floor(k2/num_per_initial))
                         Z_mean+=Z[i][k2]*X_initial_probs[index]/num_per_initial
@@ -231,15 +232,15 @@ def continuation_solver_bar(X_ini,X_initial_probs,Y_ini,Z_ini):
                 Y_mean=0
                 Z_mean=0
                 num_per_initial=len(X[i])/num_initial
-                if problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+                if problem=='ex_73' or problem=='ex_73_E' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
                     for k2 in range(len(X[i])):
                         index=int(math.floor(k2/num_per_initial))
                         X_mean+=X[i][k2]*X_initial_probs[index]/num_per_initial
-                elif problem=='ex_1' or problem=='trader_Pontryagin':
+                if problem=='ex_1' or problem=='ex_73_E' or problem=='trader_Pontryagin':
                     for k2 in range(len(Y[i])):
                         index=int(math.floor(k2/num_per_initial))
                         Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
-                elif problem=='trader_weak':
+                if problem=='trader_weak':
                     for k in range(len(Z[i])):
                         index=int(math.floor(k2/num_per_initial))
                         Z_mean+=Z[i][k2]*X_initial_probs[index]/num_per_initial
@@ -280,15 +281,15 @@ def solver_bar(X,Y_terminal,X_initial_probs,Y_old,Z_old):
             Y_mean=0
             Z_mean=0
             num_per_initial=len(X[i])/num_initial
-            if problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+            if problem=='ex_73' or problem=='ex_73_E' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
                 for k in range(len(X[i])):
                     index=int(math.floor(k/num_per_initial))
                     X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
-            elif problem=='ex_1' or problem=='trader_Pontryagin':
+            if problem=='ex_1' or problem=='ex_73_E' or problem=='trader_Pontryagin':
                 for k in range(len(Y[i])):
                     index=int(math.floor(k/num_per_initial))
                     Y_mean+=Y_old[i][k]*X_initial_probs[index]/num_per_initial
-            elif problem=='trader_weak':
+            if problem=='trader_weak':
                 for k in range(len(Z[i])):
                     index=int(math.floor(k/num_per_initial))
                     Z_mean+=Z_old[i][k]*X_initial_probs[index]/num_per_initial
@@ -302,15 +303,15 @@ def solver_bar(X,Y_terminal,X_initial_probs,Y_old,Z_old):
             Y_mean=0
             Z_mean=0
             num_per_initial=len(X[i])/num_initial
-            if problem=='ex_73' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
+            if problem=='ex_73' or problem=='ex_73_E' or problem=='flocking_Pontryagin' or problem=='flocking_weak':
                 for k in range(len(X[i])):
                     index=int(math.floor(k/num_per_initial))
                     X_mean+=X[i][k]*X_initial_probs[index]/num_per_initial
-            elif problem=='ex_1' or problem=='trader_Pontryagin':
+            if problem=='ex_1' or problem=='ex_73_E' or problem=='trader_Pontryagin':
                 for k in range(len(Y[i])):
                     index=int(math.floor(k/num_per_initial))
                     Y_mean+=Y[i][k]*X_initial_probs[index]/num_per_initial
-            elif problem=='trader_weak':
+            if problem=='trader_weak':
                 for k in range(len(Z[i])):
                     index=int(math.floor(k/num_per_initial))
                     Z_mean+=Z[i][k]*X_initial_probs[index]/num_per_initial
@@ -372,10 +373,10 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     start_time=time.time()
-    problem ='trader_Pontryagin'
+    problem ='ex_73_E'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
-    execution='ordinary'
+    execution='changing_rho'
     # possible values in order of appearance:
     # ordinary, changing_rho, changing_sigma, continuation_rho, continuation_sigma
     global b
@@ -470,8 +471,8 @@ if __name__ == '__main__':
         f=f_example_72
         g=g_example_72
         periodic_2_pi=False
-        J=25
-        J_solver_bar=10
+        J=10
+        J_solver_bar=5
         num_keep=5
         T=1.0
         num_intervals_total=6
@@ -485,8 +486,23 @@ if __name__ == '__main__':
         f=f_example_73
         g=g_example_73
         periodic_2_pi=False
-        J=25
-        J_solver_bar=10
+        J=10
+        J_solver_bar=5
+        num_keep=5
+        T=1.0
+        num_intervals_total=6
+        num_intervals_coarse=1
+        x_0=[2.0]
+        x_0_probs=[1.0]
+        sigma=1
+        rho=1
+    elif problem=='ex_73_E':
+        b=b_example_73_E
+        f=f_example_73
+        g=g_example_73_E
+        periodic_2_pi=False
+        J=10
+        J_solver_bar=5
         num_keep=5
         T=1.0
         num_intervals_total=6
@@ -607,8 +623,9 @@ if __name__ == '__main__':
             print(true_Y_0)
             
     elif execution=='changing_rho':
-        num_rho=10
-        rho_values=np.linspace(1,10,num_rho)
+        num_rho=20
+        #rho_values=np.linspace(2,9,num_rho)
+        rho_values=np.linspace(1,6,num_rho)
         all_Y_0_values=np.zeros((num_rho,num_keep))
         for index in range(num_rho):
             index2=0

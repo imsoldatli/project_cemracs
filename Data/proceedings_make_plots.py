@@ -175,8 +175,8 @@ if __name__ == '__main__':
 
 #### Example 4
 #    ### Example 4, tree with 1
-#    rho_values=np.load('./ex 73/tree_example_73_E_rho_values.npy')
-#    tree_Y_0_values_1=np.load('./ex 73/tree_example_73_E_one_level_changing_rho.npy')
+    rho_values=np.load('./ex 73/tree_example_73_E_rho_values.npy')
+    tree_Y_0_values_1=np.load('./ex 73/tree_example_73_E_one_level_changing_rho.npy')
 #    num_keep=5
 #    for index2 in range(num_keep):
 #        for index in range(len(rho_values)):
