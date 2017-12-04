@@ -614,7 +614,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='ex_72'
+    problem='flocking_solution'
 
 
 
@@ -622,7 +622,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='changing_sigma'
+    execution='flocking_solution'
 
 
     # possible values in order of appearance:
@@ -664,6 +664,8 @@ if __name__ == '__main__':
     global h_bar
     global c_g
     global ftt_h_pad
+    
+    global accuracy_multiplier
 
     #set the above variables depending on 'problem'
     if problem =='jetlag_Pontryagin':
@@ -994,7 +996,7 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=20 #130
+        num_t=130
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
@@ -1007,9 +1009,11 @@ if __name__ == '__main__':
         sigma=1.0
         rho=1.0
 
-        eta=np.zeros((num_t))
-        for k in range(num_t):
-            t=t_grid[k]
+        accuracy_multiplier=1
+        eta=np.zeros((num_t*accuracy_multiplier))
+        for k in range(num_t*accuracy_multiplier):
+            #t=t_grid[k]
+            t=k*delta_t/accuracy_multiplier
             eta[k]=np.sqrt(rho)*(np.exp(2*np.sqrt(rho)*(T-t))-1)/(np.exp(2*np.sqrt(rho)*(T-t))+1)
         
     sqrt_delta_t=np.sqrt(delta_t)
@@ -1371,38 +1375,42 @@ if __name__ == '__main__':
 
 
     elif execution=='flocking_solution':
-        mu=np.zeros((num_t,num_x))
+        #mu=np.zeros((num_t,num_x))
+        mu_end=np.zeros((num_x))
 
-        for t in range(1,num_t):
+        for t in range(1,num_t*accuracy_multiplier):
             mean_mu=0
             variance_mu=0
             for s in range(0,t):
-                variance_mu=variance_mu+delta_t*np.exp(-2*np.sum(eta[s:t])*delta_t)
+                variance_mu=variance_mu+delta_t/accuracy_multiplier*np.exp(-2*np.sum(eta[s:t])*delta_t/accuracy_multiplier)
             variance_mu=sigma**2*variance_mu
-            #print(mean_mu,variance_mu)
+            if t%accuracy_multiplier==0:
+                print(mean_mu,variance_mu)
 
-            mu[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid)
-            mu[t]=mu[t]/np.sum(mu[t])
-        mu[0,int(num_x/2)]=1
+            #mu[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid)
+            #mu[t]=mu[t]/np.sum(mu[t])
+        mu_end=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid)
+        mu_end=mu_end/np.sum(mu_end)
+        #mu[0,int(num_x/2)]=1
 
-        num_bins=5
-        num_x_hist=int(num_x/num_bins)
-        delta_x_hist=np.abs(x_max-x_min)/num_x_hist
-        x_grid_hist=np.linspace(x_min,x_max,num_x_hist)
-        mu_hist=np.zeros((num_t,num_x_hist))
+#        num_bins=5
+#        num_x_hist=int(num_x/num_bins)
+#        delta_x_hist=np.abs(x_max-x_min)/num_x_hist
+#        x_grid_hist=np.linspace(x_min,x_max,num_x_hist)
+#        mu_hist=np.zeros((num_t,num_x_hist))
 
 
-        for t in range(1,num_t):
-            mean_mu=0
-            variance_mu=0
-            for s in range(0,t):
-                variance_mu=variance_mu+delta_t*np.exp(-2*np.sum(eta[s:t])*delta_t)
-            variance_mu=sigma**2*variance_mu
-            #print(mean_mu,variance_mu)
-
-            mu_hist[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid_hist)
-            mu_hist[t]=mu_hist[t]/np.sum(mu_hist[t])
-        mu_hist[0,int(num_x_hist/2)]=1
+#        for t in range(1,num_t):
+#            mean_mu=0
+#            variance_mu=0
+#            for s in range(0,t):
+#                variance_mu=variance_mu+delta_t*np.exp(-2*np.sum(eta[s:t])*delta_t)
+#            variance_mu=sigma**2*variance_mu
+#            #print(mean_mu,variance_mu)
+#
+#            mu_hist[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid_hist)
+#            mu_hist[t]=mu_hist[t]/np.sum(mu_hist[t])
+#        mu_hist[0,int(num_x_hist/2)]=1
                 
         #mu=[mu[10*i] for i in range(40)]
         #mu_hist=[mu_hist[10*i] for i in range(40)]

@@ -64,17 +64,17 @@ if __name__ == '__main__':
 #    plt.ylabel('$Y_0$')
 #    plt.savefig('paper_tree_example_72_changing_sigma.eps')
 
-    ### Example 2, grid with 1, changing sigma (rho=5)
-    sigma_values=np.load('./ex 72/grid_example_72_sigma_values.npy')
-    grid_Y_0_values_one=np.load('./ex 72/grid_example_72_one_level_changing_sigma.npy')
-    num_keep=5
-    num_sigma=20
-    for index in range(num_sigma):
-        for index2 in range(num_keep):
-            grid_1=plt.scatter(sigma_values[index],grid_Y_0_values_one[index][index2],color='black',marker='*')
-    plt.xlabel('$\sigma$')
-    plt.ylabel('$Y_0$')
-    plt.savefig('paper_grid_example_72_changing_sigma.eps')
+#    ### Example 2, grid with 1, changing sigma (rho=5)
+#    sigma_values=np.load('./ex 72/grid_example_72_sigma_values.npy')
+#    grid_Y_0_values_one=np.load('./ex 72/grid_example_72_one_level_changing_sigma.npy')
+#    num_keep=5
+#    num_sigma=20
+#    for index in range(num_sigma):
+#        for index2 in range(num_keep):
+#            grid_1=plt.scatter(sigma_values[index],grid_Y_0_values_one[index][index2],color='black',marker='*')
+#    plt.xlabel('$\sigma$')
+#    plt.ylabel('$Y_0$')
+#    plt.savefig('paper_grid_example_72_changing_sigma.eps')
     
 #    ### Example 2, tree with 1, changing sigma (rho=3.5)
 #    sigma_values=np.load('./ex 72/tree_example_72_sigma_values.npy')
@@ -279,40 +279,40 @@ if __name__ == '__main__':
 #    plt.legend([plot1,plot2,plot3], ['Tree, Pontryagin', 'Tree, Weak', 'True'],bbox_to_anchor=(0, 1), loc=2, borderaxespad=0.)
 #    plt.savefig('paper_flocking_tree_and_true_t20.eps')
             
-#    ### Example 5 (flocking), W2 between true and grid_Pont, and true and grid_weak
-#    path='/home/christy/Documents/CEMRACS/'
-#    num_trials=7
-#    value_num_t=np.linspace(10,130,num_trials)
-#    all_d1=np.zeros(num_trials)
-#    all_d2=np.zeros(num_trials)
-#    d1=0
-#    d2=0
-#
-#    for k in range(num_trials):
-#        print(k)
-#        num_t=value_num_t[k]
-#        num_t=int(num_t)
-#        mu_Pontryagin=np.load(path+'flocking_grid/flocking_mu_Pont_t'+str(num_t)+'.npy')
-#        mu_weak=np.load(path+'flocking_grid/flocking_mu_weak_t'+str(num_t)+'.npy')
-#        mu_true=np.load(path+'flocking_true/mu_true_t'+str(num_t)+'.npy')
-#        mu_Pontryagin_end=mu_Pontryagin[len(mu_Pontryagin)-1]
-#        mu_weak_end=mu_weak[len(mu_weak)-1]
-#        mu_true_end=mu_true[len(mu_true)-1]
-#        num_x=len(mu_Pontryagin[0])
-#        x_min=-3
-#        x_max=3
-#        x_grid=np.linspace(x_min,x_max,num_x)
-#        d1=Wd_exact_R(x_grid,mu_Pontryagin_end,mu_true_end,2)
-#        print(d1)
-#        d1=Wd_approx_R(x_grid,mu_Pontryagin_end,mu_true_end,2)
-#        print(d1)
-#        d2=Wd_exact_R(x_grid,mu_weak_end,mu_true_end,2)
-#        print(d2)
-#        d2=Wd_approx_R(x_grid,mu_weak_end,mu_true_end,2)
-#        print(d2)
-#        all_d1[k]=d1
-#        all_d2[k]=d2
-#
+    ### Example 5 (flocking), W2 between true and grid_Pont, and true and grid_weak
+    path='/home/christy/Documents/CEMRACS/'
+    num_trials=1
+    value_num_t=np.linspace(10,130,num_trials)
+    all_d1=np.zeros(num_trials)
+    all_d2=np.zeros(num_trials)
+    d1=0
+    d2=0
+
+    for k in range(num_trials):
+        print(k)
+        num_t=value_num_t[k]
+        num_t=int(num_t)
+        mu_Pontryagin=np.load(path+'flocking_grid/flocking_mu_Pont_t'+str(num_t)+'.npy')
+        mu_weak=np.load(path+'flocking_grid/flocking_mu_weak_t'+str(num_t)+'.npy')
+        mu_true=np.load(path+'flocking_true/mu_true_t'+str(num_t)+'.npy')
+        mu_Pontryagin_end=mu_Pontryagin[len(mu_Pontryagin)-1]
+        mu_weak_end=mu_weak[len(mu_weak)-1]
+        mu_true_end=mu_true[len(mu_true)-1]
+        num_x=len(mu_Pontryagin[0])
+        x_min=-3
+        x_max=3
+        x_grid=np.linspace(x_min,x_max,num_x)
+        d1=Wd_exact_R(x_grid,mu_Pontryagin_end,mu_true_end,2)
+        print(d1)
+        d1=Wd_approx_R(x_grid,mu_Pontryagin_end,mu_true_end,2)
+        print(d1)
+        d2=Wd_exact_R(x_grid,mu_weak_end,mu_true_end,2)
+        print(d2)
+        d2=Wd_approx_R(x_grid,mu_weak_end,mu_true_end,2)
+        print(d2)
+        all_d1[k]=d1
+        all_d2[k]=d2
+
 #    all_d1_short=np.load('all_d1.npy')
 #    all_d2_short=np.load('all_d2.npy')
 #    all_d1_long=np.load('all_d1_long.npy')
@@ -329,5 +329,5 @@ if __name__ == '__main__':
 #    plt.xlabel('number of time steps')
 #    plt.ylabel('$W_2$ distance from true solution at time $T$')
 #    plt.legend([plot1, plot2], ['Pontryagin', 'Weak',],bbox_to_anchor=(1, 1), loc=1, borderaxespad=0.)
-
+#
 #    plt.savefig('paper_flocking_changing_delta_t.eps')
