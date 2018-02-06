@@ -370,9 +370,9 @@ def backward(mu,u_old,v_old):
     
                     if i==num_t-2:
     
-                        u[i][j] = (g(x_down) + g(x_up))/6.0 + g(x_grid[j])*2/3.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+                        u[i][j] = (g(x_down) + g(x_up))/6.0 + g(x_grid[j])*2.0/3.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
     
-                        v[i][j] = sqrt_delta_t * (g(x_up) - g(x_down))/6.0
+                        v[i][j] = np.sqrt(3)*sqrt_delta_t * (g(x_up) - g(x_down))/6.0
     
                         if v[i,j]<bounds[0,i]:
                             v[i,j]=bounds[0,i]
@@ -384,7 +384,7 @@ def backward(mu,u_old,v_old):
         
                         u[i][j] = (u_down + u_up)/6.0 + u[i+1][j]*2.0/3.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
         
-                        v[i][j] = sqrt_delta_t * (u_up - u_down)/6.0
+                        v[i][j] = np.sqrt(3)/sqrt_delta_t * (u_up - u_down)/6.0
                         if v[i,j]<bounds[0,i]:
                             v[i,j]=bounds[0,i]
                         elif v[i,j]>bounds[1,i]:
@@ -473,7 +473,7 @@ def backward(mu,u_old,v_old):
     
                     u[i][j] = (u_down + u_up)/6.0 + u[i+1][j]*2.0/3.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
     
-                    v[i][j] = sqrt_delta_t * (u_up - u_down)/6.0
+                    v[i][j] = np.sqrt(3)/sqrt_delta_t * (u_up - u_down)/6.0
 
     return [u,v]
 
@@ -639,7 +639,7 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
                 
                 u[i][j] = (u_down + u_up)/6.0 + u[i+1][j]*2.0/3.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
                 
-                v[i][j] = sqrt_delta_t*(u_up-u_down)/6.0   
+                v[i][j] = np.sqrt(3)/sqrt_delta_t*(u_up-u_down)/6.0   
 
     return [u,v]
 
