@@ -290,13 +290,24 @@ def forward(u,v,mu_0):
             Z_mean=np.dot(v[i],mu[i])
 
         for j in range(num_x): #x_j
-            low=x_grid[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t-sigma*sqrt_delta_t
-            low_index=pi(low)
-            mu[i+1,low_index]+=mu[i,j]*0.5
-                        
-            up=x_grid[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t+sigma*sqrt_delta_t
-            up_index=pi(up)
-            mu[i+1,up_index]+=mu[i,j]*0.5
+            if quant_pts==2:
+                low=x_grid[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t-sigma*sqrt_delta_t
+                low_index=pi(low)
+                mu[i+1,low_index]+=mu[i,j]*0.5
+
+                up=x_grid[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t+sigma*sqrt_delta_t
+                up_index=pi(up)
+                mu[i+1,up_index]+=mu[i,j]*0.5
+            else:
+                low=x_grid[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t-sigma*np.sqrt(3)*sqrt_delta_t
+                low_index=pi(low)
+                mu[i+1,low_index]+=mu[i,j]/6.0
+                            
+                mu[i+1,j]+=mu[i,j]*2.0/3.0
+                
+                up=x_grid[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t+sigma*np.sqrt(3)*sqrt_delta_t
+                up_index=pi(up)
+                mu[i+1,up_index]+=mu[i,j]/6.0
     return mu
 
 #use mu, u_old, v_old to go backwards in u and v
@@ -315,36 +326,69 @@ def backward(mu,u_old,v_old):
 
             Z_mean=np.dot(v_old[i],mu[i])
             for j in range(num_x):
-                x_down = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t - sigma * sqrt_delta_t
-
-                x_up = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t + sigma * sqrt_delta_t
-
-                j_down = pi(x_down)
-
-                j_up = pi(x_up)
-
-                if i==num_t-2:
-
-                    u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
-
-                    v[i][j] = 1.0/sqrt_delta_t * (g(x_up) - g(x_down))
-
-                    if v[i,j]<bounds[0,i]:
-                        v[i,j]=bounds[0,i]
-                    elif v[i,j]>bounds[1,i]:
-                        v[i,j]=bounds[1,i]
+                if quant_pts==2:
+                
+                    x_down = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t - sigma * sqrt_delta_t
+    
+                    x_up = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t + sigma * sqrt_delta_t
+    
+                    j_down = pi(x_down)
+    
+                    j_up = pi(x_up)
+    
+                    if i==num_t-2:
+    
+                        u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+    
+                        v[i][j] = 0.5/sqrt_delta_t * (g(x_up) - g(x_down))
+    
+                        if v[i,j]<bounds[0,i]:
+                            v[i,j]=bounds[0,i]
+                        elif v[i,j]>bounds[1,i]:
+                            v[i,j]=bounds[1,i]
+                    else:
+                        u_up = u[i+1][j_up]
+                        u_down = u[i+1][j_down]
+        
+                        u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+        
+                        v[i][j] = 0.5/sqrt_delta_t * (u_up - u_down)
+                        if v[i,j]<bounds[0,i]:
+                            v[i,j]=bounds[0,i]
+                        elif v[i,j]>bounds[1,i]:
+                            v[i,j]=bounds[1,i]
+                
                 else:
-                    u_up = u[i+1][j_up]
-                    u_down = u[i+1][j_down]
+                    
+                    x_down = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t - sigma * np.sqrt(3) * sqrt_delta_t
     
-                    u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+                    x_up = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t + sigma * np.sqrt(3) * sqrt_delta_t
     
-                    v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
-                    if v[i,j]<bounds[0,i]:
-                        v[i,j]=bounds[0,i]
-                    elif v[i,j]>bounds[1,i]:
-                        v[i,j]=bounds[1,i]
-
+                    j_down = pi(x_down)
+    
+                    j_up = pi(x_up)
+    
+                    if i==num_t-2:
+    
+                        u[i][j] = (g(x_down) + g(x_up))/6.0 + g(x_grid[j])*2/3.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+    
+                        v[i][j] = sqrt_delta_t * (g(x_up) - g(x_down))/6.0
+    
+                        if v[i,j]<bounds[0,i]:
+                            v[i,j]=bounds[0,i]
+                        elif v[i,j]>bounds[1,i]:
+                            v[i,j]=bounds[1,i]
+                    else:
+                        u_up = u[i+1][j_up]
+                        u_down = u[i+1][j_down]
+        
+                        u[i][j] = (u_down + u_up)/6.0 + u[i+1][j]*2.0/3.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+        
+                        v[i][j] = sqrt_delta_t * (u_up - u_down)/6.0
+                        if v[i,j]<bounds[0,i]:
+                            v[i,j]=bounds[0,i]
+                        elif v[i,j]>bounds[1,i]:
+                            v[i,j]=bounds[1,i]
     else:
         for i in reversed(range(num_t-1)):
             convolution=0
@@ -365,13 +409,25 @@ def backward(mu,u_old,v_old):
             elif problem=='trader_weak':
                 Z_mean=np.dot(v_old[i],mu[i])
             for j in range(num_x):
-                x_down = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t - sigma * sqrt_delta_t
-
-                x_up = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t + sigma * sqrt_delta_t
-
-                j_down = pi(x_down)
-
-                j_up = pi(x_up)
+                
+                if quant_pts==2:
+                    x_down = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t - sigma * sqrt_delta_t
+    
+                    x_up = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t + sigma * sqrt_delta_t
+    
+                    j_down = pi(x_down)
+    
+                    j_up = pi(x_up)
+                
+                else:
+                    
+                    x_down = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t - sigma * np.sqrt(3) * sqrt_delta_t
+    
+                    x_up = x_grid[j] + b(i, j, mu, u_old, v_old,X_mean,Y_mean,Z_mean,convolution) * delta_t + sigma * np.sqrt(3) * sqrt_delta_t
+    
+                    j_down = pi(x_down)
+    
+                    j_up = pi(x_up)
 
 #                if i==num_t-2:
 #
@@ -406,10 +462,18 @@ def backward(mu,u_old,v_old):
 
                     u_up = u[i+1][j_up]
                     u_down = u[i+1][j_down]
-
-                u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
-
-                v[i][j] = 1.0/sqrt_delta_t * (u_up - u_down)
+                
+                if quant_pts==2:
+                    
+                    u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+    
+                    v[i][j] = 0.5/sqrt_delta_t * (u_up - u_down)
+                    
+                else:
+    
+                    u[i][j] = (u_down + u_up)/6.0 + u[i+1][j]*2.0/3.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+    
+                    v[i][j] = sqrt_delta_t * (u_up - u_down)/6.0
 
     return [u,v]
 
@@ -473,13 +537,26 @@ def forward_lv(u,v,x_grid_lv,mu_0):
             Z_mean=np.dot(v[i],mu[i])
         for j in range(num_x_lv): #x_j
             
-            low=x_grid_lv[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t-sigma*sqrt_delta_t
-            low_index=pi_lv(low,x_grid_lv)
-            mu[i+1,low_index]+=mu[i,j]*0.5
-                        
-            up=x_grid_lv[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t+sigma*sqrt_delta_t
-            up_index=pi_lv(up,x_grid_lv)
-            mu[i+1,up_index]+=mu[i,j]*0.5
+            if quant_pts==2:
+                low=x_grid_lv[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t-sigma*sqrt_delta_t
+                low_index=pi_lv(low,x_grid_lv)
+                mu[i+1,low_index]+=mu[i,j]*0.5
+                            
+                up=x_grid_lv[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t+sigma*sqrt_delta_t
+                up_index=pi_lv(up,x_grid_lv)
+                mu[i+1,up_index]+=mu[i,j]*0.5
+                
+            else:
+                low=x_grid_lv[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t-sigma*np.sqrt(3)*sqrt_delta_t
+                low_index=pi_lv(low,x_grid_lv)
+                mu[i+1,low_index]+=mu[i,j]/6.0
+                            
+                mu[i+1,j]+=mu[i,j]*2.0/3.0
+                
+                up=x_grid_lv[j]+b(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution)*delta_t+sigma*np.sqrt(3)*sqrt_delta_t
+                up_index=pi_lv(up,x_grid_lv)
+                mu[i+1,up_index]+=mu[i,j]/6.0
+                
     return mu
 
 
@@ -511,12 +588,20 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
             Z_mean=np.dot(v_old[i],mu[i])
         for j in range(num_x_lv):
             
-            x_down=x_grid_lv[j]+b(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)*delta_t-sigma*sqrt_delta_t
-            j_down=pi_lv(x_down,x_grid_lv)
-            
-            x_up=x_grid_lv[j]+b(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)*delta_t+sigma*sqrt_delta_t
-            j_up=pi_lv(x_up,x_grid_lv)
+            if quant_pts==2:
+                x_down=x_grid_lv[j]+b(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)*delta_t-sigma*sqrt_delta_t
+                j_down=pi_lv(x_down,x_grid_lv)
+                
+                x_up=x_grid_lv[j]+b(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)*delta_t+sigma*sqrt_delta_t
+                j_up=pi_lv(x_up,x_grid_lv)
 
+            else:
+                x_down=x_grid_lv[j]+b(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)*delta_t-sigma*np.sqrt(3)*sqrt_delta_t
+                j_down=pi_lv(x_down,x_grid_lv)
+                
+                x_up=x_grid_lv[j]+b(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)*delta_t+sigma*np.sqrt(3)*sqrt_delta_t
+                j_up=pi_lv(x_up,x_grid_lv)
+    
             if linear_int:
                 if x_down>x_grid_lv[j_down]:
                     if j_down<num_x_lv-1:
@@ -543,10 +628,18 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
             
                 u_up = u[i+1][j_up]
                 u_down = u[i+1][j_down]
-            
-            u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
-            
-            v[i][j] = 1.0/sqrt_delta_t*(u_up-u_down)
+                
+            if quant_pts==2:
+                
+                u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+                
+                v[i][j] = 0.5/sqrt_delta_t*(u_up-u_down)
+
+            else:
+                
+                u[i][j] = (u_down + u_up)/6.0 + u[i+1][j]*2.0/3.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
+                
+                v[i][j] = sqrt_delta_t*(u_up-u_down)/6.0   
 
     return [u,v]
 
@@ -632,6 +725,9 @@ if __name__ == '__main__':
     global linear_int
     linear_int=False
 
+    global quant_pts
+    quant_pts=2
+    
     global b
     global f
     global g
