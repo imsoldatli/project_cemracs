@@ -373,10 +373,10 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     start_time=time.time()
-    problem ='flocking'
+    problem ='ex_1'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
-    execution='changing_rho'
+    execution='ordinary'
     # possible values in order of appearance:
     # ordinary, changing_rho, changing_sigma, continuation_rho, continuation_sigma
     global b

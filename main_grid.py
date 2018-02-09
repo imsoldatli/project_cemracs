@@ -372,7 +372,7 @@ def backward(mu,u_old,v_old):
     
                         u[i][j] = (g(x_down) + g(x_up))/6.0 + g(x_grid[j])*2.0/3.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
     
-                        v[i][j] = np.sqrt(3)*sqrt_delta_t * (g(x_up) - g(x_down))/6.0
+                        v[i][j] = np.sqrt(3)/sqrt_delta_t * (g(x_up) - g(x_down))/6.0
     
                         if v[i,j]<bounds[0,i]:
                             v[i,j]=bounds[0,i]
@@ -707,7 +707,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='flocking_solution'
+    problem='ex_1'
 
 
 
@@ -715,7 +715,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='flocking_solution'
+    execution='changing_delta_t'
 
 
     # possible values in order of appearance:
@@ -1543,7 +1543,7 @@ if __name__ == '__main__':
 #        value_num_t=np.linspace(110,110,1)
 #        value_num_t=np.linspace(90,90,1)
 #        value_num_t=np.linspace(70,70,1)
-        value_num_t=np.linspace(10,10,1)
+        value_num_t=np.linspace(4,20,9)
         all_Y_0_values=np.zeros((len(value_num_t),num_keep))
         all_Z_0_values=np.zeros((len(value_num_t),num_keep))
         for n in range(len(value_num_t)):
@@ -1653,8 +1653,9 @@ if __name__ == '__main__':
         elif problem=='flocking_weak':
             np.save('./Data/flocking_Z_0_weak.npy',all_Z_0_values)
 
-        true_Y_0=0
+        
         if problem=='ex_1':
+            true_Y_0=2.30605907725
             log_errors=np.zeros(len(value_num_t))
             for n in range(len(value_num_t)):
                 log_errors[n]=math.log(abs(all_Y_0_values[n][num_keep-1]-true_Y_0))
