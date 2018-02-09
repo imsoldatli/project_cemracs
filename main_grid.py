@@ -1661,7 +1661,7 @@ if __name__ == '__main__':
                 log_errors[n]=math.log(abs(all_Y_0_values[n][num_keep-1]-true_Y_0))
                 
             np.save('./Data/ex_1_log_errors_2.npy',log_errors)
-            log_num_t=math.log(value_num_t)
+            log_num_t=np.log(value_num_t)
             np.save('./Data/ex_1_log_num_t_2.npy',log_num_t)
 
             # if problem=='trader_Pontryagin':
