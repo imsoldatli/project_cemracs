@@ -444,6 +444,7 @@ def backward(mu,u_old,v_old):
                             u_down=u[i+1][j_down]
                     else:
                         if j_down>0:
+                            #u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
                             u_down= lin_int(x_grid[j_down],x_grid[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
                         else:
                             u_down=u[i+1][j_down]
@@ -455,7 +456,8 @@ def backward(mu,u_old,v_old):
                             u_up=u[i+1][j_up]
                     else:
                         if j_up>0:
-                            u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+                            #u_up= lin_int(x_grid[j_up],x_grid[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+                            u_up= lin_int(x_grid[j_up-1],x_grid[j_up],u[i+1][j_up-1],u[i+1][j_up],x_up)
                         else:
                             u_up=u[i+1][j_up]
                 else:
@@ -610,7 +612,8 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
                         u_down=u[i+1][j_down]
                 else:
                     if j_down>0:
-                        u_down= lin_int(x_grid_lv[j_down],x_grid_lv[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
+                        #u_down= lin_int(x_grid_lv[j_down],x_grid_lv[j_down-1],u[i+1][j_down],u[i+1][j_down-1],x_down)
+                        u_down= lin_int(x_grid_lv[j_down-1],x_grid_lv[j_down],u[i+1][j_down-1],u[i+1][j_down],x_down)
                     else:
                         u_down=u[i+1][j_down]
                 
@@ -621,7 +624,8 @@ def backward_lv(mu,u_old,v_old,x_grid_lv,Y_terminal):
                         u_up=u[i+1][j_up]
                 else:
                     if j_up>0:
-                        u_up= lin_int(x_grid_lv[j_up],x_grid_lv[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+                        #u_up= lin_int(x_grid_lv[j_up],x_grid_lv[j_up-1],u[i+1][j_up],u[i+1][j_up-1],x_up)
+                        u_up= lin_int(x_grid_lv[j_up-1],x_grid_lv[j_up],u[i+1][j_up-1],u[i+1][j_up],x_up)
                     else:
                         u_up=u[i+1][j_up]
             else:
@@ -723,7 +727,7 @@ if __name__ == '__main__':
     #true_start, changing_delta_t, continuation_in_time,
     
     global linear_int
-    linear_int=False
+    linear_int=True
 
     global quant_pts
     quant_pts=2
@@ -877,12 +881,12 @@ if __name__ == '__main__':
         J=25
         num_keep=5
         T=1
-        num_t=30
+        num_t=12 #30
         delta_t=T/(num_t-1)
         t_grid=np.linspace(0,T,num_t)
         delta_x=delta_t**(2)
-        x_min=-3
-        x_max=7
+        x_min=-1 #-3
+        x_max=5 #7
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
         sigma=1
@@ -1570,10 +1574,14 @@ if __name__ == '__main__':
                 bounds=np.load('./Data/trader_bounds'+str(num_t)+'.npy')
                 
             delta_x=delta_t**(2)
+            #print('here')
+            #print(delta_x)
             sqrt_delta_t=math.sqrt(delta_t)
 
             num_x=int((x_max-x_min)/delta_x+1)
             x_grid=np.linspace(x_min,x_max,num_x)
+            delta_x=x_grid[1]-x_grid[0]
+            #print(delta_x)
 
             mu_0=np.zeros((num_x))
             if periodic_2_pi:
