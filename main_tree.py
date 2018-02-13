@@ -149,7 +149,7 @@ def f_trader_weak(i,j,X,Y,Z,X_initial_probs,X_mean,Y_mean,Z_mean):
 #        index=int(math.floor(k/num_per_initial))
 #        Z_mean+=Z[i][k]*X_initial_probs[index]/num_per_initial
     #Z_mean=Z_mean_all[i]
-    return 0.5*c_x*X[i][j]**2+X[i][j]*h_bar*rho*Z_mean/sigma-rho*0.5*Z[i][j]**2/sigma**2
+    return 0.5*c_x*X[i][j]**2+X[i][j]*h_bar*rho*Z_mean/sigma+rho*0.5*Z[i][j]**2/sigma**2
 
 def g_trader_weak(index,xi_vals,xi_probs):
     x=xi_vals[index]

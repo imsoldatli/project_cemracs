@@ -279,39 +279,39 @@ if __name__ == '__main__':
 #    plt.legend([plot1,plot2,plot3], ['Tree, Pontryagin', 'Tree, Weak', 'True'],bbox_to_anchor=(0, 1), loc=2, borderaxespad=0.)
 #    plt.savefig('paper_flocking_tree_and_true_t20.eps')
             
-    ### Example 5 (flocking), W2 between true and grid_Pont, and true and grid_weak
-    path='/home/christy/Documents/CEMRACS/'
-    num_trials=1
-    value_num_t=np.linspace(10,130,num_trials)
-    all_d1=np.zeros(num_trials)
-    all_d2=np.zeros(num_trials)
-    d1=0
-    d2=0
-
-    for k in range(num_trials):
-        print(k)
-        num_t=value_num_t[k]
-        num_t=int(num_t)
-        mu_Pontryagin=np.load(path+'flocking_grid/flocking_mu_Pont_t'+str(num_t)+'.npy')
-        mu_weak=np.load(path+'flocking_grid/flocking_mu_weak_t'+str(num_t)+'.npy')
-        mu_true=np.load(path+'flocking_true/mu_true_t'+str(num_t)+'.npy')
-        mu_Pontryagin_end=mu_Pontryagin[len(mu_Pontryagin)-1]
-        mu_weak_end=mu_weak[len(mu_weak)-1]
-        mu_true_end=mu_true[len(mu_true)-1]
-        num_x=len(mu_Pontryagin[0])
-        x_min=-3
-        x_max=3
-        x_grid=np.linspace(x_min,x_max,num_x)
-        d1=Wd_exact_R(x_grid,mu_Pontryagin_end,mu_true_end,2)
-        print(d1)
-        d1=Wd_approx_R(x_grid,mu_Pontryagin_end,mu_true_end,2)
-        print(d1)
-        d2=Wd_exact_R(x_grid,mu_weak_end,mu_true_end,2)
-        print(d2)
-        d2=Wd_approx_R(x_grid,mu_weak_end,mu_true_end,2)
-        print(d2)
-        all_d1[k]=d1
-        all_d2[k]=d2
+#    ### Example 5 (flocking), W2 between true and grid_Pont, and true and grid_weak
+#    path='/home/christy/Documents/CEMRACS/'
+#    num_trials=1
+#    value_num_t=np.linspace(10,130,num_trials)
+#    all_d1=np.zeros(num_trials)
+#    all_d2=np.zeros(num_trials)
+#    d1=0
+#    d2=0
+#
+#    for k in range(num_trials):
+#        print(k)
+#        num_t=value_num_t[k]
+#        num_t=int(num_t)
+#        mu_Pontryagin=np.load(path+'flocking_grid/flocking_mu_Pont_t'+str(num_t)+'.npy')
+#        mu_weak=np.load(path+'flocking_grid/flocking_mu_weak_t'+str(num_t)+'.npy')
+#        mu_true=np.load(path+'flocking_true/mu_true_t'+str(num_t)+'.npy')
+#        mu_Pontryagin_end=mu_Pontryagin[len(mu_Pontryagin)-1]
+#        mu_weak_end=mu_weak[len(mu_weak)-1]
+#        mu_true_end=mu_true[len(mu_true)-1]
+#        num_x=len(mu_Pontryagin[0])
+#        x_min=-3
+#        x_max=3
+#        x_grid=np.linspace(x_min,x_max,num_x)
+#        d1=Wd_exact_R(x_grid,mu_Pontryagin_end,mu_true_end,2)
+#        print(d1)
+#        d1=Wd_approx_R(x_grid,mu_Pontryagin_end,mu_true_end,2)
+#        print(d1)
+#        d2=Wd_exact_R(x_grid,mu_weak_end,mu_true_end,2)
+#        print(d2)
+#        d2=Wd_approx_R(x_grid,mu_weak_end,mu_true_end,2)
+#        print(d2)
+#        all_d1[k]=d1
+#        all_d2[k]=d2
 
 #    all_d1_short=np.load('all_d1.npy')
 #    all_d2_short=np.load('all_d2.npy')
@@ -331,3 +331,45 @@ if __name__ == '__main__':
 #    plt.legend([plot1, plot2], ['Pontryagin', 'Weak',],bbox_to_anchor=(1, 1), loc=1, borderaxespad=0.)
 #
 #    plt.savefig('paper_flocking_changing_delta_t.eps')
+
+
+
+    ### Example 6 (trader), W2 between true and grid_Pont, and true and grid_weak, and true and grid_weak_truncated
+    path='/home/christy/Documents/CEMRACS/project_cemracs/'
+    num_trials=1
+    value_num_t=np.linspace(10,130,num_trials)
+    all_d1=np.zeros(num_trials)
+    all_d2=np.zeros(num_trials)
+    d1=0
+    d2=0
+
+    for k in range(num_trials):
+        print(k)
+        num_t=value_num_t[k]
+        num_t=int(num_t)
+        mu_Pontryagin=np.load(path+'Data/feb_trader_mu_Pont_t'+str(num_t)+'.npy')
+        mu_weak=np.load(path+'Data/feb_trader_mu_weak_t'+str(num_t)+'.npy')
+        mu_weak_trunc=np.load(path+'Data/feb_trader_mu_weak_trunc_t'+str(num_t)+'.npy')
+        mu_true=np.load(path+'Data/feb_trader_mu_true_t'+str(num_t)+'.npy')
+        mu_Pontryagin_end=mu_Pontryagin[len(mu_Pontryagin)-1]
+        mu_weak_end=mu_weak[len(mu_weak)-1]
+        mu_weak_trunc_end=mu_weak_trunc[len(mu_weak_trunc)-1]
+        mu_true_end=mu_true[len(mu_true)-1]
+        num_x=len(mu_Pontryagin[0])
+        x_min=-2
+        x_max=4
+        x_grid=np.linspace(x_min,x_max,num_x)
+        d1=Wd_exact_R(x_grid,mu_Pontryagin_end,mu_true_end,2)
+        print(d1)
+        d1=Wd_approx_R(x_grid,mu_Pontryagin_end,mu_true_end,2)
+        print(d1)
+        d2=Wd_exact_R(x_grid,mu_weak_end,mu_true_end,2)
+        print(d2)
+        d2=Wd_approx_R(x_grid,mu_weak_end,mu_true_end,2)
+        print(d2)
+        all_d1[k]=d1
+        all_d2[k]=d2
+        d3=Wd_exact_R(x_grid,mu_weak_trunc_end,mu_true_end,2)
+        print(d3)
+        d3=Wd_approx_R(x_grid,mu_weak_trunc_end,mu_true_end,2)
+        print(d3)

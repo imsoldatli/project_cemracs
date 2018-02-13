@@ -164,12 +164,11 @@ def f_trader_weak_trunc(i,j,mu,u,v,X_mean,Y_mean,Z_mean,convolution):
     #Z_mean=Z_mean_all[i]
     value=0
     if v[i,j]<bounds[0,i]:
-        value=0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*bounds[0,i]**2/sigma**2
+        value=0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma+rho*0.5*bounds[0,i]**2/sigma**2
     elif v[i,j] > bounds[1,i]:
-        value= 0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*bounds[1,i]**2/sigma**2
-
+        value=0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma+rho*0.5*bounds[1,i]**2/sigma**2
     else:
-        value=0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma-rho*0.5*v[i][j]**2/sigma**2
+        value=0.5*c_x*x_grid[j]**2+x_grid[j]*h_bar*rho*Z_mean/sigma+rho*0.5*v[i][j]**2/sigma**2
     return(value)
 
 def g_trader_weak_trunc(x):
@@ -355,7 +354,7 @@ def backward(mu,u_old,v_old):
                     if i==num_t-2:
     
                         u[i][j] = (g(x_down) + g(x_up))/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
-    
+    #ToDo
                         v[i][j] = 0.5/sqrt_delta_t * (g(x_up) - g(x_down))
     
                         if v[i,j]<bounds[0,i]:
@@ -367,7 +366,7 @@ def backward(mu,u_old,v_old):
                         u_down = u[i+1][j_down]
         
                         u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
-        
+        #ToDo
                         v[i][j] = 0.5/sqrt_delta_t * (u_up - u_down)
                         if v[i,j]<bounds[0,i]:
                             v[i,j]=bounds[0,i]
@@ -510,7 +509,7 @@ def backward(mu,u_old,v_old):
                 if quant_pts==2:
                     
                     u[i][j] = (u_down + u_up)/2.0 + delta_t*f(i,j,mu,u_old,v_old,X_mean,Y_mean,Z_mean,convolution)
-    
+    #ToDo
                     v[i][j] = 0.5/sqrt_delta_t * (u_up - u_down)
                     
                 elif quant_pts==3:
@@ -760,7 +759,7 @@ if __name__ == '__main__':
 
 
     global problem
-    problem='ex_1'
+    problem='trader_solution' #'trader_weak_trunc'
 
 
 
@@ -768,7 +767,7 @@ if __name__ == '__main__':
     #trader(_Pontryagin,_weak,_weak_trunc,_solution), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
 
     global execution
-    execution='changing_delta_t'
+    execution='trader_solution' #'changing_delta_t'
 
 
     # possible values in order of appearance:
@@ -776,7 +775,7 @@ if __name__ == '__main__':
     #true_start, changing_delta_t, continuation_in_time,
     
     global linear_int
-    linear_int=True
+    linear_int=False
 
     global quant_pts
     quant_pts=2
@@ -1054,7 +1053,7 @@ if __name__ == '__main__':
         num_x=int((x_max-x_min)/delta_x+1)
         x_grid=np.linspace(x_min,x_max,num_x)
         global bounds
-        bounds=np.load('./Data/trader/trunc_true/value_y_true_to_trunc_z_weak.npy')
+        #bounds=np.load('./Data/trader/trunc_true/value_y_true_to_trunc_z_weak.npy')
     # Variable trader
 
 
@@ -1422,7 +1421,7 @@ if __name__ == '__main__':
             print(all_Y_0_values[index])
 
     elif execution=='trader_solution':
-        value_num_t=np.linspace(10,130,7)
+        value_num_t=np.linspace(10,10,1)
         #value_num_t=np.linspace(130,130,1)
         #comment until ##end##  if you use only one value for num_t
         for h in range(len(value_num_t)):
@@ -1472,19 +1471,19 @@ if __name__ == '__main__':
                 mu[t]=scipy.stats.norm(mean_mu, variance_mu).pdf(x_grid)
                 mu[t]=mu[t]/np.sum(mu[t])
             mu[0,int(num_x/2)]=1
-            np.save('./Data/trader/trunc_true/trader_mu_true_t'+str(num_t)+'.npy',mu)
+            np.save('./Data/feb_trader_mu_true_t'+str(num_t)+'.npy',mu)
 
             true_Y=np.zeros((num_t,num_x))
             for t in range(num_t):
                 mean_t=np.dot(x_grid,mu[t])
                 true_Y[t]=eta[0,t]*x_grid+(eta_bar[0][t]-eta[0][t])*mean_t
-            np.save('./Data/trader/trunc_true/trader_Y_solution_t'+str(num_t)+'.npy',true_Y)
+            #np.save('./Data/trader/trunc_true/trader_Y_solution_t'+str(num_t)+'.npy',true_Y)
 
             bounds=np.zeros((2,num_t))
             for t in range(num_t):
                 bounds[0,t]=sigma*min(true_Y[t])
                 bounds[1,t]=sigma*max(true_Y[t])
-            np.save('./Data/trader/trunc_true/bounds_t'+str(num_t)+'.npy',bounds)
+            np.save('./Data/feb_trader_true_bounds_t'+str(num_t)+'.npy',bounds)
 
             #np.save('./Data/trader/y*sigma_trader_Pont_t20',np.multiply(sigma,u))
 
@@ -1596,7 +1595,7 @@ if __name__ == '__main__':
 #        value_num_t=np.linspace(110,110,1)
 #        value_num_t=np.linspace(90,90,1)
 #        value_num_t=np.linspace(70,70,1)
-        value_num_t=np.linspace(4,20,9)
+        value_num_t=np.linspace(10,10,1)
         all_Y_0_values=np.zeros((len(value_num_t),num_keep))
         all_Z_0_values=np.zeros((len(value_num_t),num_keep))
         for n in range(len(value_num_t)):
@@ -1620,7 +1619,8 @@ if __name__ == '__main__':
                 x_min=-3
                 x_max=7
             if problem=='trader_weak_trunc':
-                bounds=np.load('./Data/trader_bounds'+str(num_t)+'.npy')
+                bounds=np.load('./Data/feb_trader_bounds_t'+str(num_t)+'.npy')
+                #bounds=np.load('./Data/feb_trader_true_bounds_t'+str(num_t)+'.npy')
                 
             delta_x=delta_t**(2)
             #print('here')
@@ -1670,17 +1670,17 @@ if __name__ == '__main__':
 
 
             if problem=='trader_Pontryagin':
-                np.save('./Data/trader_mu_Pont_t'+str(num_t)+'.npy',mu)
-                np.save('./Data/trader_Y_0_Pont_t'+str(num_t)+'.npy',all_Y_0_values[n])
-                np.save('./Data/trader_Y_Pont_t'+str(num_t)+'.npy',u)
+                np.save('./Data/feb_trader_mu_Pont_t'+str(num_t)+'.npy',mu)
+                #np.save('./Data/feb_trader_Y_0_Pont_t'+str(num_t)+'.npy',all_Y_0_values[n])
+                #np.save('./Data/feb_trader_Y_Pont_t'+str(num_t)+'.npy',u)
             elif problem=='trader_weak':
-                np.save('./Data/trader_mu_weak_t'+str(num_t)+'.npy',mu)
-                np.save('./Data/trader_Z_0_weak_t'+str(num_t)+'.npy',all_Z_0_values[n])
-                np.save('./Data/trader_Z_weak_t'+str(num_t)+'.npy',v)
+                np.save('./Data/feb_trader_mu_weak_t'+str(num_t)+'.npy',mu)
+                #np.save('./Data/feb_trader_Z_0_weak_t'+str(num_t)+'.npy',all_Z_0_values[n])
+                #np.save('./Data/feb_trader_Z_weak_t'+str(num_t)+'.npy',v)
             elif problem=='trader_weak_trunc':
-                np.save('./Data/trader_mu_weak_trunc_t'+str(num_t)+'.npy',mu)
-                np.save('./Data/trader_Z_0_weak_trunc_t'+str(num_t)+'.npy',all_Z_0_values[n])
-                np.save('./Data/trader_Z_weak_trunc_t'+str(num_t)+'.npy',v)
+                np.save('./Data/feb_trader_mu_weak_trunc_t'+str(num_t)+'.npy',mu)
+                #np.save('./Data/feb_trader_Z_0_weak_trunc_t'+str(num_t)+'.npy',all_Z_0_values[n])
+                #np.save('./Data/feb_trader_Z_weak_trunc_t'+str(num_t)+'.npy',v)
             elif problem=='flocking_Pontryagin':
                 np.save('./Data/flocking_mu_Pont_t'+str(num_t)+'.npy',mu)
                 np.save('./Data/flocking_Y_0_Pont_t'+str(num_t)+'.npy',all_Y_0_values[n])
@@ -1695,20 +1695,20 @@ if __name__ == '__main__':
                 for t in range(num_t):
                     bounds[0,t]=sigma*min(u[t])
                     bounds[1,t]=sigma*max(u[t])
-                np.save('./Data/bounds_t'+str(num_t)+'.npy',bounds)
+                np.save('./Data/feb_trader_bounds_t'+str(num_t)+'.npy',bounds)
                 
                 
                 
-        if problem=='trader_Pontryagin':
-            np.save('./Data/trader_Y_0_Pont.npy',all_Y_0_values)
-        elif problem=='trader_weak':
-            np.save('./Data/trader_Z_0_weak.npy',all_Z_0_values)
-        elif problem=='trader_weak_trunc':
-            np.save('./Data/trader_Z_0_weak_trunc.npy',all_Z_0_values)
-        elif problem=='flocking_Pontryagin':
-            np.save('./Data/flocking_Y_0_Pont.npy',all_Y_0_values)
-        elif problem=='flocking_weak':
-            np.save('./Data/flocking_Z_0_weak.npy',all_Z_0_values)
+#        if problem=='trader_Pontryagin':
+#            np.save('./Data/trader_Y_0_Pont.npy',all_Y_0_values)
+#        elif problem=='trader_weak':
+#            np.save('./Data/trader_Z_0_weak.npy',all_Z_0_values)
+#        elif problem=='trader_weak_trunc':
+#            np.save('./Data/trader_Z_0_weak_trunc.npy',all_Z_0_values)
+#        elif problem=='flocking_Pontryagin':
+#            np.save('./Data/flocking_Y_0_Pont.npy',all_Y_0_values)
+#        elif problem=='flocking_weak':
+#            np.save('./Data/flocking_Z_0_weak.npy',all_Z_0_values)
 
         
         if problem=='ex_1':
