@@ -373,7 +373,7 @@ def solver(level,xi_vals,xi_probs):
 
 if __name__ == '__main__':
     start_time=time.time()
-    problem ='ex_1'
+    problem ='trader_weak'
     #possible values in order of appearance: jetlag(_Pontryagin,_weak),
     #trader(_Pontryagin,_weak), ex_1, ex_72, ex_73, flocking(_Pontryagin,_weak)
     execution='ordinary'
@@ -536,9 +536,9 @@ if __name__ == '__main__':
         x_0_probs=[1.0]
     elif problem=='trader_weak':
         sigma=0.7
-        rho=0.03
-        c_x=1
-        h_bar=10
+        rho=0.3
+        c_x=2
+        h_bar=2
         c_g=0.3
         b=b_trader_weak
         f=f_trader_weak
