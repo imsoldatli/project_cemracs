@@ -1,0 +1,5 @@
+<stdin>:1055: SyntaxWarning: name 'bounds' is assigned to before global declaration
+('num_t=', 130)
+[ 1.68531835  1.68542678  1.68531835  1.68542678  1.68531835]
+[ 1.61238462  1.61309822  1.61238462  1.61309822  1.61238462]
+('Time elapsted:', 12792.754273176193)

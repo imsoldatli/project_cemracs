@@ -1,0 +1,10 @@
+<stdin>:1007: SyntaxWarning: name 'bounds' is assigned to before global declaration
+('num_t=', 70)
+[ 0.21490381  0.21489942  0.21490381  0.21489942  0.21490381]
+[ -4.18356259e-07  -1.71377734e-07  -4.18356306e-07  -1.71377719e-07
+  -4.18356304e-07]
+Traceback (most recent call last):
+  File "<stdin>", line 1663, in <module>
+  File "/usr/lib64/python2.7/site-packages/numpy/lib/npyio.py", line 429, in save
+    fid = open(file, "wb")
+IOError: [Errno 2] No such file or directory: './Data/flocking_Z_0_weak.npy'
